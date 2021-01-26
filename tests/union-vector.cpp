@@ -46,7 +46,7 @@ int main()
                 printf("    BYE\n");
                 break;
             default:
-                printf("    Unsupported: \n");
+                printf("    Unsupported type\n");
         }
         printf("  }\n");
     }
