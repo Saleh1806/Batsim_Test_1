@@ -1,0 +1,21 @@
+rule call_flatc_cpp
+  command = flatc --cpp -o gen-cpp $in
+
+rule call_flatc_go
+  command = flatc --go -o gen-go $in
+
+rule call_flatc_python
+  command = flatc --python -o gen-py $in
+
+rule call_flatc_rust
+  command = flatc --rust -o gen-rust $in
+
+rule compile_cpp_example
+  command = g++ -o $out -Igen-cpp $in
+
+build gen-cpp/schema1_generated.h : call_flatc_cpp schema1.fbs
+build gen-rust/schema1_generated.rs : call_flatc_rust schema1.fbs
+build gen-py/Batsim/__init__.py gen-py/Batsim/Protocol/ByeEvent.py gen-py/Batsim/Protocol/Event.py gen-py/Batsim/Protocol/EventUnion.py gen-py/Batsim/Protocol/HelloEvent.py gen-py/Batsim/Protocol/__init__.py gen-py/Batsim/Protocol/Message.py : call_flatc_python schema1.fbs
+build gen-go/Batsim/Protocol/ByeEvent.go gen-go/Batsim/Protocol/Event.go gen-go/Batsim/Protocol/EventUnion.go gen-go/Batsim/Protocol/HelloEvent.go gen-go/Batsim/Protocol/Message.go : call_flatc_go schema1.fbs
+
+build tests/union-vector : compile_cpp_example tests/union-vector.cpp

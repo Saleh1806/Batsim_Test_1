@@ -1,0 +1,3 @@
+.ninja_*
+gen-*
+tests/union-vector

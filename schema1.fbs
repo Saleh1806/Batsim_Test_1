@@ -1,0 +1,20 @@
+namespace Batsim.Protocol;
+
+table HelloEvent { greeting: string; }
+table ByeEvent {}
+
+union EventUnion {
+  hello: HelloEvent,
+  bye: ByeEvent
+}
+
+/// Event doc
+table Event {
+  timestamp: float64;
+  event: EventUnion;
+}
+
+table Message {
+  now: float64;
+  events: [Event];
+}
