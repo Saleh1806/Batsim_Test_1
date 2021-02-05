@@ -23,6 +23,15 @@ let
       '';
     };
 
+    go-shell = pkgs.mkShell rec {
+      buildInputs = [
+        pkgs.go
+      ];
+      shellHook = ''
+        export GOPATH=$(realpath ./tests/go)
+      '';
+    };
+
     flatbuffers_python = pkgs.python3Packages.buildPythonPackage {
       name = "flatbuffers-1.12";
       doCheck = false;
