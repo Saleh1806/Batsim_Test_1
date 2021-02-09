@@ -35,8 +35,17 @@ let
     rust-shell = pkgs.mkShell rec {
       buildInputs = [
         pkgs.cargo
+        flatbuffers_for_rust
       ];
     };
+
+    flatbuffers_for_rust = pkgs.flatbuffers.overrideAttrs(attrs: {
+      src = pkgs.fetchgit {
+        rev = "8008dde117ef165ef115564d58cb95a7d11ac918";
+        url = "https://github.com/google/flatbuffers.git";
+        sha256 = "sha256:1dbmidqhsrydfs3xjpv36h379dwi0wwp312mykfcffpp01qrxj8j";
+      };
+    });
 
     flatbuffers_python = pkgs.python3Packages.buildPythonPackage {
       name = "flatbuffers-1.12";

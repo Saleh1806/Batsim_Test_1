@@ -45,27 +45,25 @@ fn main() {
     println!("Serialized a Message of size={}", buf.len());
 
     // Deserialize the buffer
-    unsafe {
-        let msg_copy = flatbuffers::root_unchecked::<Message>(buf);
+    let msg_copy = flatbuffers::root::<Message>(buf).unwrap();
 
-        // Print its content
-        println!("  now={}", msg_copy.now());
+    // Print its content
+    println!("  now={}", msg_copy.now());
 
-        for event in msg_copy.events().unwrap().iter() {
-            match event.event_type() {
-                EventUnion::hello => {
-                    println!("  HELLO {{");
-                    println!("    timestamp={}", event.timestamp());
-                    println!("    greeting={}", event.event_as_hello().unwrap().greeting().unwrap());
-                    println!("  }}")
-                },
-                EventUnion::bye => {
-                    println!("  BYE {{");
-                    println!("    timestamp={}", event.timestamp());
-                    println!("  }}");
-                },
-                _ => println!("  unhandled message type"),
-            }
+    for event in msg_copy.events().unwrap().iter() {
+        match event.event_type() {
+            EventUnion::hello => {
+                println!("  HELLO {{");
+                println!("    timestamp={}", event.timestamp());
+                println!("    greeting={}", event.event_as_hello().unwrap().greeting().unwrap());
+                println!("  }}")
+            },
+            EventUnion::bye => {
+                println!("  BYE {{");
+                println!("    timestamp={}", event.timestamp());
+                println!("  }}");
+            },
+            _ => println!("  unhandled message type"),
         }
     }
 }
