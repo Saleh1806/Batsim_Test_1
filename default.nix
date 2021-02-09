@@ -32,6 +32,12 @@ let
       '';
     };
 
+    rust-shell = pkgs.mkShell rec {
+      buildInputs = [
+        pkgs.cargo
+      ];
+    };
+
     flatbuffers_python = pkgs.python3Packages.buildPythonPackage {
       name = "flatbuffers-1.12";
       doCheck = false;
