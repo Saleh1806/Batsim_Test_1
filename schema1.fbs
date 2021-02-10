@@ -18,3 +18,5 @@ table Message {
   now: float64;
   events: [Event];
 }
+
+root_type Message;

@@ -11,7 +11,7 @@ rule call_flatc_rust
   command = flatc --rust -o gen-rust $in
 
 rule compile_cpp_example
-  command = g++ -o $out -Igen-cpp $in
+  command = g++ -g -std=c++11 -Wall -Wextra -L/nix/store/s7qbmq1sllgw0nbgbjqsjirhyxjra15v-flatbuffers-1.12.0/lib -lflatbuffers -o $out -Igen-cpp $in
 
 build gen-cpp/schema1_generated.h : call_flatc_cpp schema1.fbs
 build gen-rust/schema1_generated.rs : call_flatc_rust schema1.fbs
