@@ -7,9 +7,10 @@ let
 
     shell = pkgs.mkShell rec {
       buildInputs = [
-        pkgs.flatbuffers
+        flatbuffers_for_cpp_json
         pkgs.ninja
       ];
+      FLATBUFFERS_LIB_PATH="${flatbuffers_for_cpp_json}/lib";
     };
 
     py-shell = pkgs.mkShell rec {
@@ -38,6 +39,16 @@ let
         flatbuffers_for_rust
       ];
     };
+
+    flatbuffers_for_cpp_json = pkgs.flatbuffers.overrideAttrs(attrs: {
+      #patches = [];
+      cmakeBuildType = "Debug";
+      cmakeFlags = [
+        "-DFLATBUFFERS_BUILD_FLATLIB=OFF"
+        "-DFLATBUFFERS_BUILD_SHAREDLIB=ON"
+      ];
+      dontStrip = true;
+    });
 
     flatbuffers_for_rust = pkgs.flatbuffers.overrideAttrs(attrs: {
       src = pkgs.fetchgit {
