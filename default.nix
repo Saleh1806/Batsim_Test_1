@@ -86,8 +86,8 @@ let
         })
         (pkgs.fetchpatch {
           # Generates pkg-config files.
-          url = "https://github.com/mpoquet/flatbuffers/commit/4e0c53ba75ef419e8f3fbc9507d57ceea08b0144.patch";
-          sha256 = "sha256:1wwmz7fwcvrhl44xyy1pvym12zbrsqqfjyfl8h8f44i1dzh0870y";
+          url = "https://github.com/mpoquet/flatbuffers/commit/322a90d0819f9dff0a441b229fa4012a7383bbcb.patch";
+          sha256 = "sha256:01783vidf3lm2kpm7arr71s7pc8mq6czqip6k64ry18658dgyypx";
         })
       ];
       nativeBuildInputs = [pkgs.cmake pkgs.pkgconfig];
