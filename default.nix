@@ -2,6 +2,7 @@
 }:
 
 let
+  batprotocol_version = "0.1.0";
   jobs = rec {
     inherit pkgs;
 
@@ -16,7 +17,7 @@ let
 
     batprotocol-cpp = pkgs.stdenv.mkDerivation rec {
       name = "batprotocol-cpp";
-      version = "0.1.0";
+      version = "${batprotocol_version}";
       nativeBuildInputs = [
         flatbuffers_for_cpp_json
         pkgs.meson
@@ -51,7 +52,7 @@ let
     };
 
     batprotocol-py = pkgs.python3Packages.buildPythonPackage rec {
-      version = "0.1.0";
+      version = "${batprotocol_version}";
       name = "batprotocol-py-${version}";
       nativeBuildInputs = [
         flatbuffers_for_cpp_json
@@ -73,6 +74,36 @@ let
         pkgs.python3Packages.ipython
         batprotocol-py
       ];
+    };
+
+    batprotocol-rust-src = pkgs.stdenv.mkDerivation rec {
+      name = "batprotocol-rust-src";
+      version = "${batprotocol_version}";
+      src = pkgs.lib.sourceByRegex ./. [
+        "^batprotocol\.fbs"
+        "^rust"
+        "^rust/Cargo\..*"
+        "^rust/src"
+        "^rust/src/lib\.rs"
+        "^rust/tests"
+        "^rust/tests/.*\.rs"
+      ];
+      nativeBuildInputs = [flatbuffers_for_rust];
+      buildPhase = ''
+        cd rust
+        flatc --rust -o src ../batprotocol.fbs
+      '';
+      installPhase = ''
+        mkdir -p $out
+        cp -r * $out/
+      '';
+    };
+
+    batprotocol-rust = pkgs.rustPlatform.buildRustPackage rec {
+      name = "batprotocol-rust";
+      version = batprotocol-rust-src.version;
+      src = batprotocol-rust-src;
+      cargoSha256 = "sha256:06ldr2ci896406jbs873a27qhhqrsxw4avi9w5gyykc6jlpx99as";
     };
 
     go-shell = pkgs.mkShell rec {
