@@ -9,8 +9,45 @@ let
       buildInputs = [
         flatbuffers_for_cpp_json
         pkgs.ninja
+        pkgs.pkgconfig
       ];
       FLATBUFFERS_LIB_PATH="${flatbuffers_for_cpp_json}/lib";
+    };
+
+    batprotocol-cpp = pkgs.stdenv.mkDerivation rec {
+      name = "batprotocol-cpp";
+      version = "0.1.0";
+      nativeBuildInputs = [
+        flatbuffers_for_cpp_json
+        pkgs.meson
+        pkgs.ninja
+      ];
+      propagatedBuildInputs = [
+        flatbuffers_for_cpp_json
+      ];
+      src = pkgs.lib.sourceByRegex ./. [
+        "^batprotocol\.fbs"
+        "^cpp"
+        "^cpp/meson\.build"
+      ];
+      preConfigure = "cd cpp";
+    };
+
+    cpp-test = pkgs.stdenv.mkDerivation rec {
+      name = "cpp-test";
+      version = "0.1.0";
+      nativeBuildInputs = [
+        pkgs.meson
+        pkgs.ninja
+        pkgs.pkgconfig
+      ];
+      buildInputs = [
+        batprotocol-cpp
+      ];
+      src = pkgs.lib.sourceByRegex ./cpp/tests [
+        "^meson\.build"
+        "^.*?pp"
+      ];
     };
 
     py-shell = pkgs.mkShell rec {
@@ -41,7 +78,19 @@ let
     };
 
     flatbuffers_for_cpp_json = pkgs.flatbuffers.overrideAttrs(attrs: {
-      #patches = [];
+      patches = [
+        # Enables version retrieval when .git is absent.
+        (pkgs.fetchpatch {
+          url = "https://github.com/google/flatbuffers/commit/7e4124d6e6ccafb267f80f3e57e3780913d5cbe5.patch";
+          sha256 = "sha256:0h74bra1dlhy5ml9axjmmbq4b9kj6d43rf7rxbwm1ww35k0ajhzl";
+        })
+        (pkgs.fetchpatch {
+          # Generates pkg-config files.
+          url = "https://github.com/mpoquet/flatbuffers/commit/4e0c53ba75ef419e8f3fbc9507d57ceea08b0144.patch";
+          sha256 = "sha256:1wwmz7fwcvrhl44xyy1pvym12zbrsqqfjyfl8h8f44i1dzh0870y";
+        })
+      ];
+      nativeBuildInputs = [pkgs.cmake pkgs.pkgconfig];
       cmakeBuildType = "Debug";
       cmakeFlags = [
         "-DFLATBUFFERS_BUILD_FLATLIB=OFF"

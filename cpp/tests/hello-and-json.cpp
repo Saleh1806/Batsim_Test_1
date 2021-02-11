@@ -4,11 +4,11 @@
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/idl.h>
 
-#include <schema1_generated.h>
+#include <batprotocol_generated.h>
 
 void manually_print_buffer(const uint8_t* buf, int buf_size)
 {
-    using namespace Batsim::Protocol;
+    using namespace Batprotocol;
     printf("Serialized a Message of size=%d {\n", buf_size);
 
     // Deserialize the buffer
@@ -40,7 +40,7 @@ void manually_print_buffer(const uint8_t* buf, int buf_size)
 
 int main()
 {
-    using namespace Batsim::Protocol;
+    using namespace Batprotocol;
 
     // Manually create a Message
     flatbuffers::FlatBufferBuilder fbb;
@@ -50,7 +50,7 @@ int main()
     auto hello_event = CreateEvent(fbb, 0.0, EventUnion_hello, hello.Union());
     auto bye_event = CreateEvent(fbb, 42, EventUnion_bye, bye.Union());
 
-    std::vector<flatbuffers::Offset<Batsim::Protocol::Event>> events;
+    std::vector<flatbuffers::Offset<Batprotocol::Event>> events;
     events.push_back(hello_event);
     events.push_back(bye_event);
 

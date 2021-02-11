@@ -1,4 +1,4 @@
-namespace Batsim.Protocol;
+namespace Batprotocol;
 
 table HelloEvent { greeting: string; }
 table ByeEvent {}

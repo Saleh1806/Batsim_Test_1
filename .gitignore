@@ -1,3 +1,6 @@
 .ninja_*
 gen-*
 tests/union-vector
+build
+install
+result
