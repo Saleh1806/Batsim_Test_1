@@ -59,14 +59,18 @@ let
       ];
       propagatedBuildInputs = [
         pkgs.python3Packages.setuptools_scm
+        pkgs.python3Packages.pytest
         flatbuffers_python
       ];
       src = pkgs.lib.sourceByRegex ./. [
         "^batprotocol\.fbs"
         "^py"
         "^py/setup\.py"
+        "^py/tests"
+        "^py/tests/.*\.py"
       ];
       preConfigure = "cd py";
+      checkPhase = "python -m pytest tests";
     };
 
     py-test-shell = pkgs.mkShell rec {
