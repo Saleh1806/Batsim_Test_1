@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import flatbuffers
 
-import Batsim.Protocol.ByeEvent as ByeEvent
-import Batsim.Protocol.Event as Event
-import Batsim.Protocol.EventUnion as EventUnion
-import Batsim.Protocol.HelloEvent as HelloEvent
-import Batsim.Protocol.Message as Message
+import Batprotocol.ByeEvent as ByeEvent
+import Batprotocol.Event as Event
+import Batprotocol.EventUnion as EventUnion
+import Batprotocol.HelloEvent as HelloEvent
+import Batprotocol.Message as Message
 
 # Manually create a Message
 fbb = flatbuffers.Builder(1024)

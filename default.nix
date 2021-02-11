@@ -50,15 +50,29 @@ let
       ];
     };
 
-    py-shell = pkgs.mkShell rec {
-      buildInputs = [
-        pkgs.python3Packages.ipython
+    batprotocol-py = pkgs.python3Packages.buildPythonPackage rec {
+      version = "0.1.0";
+      name = "batprotocol-py-${version}";
+      nativeBuildInputs = [
+        flatbuffers_for_cpp_json
+      ];
+      propagatedBuildInputs = [
+        pkgs.python3Packages.setuptools_scm
         flatbuffers_python
       ];
-      shellHook = ''
-        export PYTHONPATH=$PYTHONPATH:$(realpath ./gen-py)
-        ipython
-      '';
+      src = pkgs.lib.sourceByRegex ./. [
+        "^batprotocol\.fbs"
+        "^py"
+        "^py/setup\.py"
+      ];
+      preConfigure = "cd py";
+    };
+
+    py-test-shell = pkgs.mkShell rec {
+      buildInputs = [
+        pkgs.python3Packages.ipython
+        batprotocol-py
+      ];
     };
 
     go-shell = pkgs.mkShell rec {
