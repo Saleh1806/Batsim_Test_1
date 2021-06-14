@@ -1,4 +1,4 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz") {}
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz") {}
 }:
 
 let
@@ -126,19 +126,16 @@ let
       ];
     };
 
-    flatbuffers_for_cpp_json = pkgs.flatbuffers.overrideAttrs(attrs: {
-      patches = [
-        # Enables version retrieval when .git is absent.
-        (pkgs.fetchpatch {
-          url = "https://github.com/google/flatbuffers/commit/7e4124d6e6ccafb267f80f3e57e3780913d5cbe5.patch";
-          sha256 = "sha256:0h74bra1dlhy5ml9axjmmbq4b9kj6d43rf7rxbwm1ww35k0ajhzl";
-        })
-        (pkgs.fetchpatch {
-          # Generates pkg-config files.
-          url = "https://github.com/mpoquet/flatbuffers/commit/322a90d0819f9dff0a441b229fa4012a7383bbcb.patch";
-          sha256 = "sha256:01783vidf3lm2kpm7arr71s7pc8mq6czqip6k64ry18658dgyypx";
-        })
-      ];
+    flatbuffers_for_cpp_json = pkgs.flatbuffers.overrideAttrs(attrs: rec {
+      version = "2.0.0";
+      src = pkgs.fetchFromGitHub {
+        owner = "google";
+        repo = "flatbuffers";
+        rev = "v${version}";
+        sha256 = "sha256:1zbf6bdpps8369r1ql00irxrp58jnalycc8jcapb8iqg654vlfz8";
+      };
+      patches = [];
+
       nativeBuildInputs = [pkgs.cmake pkgs.pkgconfig];
       cmakeBuildType = "Debug";
       cmakeFlags = [
