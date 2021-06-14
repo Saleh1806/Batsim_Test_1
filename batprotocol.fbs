@@ -1,14 +1,367 @@
 namespace Batprotocol;
+///
+/// Profiles
+///
 
-table HelloEvent { greeting: string; }
-table ByeEvent {}
-
-union EventUnion {
-  hello: HelloEvent,
-  bye: ByeEvent
+// Groups of profiles
+union ParallelTaskProfileUnion {
+  ParallelTaskProfile
+, ParallelTaskHomogeneousProfile
+, ParallelTaskOnStorageHomogeneousProfile
+, ParallelTaskDataStagingBetweenStoragesProfiles
 }
 
-/// Event doc
+union ProfileUnion {
+  DelayProfile
+, ParallelTaskProfile
+, ParallelTaskHomogeneousProfile
+, SequentialCompositionProfile
+, ForkJoinCompositionProfile
+, ParallelTaskMergeCompositionProfile
+, ParallelTaskOnStorageHomogeneousProfile
+, ParallelTaskDataStagingBetweenStoragesProfiles
+, TraceReplayProfile
+}
+
+table DelayProfile {
+  delay: float64;
+}
+
+table ParallelTaskProfile {
+  /// The amount of computation (in flops) to do by each SimGrid executor. Can either be null or of size that equals the number of SimGrid executors.
+  computation_vector: [float64];
+
+  /// The amount of communication (in bytes) to do on each (oriented) link between the hosts where the SimGrid executors take place. Must either be null or of size that equals the square of the number of related SimGrid executors.
+  communication_matrix: [float64];
+}
+
+table SequentialCompositionProfile {
+  /// The number of times the whole sequence should be executed.
+  iteration_count: uint32 = 1;
+  profiles: [ProfileUnion] (required);
+}
+
+table ForkJoinCompositionProfile {
+  profiles: [ProfileUnion] (required);
+}
+
+table ParallelTaskMergeCompositionProfile {
+  profiles: [ParallelTaskProfileUnion] (required);
+}
+
+enum HomogeneousParallelTaskGenerationStrategy : byte {
+  /// Every host computes computation_amount flops. Every link transfers communication_amount bytes (links from a host to itself transfers 0 bytes).
+  DefinedAmountsUsedForEachValue
+
+  /// Every host computes the same amount, and their sum equals computation_amount flops. Every link transfers the same amount (links from a host to itself transfers 0 bytes), and their sum equals communication_amount bytes.
+, DefinedAmountsSpreadUniformly
+}
+
+table ParallelTaskHomogeneousProfile {
+  /// The computation amount. Can be null. How this value is used depends on generation_strategy.
+  computation_amount: float64;
+
+  /// The communication amount. Can be null. How this value is used depends on generation_strategy.
+  communication_amount: float64;
+
+  /// The strategy used to generate the parallel task matrices.
+  generation_strategy: HomogeneousParallelTaskGenerationStrategy;
+}
+
+table ParallelTaskOnStorageHomogeneousProfile {
+  /// The storage on which the byte transfers occur.
+  storage_name: string (required);
+
+  /// The amount of bytes to read from the storage.
+  bytes_to_read: float64;
+
+  /// The amount of bytes to write on the storage.
+  bytes_to_write: float64;
+
+  /// The strategy used to generate the parallel task matrices. Only used to populate the communication matrix, as the computation vector is empty in this case.
+  generation_strategy: HomogeneousParallelTaskGenerationStrategy;
+}
+
+table ParallelTaskDataStagingBetweenStoragesProfiles {
+  /// The amount of bytes to transfer from one storage to another.
+  bytes_to_transfer: float64;
+
+  /// The storage that sends data.
+  emitter_storage_name: string (required);
+
+  /// The storage that receives data.
+  receiver_storage_name: string (required);
+}
+
+enum TraceType : byte {
+  SMPI
+, FractionalComputation
+}
+
+table TraceReplayProfile {
+  trace_type: TraceType;
+
+  /// The filename of the main trace file. This file should define a list of per-executor trace files.
+  filename: string (required);
+}
+
+///
+/// Job management events
+///
+union ComputationResourceRequest {
+  host_number: HostNumber
+, core_number: CoreNumber
+}
+
+table Job {
+  /// Defines how many computation resources the job requests. This also defines the number of SimGrid executors in most cases for rigid jobs.
+  computation_resource_request: ComputationResourceRequest;
+
+  /// If set, this is the amount of seconds after which the job will be automatically killed by Batsim.
+  walltime: float64;
+
+  /// Custom user-defined data for the job. Batsim does not use this field at all, but external decision components (e.g., a scheduler or a dynamic submitter) can.
+  extra_data: string;
+
+  /// Whether the requested resources are rigid. If true, Batsim will check that the allocated resources EXACTLY match the requested amount of resources before executing the job.
+  rigid: bool = true;
+
+  /// The job's profile, which defines how the job should be simulated by Batsim. Expecting a "workload!name" syntax, but "name" is also allowed (in this case, only profiles from the job's workload can be used).
+  profile: string;
+}
+
+// Submission
+/// The number of SimGrid hosts to use.
+struct HostNumber {
+  host_number: uint32;
+}
+
+/// The number of cores on SimGrid hosts to use.
+struct CoreNumber {
+  core_number: uint32;
+}
+
+table JobSubmittedEvent {
+  job_id: string (required);
+  job: Job (required);
+
+  /// The point in time at which the job has been submitted.
+  submission_time: float64;
+}
+
+// Completion
+enum FinalJobState : byte {
+  /// Job executed without reaching walltime, with exit_code=0.
+  COMPLETED_SUCCESSFULLY
+
+  /// Job executed without reaching walltime, with exit_code!=0.
+, COMPLETED_FAILED
+
+  /// Job executed but reached its walltime (killed automatically by Batsim).
+, COMPLETED_WALLTIME_REACHED
+
+  /// Job executed but killed by the decision process.
+, COMPLETED_KILLED
+
+  /// Job not executed. Has been rejected by the decision process.
+, REJECTED
+}
+
+table JobCompletedEvent {
+  job_id: string (required);
+
+  /// The job's final state.
+  state: FinalJobState;
+
+  /// The job's return code. 0 is equivalent to a successful completion.
+  return_code: uint32 = 0;
+}
+
+// Rejection
+table RejectJobEvent {
+  job_id: string (required);
+}
+
+// Execution
+enum ExecutorPlacementStrategy : byte {
+  /// Host1 will be used, then Host2, ..., then HostN, then Host1...
+  SpreadOverHostsFirst
+
+  /// Host1 will be used, then Host1, ... (until Host1 cores are filled), then Host2...
+, FillOneHostCoresFirst
+}
+
+struct ExecutorPlacementStrategyStruct {
+  strategy: ExecutorPlacementStrategy = SpreadOverHostsFirst;
+}
+
+table CustomExecutorToHostMapping {
+  /// Used to define precisely which host should be used by each SimGrid executor. The vector size must match the amount of SimGrid executors, which is defined by the (profile, host_allocation) tuple. The value at index i is used to determine where SimGrid executor i runs. Values are NOT host resource ids, they are unsigned integers in [0, size(host_allocation)[ that are used to refer to hosts indirectly via host_allocation.
+  mapping: [uint32];
+}
+
+union ExecutorPlacement {
+  /// Use a predefined placement strategy.
+  predefined_strategy: ExecutorPlacementStrategyStruct
+
+  /// Use a precise manual placement.
+, custom_executor_to_host_mapping: CustomExecutorToHostMapping
+}
+
+table StorageHost {
+  storage_name: string (required);
+
+  /// The host unique identifier (as given by Batsim)
+  host_id: uint32;
+}
+
+table AllocationPlacement {
+  /// Intervalset of hosts where the job should be executed.
+  host_allocation: string (required);
+
+  /// Placement of SimGrid executors on hosts.
+  executor_placement: ExecutorPlacement (required);
+}
+
+table ProfileAllocationPlacement {
+  /// The profile unique identifier. Expected syntax is "workload!name".
+  profile_id: string (required);
+
+  /// Intervalset of hosts where the profile should be executed.
+  host_allocation: string (required);
+
+  /// Placement of SimGrid executors on hosts for this profile.
+  executor_placement: ExecutorPlacement (required);
+}
+
+table ExecuteJobEvent {
+  job_id: string (required);
+
+  /// Defines the job's main resource allocation and the placement of SimGrid executors on the allocated hosts.
+  allocation: AllocationPlacement (required);
+
+  /// Can be set to override the placement of sub-profiles. Only makes sense if the job's main profile is a composition profile.
+  profile_allocation_override: [ProfileAllocationPlacement];
+
+  /// Overrides the placement of storage names. Enable the use of abstract storage names in your profiles.
+  storage_placement: [StorageHost];
+}
+
+// Kill
+table KillJobsEvent {
+  job_ids: [string] (required);
+}
+
+table KillProgressAtomicProfile {
+  /// The profile that has been killed. Syntax is "workload!name".
+  profile_id: string (required);
+
+  /// The progress of the profile's execution in [0,1]. 0 means the profile execution has just started, 1 means it has just finished.
+  progress: float64;
+}
+
+table KillProgressSequentialProfile {
+  /// The profile that has been killed. Syntax is "workload!name".
+  profile_id: string (required);
+
+  /// The iteration of the associated SequentialCompositionProfile when it has been killed.
+  current_iteration: uint32;
+
+  /// The index in [0, size(profiles)[ of the associated SequentialCompositionProfile when it has been killed.
+  current_task_index: uint32;
+
+  /// The (recursively defined) progress of the task of the associated SequentialCompositionProfile that was being executed when it has been killed.
+  current_task_progress: KillProgressWrapper (required);
+}
+
+union KillProgress {
+  atomic: KillProgressAtomicProfile
+, sequential: KillProgressSequentialProfile
+}
+
+/// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
+table KillProgressWrapper {
+  kill_progress: KillProgress;
+}
+
+table JobAndProgress {
+  job_id: string (required);
+  progress: KillProgress (required);
+}
+
+table JobsKilledEvent {
+  job_ids: [string] (required);
+  progress: [JobAndProgress] (required);
+}
+
+// Dynamic registration
+table RegisterProfileEvent {
+  /// Using "workload!name" syntax.
+  profile_id: string (required);
+  profile: ProfileUnion (required);
+}
+
+table RegisterJobEvent {
+  /// Using "workload!name" syntax.
+  job_id: string (required);
+  job: Job (required);
+}
+
+///
+/// Resource management events
+///
+
+///
+/// Simulation management events
+///
+
+table OneTime {
+  /// The point in time at which the event should occur.
+  time: float64;
+}
+
+table Periodic {
+  /// The point in time at which the first event should occur.
+  start_time: float64;
+
+  /// The duration between two consecutive events.
+  period: float64;
+}
+
+union TimeSpecifierUnion {
+  onetime: OneTime,
+  periodic: Periodic
+}
+
+table CallMeLaterEvent {
+  /// Can be used by the decision process to identify why the CallMeLaterEvent has been requested. This field is forwarded in all RequestedCallEvent related to a CallMeLaterEvent.
+  callback_id: string;
+
+  /// Defines when the future call will be done.
+  when: TimeSpecifierUnion;
+}
+
+table RequestedCallEvent {
+  callback_id: string;
+}
+
+///
+/// Main message type
+///
+
+union EventUnion {
+  job_submitted: JobSubmittedEvent
+, job_completed: JobCompletedEvent
+, reject_job: RejectJobEvent
+, execute_job: ExecuteJobEvent
+, kill_jobs: KillJobsEvent
+, jobs_killed: JobsKilledEvent
+, register_profile: RegisterProfileEvent
+, register_job: RegisterJobEvent
+, call_me_later: CallMeLaterEvent
+, requested_call: RequestedCallEvent
+}
+
 table Event {
   timestamp: float64;
   event: EventUnion;
