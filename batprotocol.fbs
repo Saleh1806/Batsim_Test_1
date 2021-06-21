@@ -1,4 +1,4 @@
-namespace batprotocol;
+namespace batprotocol.lowlevel;
 ///
 /// Profiles
 ///
