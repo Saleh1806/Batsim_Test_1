@@ -1,16 +1,9 @@
-namespace Batprotocol;
+namespace batprotocol;
 ///
 /// Profiles
 ///
 
 // Groups of profiles
-union ParallelTaskProfileUnion {
-  ParallelTaskProfile
-, ParallelTaskHomogeneousProfile
-, ParallelTaskOnStorageHomogeneousProfile
-, ParallelTaskDataStagingBetweenStoragesProfiles
-}
-
 union ProfileUnion {
   DelayProfile
 , ParallelTaskProfile
@@ -37,16 +30,16 @@ table ParallelTaskProfile {
 
 table SequentialCompositionProfile {
   /// The number of times the whole sequence should be executed.
-  iteration_count: uint32 = 1;
-  profiles: [ProfileUnion] (required);
+  repetition_count: uint32 = 1;
+  profiles: [string] (required);
 }
 
 table ForkJoinCompositionProfile {
-  profiles: [ProfileUnion] (required);
+  profiles: [string] (required);
 }
 
 table ParallelTaskMergeCompositionProfile {
-  profiles: [ParallelTaskProfileUnion] (required);
+  profiles: [string] (required);
 }
 
 enum HomogeneousParallelTaskGenerationStrategy : byte {
@@ -109,8 +102,8 @@ table TraceReplayProfile {
 /// Job management events
 ///
 union ComputationResourceRequest {
-  host_number: HostNumber
-, core_number: CoreNumber
+  HostNumber
+, CoreNumber
 }
 
 table Job {
@@ -132,12 +125,12 @@ table Job {
 
 // Submission
 /// The number of SimGrid hosts to use.
-struct HostNumber {
+table HostNumber {
   host_number: uint32;
 }
 
 /// The number of cores on SimGrid hosts to use.
-struct CoreNumber {
+table CoreNumber {
   core_number: uint32;
 }
 
@@ -191,7 +184,7 @@ enum ExecutorPlacementStrategy : byte {
 , FillOneHostCoresFirst
 }
 
-struct ExecutorPlacementStrategyStruct {
+table ExecutorPlacementStrategyTable {
   strategy: ExecutorPlacementStrategy = SpreadOverHostsFirst;
 }
 
@@ -202,7 +195,7 @@ table CustomExecutorToHostMapping {
 
 union ExecutorPlacement {
   /// Use a predefined placement strategy.
-  predefined_strategy: ExecutorPlacementStrategyStruct
+  predefined_strategy: ExecutorPlacementStrategyTable
 
   /// Use a precise manual placement.
 , custom_executor_to_host_mapping: CustomExecutorToHostMapping
@@ -265,7 +258,7 @@ table KillProgressSequentialProfile {
   profile_id: string (required);
 
   /// The iteration of the associated SequentialCompositionProfile when it has been killed.
-  current_iteration: uint32;
+  current_repetition: uint32;
 
   /// The index in [0, size(profiles)[ of the associated SequentialCompositionProfile when it has been killed.
   current_task_index: uint32;
@@ -275,8 +268,8 @@ table KillProgressSequentialProfile {
 }
 
 union KillProgress {
-  atomic: KillProgressAtomicProfile
-, sequential: KillProgressSequentialProfile
+  KillProgressAtomicProfile
+, KillProgressSequentialProfile
 }
 
 /// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
@@ -295,10 +288,14 @@ table JobsKilledEvent {
 }
 
 // Dynamic registration
-table RegisterProfileEvent {
+table ProfileAndId {
   /// Using "workload!name" syntax.
-  profile_id: string (required);
+  id: string (required);
   profile: ProfileUnion (required);
+}
+
+table RegisterProfileEvent {
+  profile: ProfileAndId;
 }
 
 table RegisterJobEvent {
@@ -329,37 +326,165 @@ table Periodic {
 }
 
 union TimeSpecifierUnion {
-  onetime: OneTime,
-  periodic: Periodic
+  OneTime,
+  Periodic
 }
 
 table CallMeLaterEvent {
   /// Can be used by the decision process to identify why the CallMeLaterEvent has been requested. This field is forwarded in all RequestedCallEvent related to a CallMeLaterEvent.
-  callback_id: string;
+  call_me_later_id: string (required);
 
   /// Defines when the future call will be done.
-  when: TimeSpecifierUnion;
+  when: TimeSpecifierUnion (required);
 }
 
 table RequestedCallEvent {
-  callback_id: string;
+  call_me_later_id: string (required);
+}
+
+table StopCallMeLaterEvent {
+  call_me_later_id: string (required);
+}
+
+table BatsimHelloEvent {
+  /// The version of the batprotocol. Expecting a semantic versioning format. For example "1.0.0", "0.1.0+9a04b9d60a211c380d62abbe70e2a3b2ffb869b3"...
+  batprotocol_version: string (required);
+
+  /// The version of Batsim. Only used for tracability purpose. For example "4.0.0", "v4.0.0-69-g4f12a4b"... Cannot contain comma (ASCII/UTF-8 0x2C) nor double quote (ASCII/UTF-8 0x22).
+  batsim_version: string (required);
+
+  /// The Git commit that precisely identifies the Batsim version. Example: "4f12a4b51ab38ff2936bc1116fa3f34a05f494e6". If not null, only contains hexadecimal characters.
+  batsim_commit: string;
+}
+
+table ExternalDecisionComponentHelloEvent {
+  /// The version of the batprotocol. Expecting a semantic versioning format. For example "1.0.0", "0.1.0+9a04b9d60a211c380d62abbe70e2a3b2ffb869b3"...
+  batprotocol_version: string (required);
+
+  /// The name of the decision component. For example "batsched" or "pybatsim". Cannot contain comma (ASCII/UTF-8 0x2C) nor double quote (ASCII/UTF-8 0x22).
+  decision_component_name: string (required);
+
+  /// The version of the decision component. Only used for tracability purpose. For example "1.2.0", "v3.2.0-1-g880dd60"... Cannot contain comma (ASCII/UTF-8 0x2C) nor double quote (ASCII/UTF-8 0x22).
+  decision_component_version: string (required);
+
+  /// The commit (from a version control system, typically Git) that precisely identifies the decision component version. Can be null. Example: "880dd60c537d7d7a8246daaf5b2d1f7bfea3cbf4". Cannot contain comma (ASCII/UTF-8 0x2C) nor double quote (ASCII/UTF-8 0x22).
+  decision_component_commit: string;
+}
+
+table HostProperty {
+  key: string (required);
+  value: string (required);
+}
+
+enum HostState: byte {
+  SLEEPING
+, IDLE
+, COMPUTING
+, SWITCHING_ON
+, SWITCHING_OFF
+// TODO: failure states
+}
+
+table Host {
+  /// The host unique identifier.
+  id: uint32;
+
+  /// The host name.
+  name: string (required);
+
+  /// The host power state.
+  pstate: uint32;
+
+  /// The host power state count.
+  pstate_count: uint32;
+
+  /// The host state.
+  state: HostState;
+
+  /// The properties defined in this specific host.
+  properties: [HostProperty];
+
+  /// The properties defined for the Zone that contains this host.
+  zone_properties: [HostProperty];
+
+  /// The host core count.
+  core_count: uint32;
+
+  /// The host computation speeds in each power state. Vector is indexed by power state number in [0,pstate_count[.
+  computation_speed: [float64];
+}
+
+table WorkloadAndFilename {
+  /// The workload unique name. This name will be prefixed in jobs with the "workload_name!job_id" syntax.
+  name: string (required);
+
+  /// The workload filename.
+  filename: string (required);
+}
+
+table SimulationBeginsEvent {
+  /// The number of hosts in the simulated platform.
+  host_number: uint32;
+
+  /// The number of computation hosts in the simulated platform.
+  computation_host_number: uint32;
+
+  /// The computation hosts.
+  computation_hosts: [Host];
+
+  /// The number of storage hosts in the simulated platforms.
+  storage_host_number: uint32;
+
+  /// The storage hosts.
+  storage_hosts: [Host];
+
+  /// Batsim's execution context, similar to what you would obtain via Batsim's command-line interface.
+  batsim_execution_context_json: string (required);
+
+  /// The static workloads given to Batsim as input.
+  workloads: [WorkloadAndFilename];
+
+  /// The profiles defined in the static workloads given to Batsim as input. Can be null if profiles are not forwarded.
+  profiles: [ProfileAndId];
+}
+
+table SimulationEndsEvent {
+}
+
+table AllStaticJobsHaveBeenSubmittedEvent {
+}
+
+table AllStaticExternalEventsHaveBeenInjectedEvent {
+}
+
+table FinishRegistration {
 }
 
 ///
 /// Main message type
 ///
-
 union EventUnion {
-  job_submitted: JobSubmittedEvent
-, job_completed: JobCompletedEvent
-, reject_job: RejectJobEvent
-, execute_job: ExecuteJobEvent
-, kill_jobs: KillJobsEvent
-, jobs_killed: JobsKilledEvent
-, register_profile: RegisterProfileEvent
-, register_job: RegisterJobEvent
-, call_me_later: CallMeLaterEvent
-, requested_call: RequestedCallEvent
+  JobSubmittedEvent
+, JobCompletedEvent
+, RejectJobEvent
+, ExecuteJobEvent
+, KillJobsEvent
+, JobsKilledEvent
+
+, RegisterProfileEvent
+, RegisterJobEvent
+
+, CallMeLaterEvent
+, RequestedCallEvent
+, StopCallMeLaterEvent
+
+, BatsimHelloEvent
+, ExternalDecisionComponentHelloEvent
+, SimulationBeginsEvent
+, SimulationEndsEvent
+, AllStaticJobsHaveBeenSubmittedEvent
+, AllStaticExternalEventsHaveBeenInjectedEvent
+, FinishRegistration
 }
 
 table Event {
