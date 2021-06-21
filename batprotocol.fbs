@@ -263,13 +263,22 @@ table KillProgressSequentialProfile {
   /// The index in [0, size(profiles)[ of the associated SequentialCompositionProfile when it has been killed.
   current_task_index: uint32;
 
-  /// The (recursively defined) progress of the task of the associated SequentialCompositionProfile that was being executed when it has been killed.
+  /// The (recursively defined) progress of the task of the associated SequentialCompositionProfile.
   current_task_progress: KillProgressWrapper (required);
+}
+
+table KillProgressForkJoinProfile {
+  /// The profile that has been killed. Syntax is "workload!name".
+  profile_id: string (required);
+
+  /// The (recursively defined) progress of the tasks of the associated ForkJoinCompositionProfile.
+  tasks_progress: [KillProgressWrapper] (required);
 }
 
 union KillProgress {
   KillProgressAtomicProfile
 , KillProgressSequentialProfile
+, KillProgressForkJoinProfile
 }
 
 /// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
