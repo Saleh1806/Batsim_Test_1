@@ -25,33 +25,26 @@ namespace batprotocol
 
     private:
         friend class EventQueue;
-        enum class PlacementType
-        {
-            UNSET
-            ,PREDEFINED_STRATEGY
-            ,CUSTOM
-        };
 
         class Placement
         {
         public:
-            Placement * make_predefined(fb::ExecutorPlacementStrategy predefined_strategy);
-            Placement * make_custom(const std::shared_ptr<std::vector<uint32_t> > & mapping);
-            ~Placement = default();
+            static Placement * make_predefined(fb::ExecutorPlacementStrategy predefined_strategy);
+            static Placement * make_custom(const std::shared_ptr<std::vector<uint32_t> > & mapping);
 
-            PlacementType _placement_type = PlacementType::UNSET;
+            fb::ExecutorPlacement _placement_type = fb::ExecutorPlacement_NONE;
             fb::ExecutorPlacementStrategy _predefined_strategy;
             std::shared_ptr<std::vector<uint32_t> > _custom_mapping;
 
         private:
             Placement() = default;
-        }
+        };
 
         struct ProfilePlacement
         {
             std::string host_allocation = "";
             Placement * placement = nullptr;
-        }
+        };
 
         Placement * _placement = nullptr;
         std::unordered_map<std::string, ProfilePlacement*> _profile_overrides;

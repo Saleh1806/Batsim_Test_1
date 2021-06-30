@@ -22,6 +22,7 @@ let
         flatbuffers_for_cpp_json
         pkgs.meson
         pkgs.ninja
+        pkgs.pkgconfig
       ];
       propagatedBuildInputs = [
         flatbuffers_for_cpp_json

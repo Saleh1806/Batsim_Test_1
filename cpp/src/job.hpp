@@ -1,11 +1,19 @@
 #pragma once
 
+#include <cstdint>
+#include <memory>
+#include <string>
+
+#include "batprotocol_generated.h"
+
 namespace batprotocol
 {
+    class MessageBuilder;
+
     class Job
     {
     public:
-        Job() = default;
+        static std::shared_ptr<Job> make();
 
         Job & set_host_number(uint32_t host_number);
         Job & set_core_number(uint32_t core_number);
@@ -16,6 +24,13 @@ namespace batprotocol
         Job & set_profile(const std::string & profile_id);
         Job & set_non_rigid();
     private:
-        TODO
+        friend class MessageBuilder;
+        Job() = default;
+        fb::ComputationResourceRequest _request_type = fb::ComputationResourceRequest_NONE;
+        uint32_t _resource_number;
+        double _walltime = -1;
+        bool _rigid = true;
+        std::string _extra_data;
+        std::string _profile_id;
     };
 } // end of namespace batprotocol
