@@ -1,10 +1,14 @@
 #include "profile.hpp"
 
+#include "assert.hpp"
+
 namespace batprotocol
 {
 
 std::shared_ptr<Profile> Profile::make_delay(double delay)
 {
+    BAT_ENFORCE(delay >= 0.0, "invalid delay (non-positive) received: %g", delay);
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_DelayProfile;
@@ -31,6 +35,12 @@ std::shared_ptr<Profile> Profile::make_parallel_task_homogeneous(
     double computation_amount,
     double communication_amount)
 {
+    BAT_ENFORCE(generation_strategy >= fb::HomogeneousParallelTaskGenerationStrategy_MIN &&
+                generation_strategy <= fb::HomogeneousParallelTaskGenerationStrategy_MAX,
+                "invalid (unknown) generation_strategy received: %d", generation_strategy);
+    BAT_ENFORCE(computation_amount >= 0.0, "invalid (non-positive) computation_amount received: %g", computation_amount);
+    BAT_ENFORCE(communication_amount >= 0.0, "invalid (non-positive) communication_amount received: %g", communication_amount);
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_ParallelTaskHomogeneousProfile;
@@ -46,9 +56,13 @@ std::shared_ptr<Profile> Profile::make_parallel_task_data_staging_between_storag
     const std::string & emitter_storage_name,
     const std::string & receiver_storage_name)
 {
+    BAT_ENFORCE(bytes_to_transfer >= 0.0, "invalid (non-positive) bytes_to_transfer received: %g", bytes_to_transfer);
+    BAT_ENFORCE(!emitter_storage_name.empty(), "invalid (empty) emitter_storage_name received");
+    BAT_ENFORCE(!receiver_storage_name.empty(), "invalid (empty) emitter_storage_name received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskDataStagingBetweenStoragesProfiles;
+    profile->_profile_type = fb::ProfileUnion_ParallelTaskDataStagingBetweenStoragesProfile;
     profile->_bytes_to_transfer = bytes_to_transfer;
     profile->_emitter_storage_name = emitter_storage_name;
     profile->_receiver_storage_name = receiver_storage_name;
@@ -56,9 +70,33 @@ std::shared_ptr<Profile> Profile::make_parallel_task_data_staging_between_storag
     return profile;
 }
 
-std::shared_ptr<Profile> Profile::make_trace_replay_smpi(
-    const std::string & filename)
+std::shared_ptr<Profile> Profile::make_parallel_task_on_storage_homogeneous(
+    const std::string & storage_name,
+    fb::HomogeneousParallelTaskGenerationStrategy generation_strategy,
+    double bytes_to_read,
+    double bytes_to_write)
 {
+    BAT_ENFORCE(!storage_name.empty(), "invalid (empty) storage_name received");
+    BAT_ENFORCE(generation_strategy >= fb::HomogeneousParallelTaskGenerationStrategy_MIN &&
+                generation_strategy <= fb::HomogeneousParallelTaskGenerationStrategy_MAX,
+                "invalid (unknown) generation_strategy received: %d", generation_strategy);
+    BAT_ENFORCE(bytes_to_read >= 0.0, "invalid (non-positive) bytes_to_read received: %g", bytes_to_read);
+    BAT_ENFORCE(bytes_to_write >= 0.0, "invalid (non-positive) bytes_to_write received: %g", bytes_to_write);
+
+    std::shared_ptr<Profile> profile(new Profile());
+
+    profile->_profile_type = fb::ProfileUnion_ParallelTaskOnStorageHomogeneousProfile;
+    profile->_storage_name = storage_name;
+    profile->_bytes_to_read = bytes_to_read;
+    profile->_bytes_to_write = bytes_to_write;
+
+    return profile;
+}
+
+std::shared_ptr<Profile> Profile::make_trace_replay_smpi(const std::string & filename)
+{
+    BAT_ENFORCE(!filename.empty(), "invalid (empty) filename received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_TraceReplayProfile;
@@ -71,6 +109,8 @@ std::shared_ptr<Profile> Profile::make_trace_replay_smpi(
 std::shared_ptr<Profile> Profile::make_trace_replay_fractional_computation(
     const std::string & filename)
 {
+    BAT_ENFORCE(!filename.empty(), "invalid (empty) filename received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_TraceReplayProfile;
@@ -84,6 +124,8 @@ std::shared_ptr<Profile> Profile::make_sequential_composition(
     const std::shared_ptr<std::vector<std::string> > & sub_profiles,
     uint32_t repetition_count)
 {
+    BAT_ENFORCE(sub_profiles.get() != nullptr, "invalid (null) sub_profiles received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_SequentialCompositionProfile;
@@ -96,6 +138,8 @@ std::shared_ptr<Profile> Profile::make_sequential_composition(
 std::shared_ptr<Profile> Profile::make_forkjoin_composition(
     const std::shared_ptr<std::vector<std::string> > & sub_profiles)
 {
+    BAT_ENFORCE(sub_profiles.get() != nullptr, "invalid (null) sub_profiles received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_ForkJoinCompositionProfile;
@@ -107,6 +151,8 @@ std::shared_ptr<Profile> Profile::make_forkjoin_composition(
 std::shared_ptr<Profile> Profile::make_parallel_task_merge_composition(
     const std::shared_ptr<std::vector<std::string> > & sub_profiles)
 {
+    BAT_ENFORCE(sub_profiles.get() != nullptr, "invalid (null) sub_profiles received");
+
     std::shared_ptr<Profile> profile(new Profile());
 
     profile->_profile_type = fb::ProfileUnion_ParallelTaskMergeCompositionProfile;

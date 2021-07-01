@@ -12,7 +12,7 @@ union ProfileUnion {
 , ForkJoinCompositionProfile
 , ParallelTaskMergeCompositionProfile
 , ParallelTaskOnStorageHomogeneousProfile
-, ParallelTaskDataStagingBetweenStoragesProfiles
+, ParallelTaskDataStagingBetweenStoragesProfile
 , TraceReplayProfile
 }
 
@@ -75,7 +75,7 @@ table ParallelTaskOnStorageHomogeneousProfile {
   generation_strategy: HomogeneousParallelTaskGenerationStrategy;
 }
 
-table ParallelTaskDataStagingBetweenStoragesProfiles {
+table ParallelTaskDataStagingBetweenStoragesProfile {
   /// The amount of bytes to transfer from one storage to another.
   bytes_to_transfer: float64;
 
@@ -292,7 +292,7 @@ union KillProgress {
 
 /// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
 table KillProgressWrapper {
-  kill_progress: KillProgress;
+  kill_progress: KillProgress (required);
 }
 
 table JobAndProgress {
@@ -475,7 +475,7 @@ table AllStaticJobsHaveBeenSubmittedEvent {
 table AllStaticExternalEventsHaveBeenInjectedEvent {
 }
 
-table FinishRegistration {
+table FinishRegistrationEvent {
 }
 
 ///
@@ -502,7 +502,7 @@ union EventUnion {
 , SimulationEndsEvent
 , AllStaticJobsHaveBeenSubmittedEvent
 , AllStaticExternalEventsHaveBeenInjectedEvent
-, FinishRegistration
+, FinishRegistrationEvent
 }
 
 table Event {

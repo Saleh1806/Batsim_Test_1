@@ -19,6 +19,8 @@ KillProgress::~KillProgress()
     {
         switch (kv.second->type)
         {
+            case fb::KillProgress_NONE: {
+            } break;
             case fb::KillProgress_KillProgressAtomicProfile: {
                 delete static_cast<Atomic*>(kv.second->data);
             } break;

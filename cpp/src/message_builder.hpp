@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
+#include <vector>
 
 #include "execute_job.hpp"
 #include "job.hpp"
@@ -19,8 +19,9 @@ namespace batprotocol
         ~MessageBuilder();
 
         // Message serialization API
-        void clear();
-        void generate_message();
+        void clear(double now);
+        void finish_message(double now);
+        void set_current_time(double now);
         const uint8_t * const buffer_pointer() const;
         const uint32_t buffer_size() const;
 
@@ -102,8 +103,15 @@ namespace batprotocol
         void add_finish_registration();
 
     private:
+        std::vector<flatbuffers::Offset<flatbuffers::String> > serialize_string_vector(const std::vector<std::string> & strings);
+        flatbuffers::Offset<fb::Job> serialize_job(const std::shared_ptr<Job> & job);
+        flatbuffers::Offset<fb::ProfileAndId> serialize_profile_and_id(const std::string & profile_id, const std::shared_ptr<Profile> & profile);
+        flatbuffers::Offset<void> serialize_time_specifier(const std::shared_ptr<TimeSpecifier> & time_specifier);
+
+    private:
         flatbuffers::FlatBufferBuilder * _builder = nullptr;
         bool _is_buffer_finished = false;
-        // TODO
+        double _current_time = 0.0;
+        std::vector<flatbuffers::Offset<fb::Event>> _events;
     };
 } // end of namespace batprotocol

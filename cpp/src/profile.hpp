@@ -9,6 +9,8 @@
 
 namespace batprotocol
 {
+    class MessageBuilder;
+
     class Profile
     {
     public:
@@ -33,6 +35,13 @@ namespace batprotocol
             const std::string & receiver_storage_name
         );
 
+        static std::shared_ptr<Profile> make_parallel_task_on_storage_homogeneous(
+            const std::string & storage_name,
+            fb::HomogeneousParallelTaskGenerationStrategy generation_strategy,
+            double bytes_to_read = 0,
+            double bytes_to_write = 0
+        );
+
         static std::shared_ptr<Profile> make_trace_replay_smpi(
             const std::string & filename
         );
@@ -55,6 +64,7 @@ namespace batprotocol
         );
 
     private:
+        friend class MessageBuilder;
         Profile() = default;
         fb::ProfileUnion _profile_type = fb::ProfileUnion_NONE;
         std::shared_ptr<std::vector<std::string> > _sub_profiles = nullptr;
@@ -72,6 +82,10 @@ namespace batprotocol
         double _bytes_to_transfer = 0;
         std::string _emitter_storage_name;
         std::string _receiver_storage_name;
+
+        std::string _storage_name;
+        double _bytes_to_read = 0;
+        double _bytes_to_write = 0;
 
         fb::TraceType _trace_type;
         std::string _filename;

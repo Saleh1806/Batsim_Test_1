@@ -27,7 +27,7 @@ namespace batprotocol
         friend class MessageBuilder;
         Job() = default;
         fb::ComputationResourceRequest _request_type = fb::ComputationResourceRequest_NONE;
-        uint32_t _resource_number;
+        uint32_t _resource_number = 0;
         double _walltime = -1;
         bool _rigid = true;
         std::string _extra_data;

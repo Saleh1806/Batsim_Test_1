@@ -30,7 +30,7 @@ Job & Job::set_core_number(uint32_t core_number)
 
 Job & Job::set_walltime(double walltime)
 {
-    BAT_ENFORCE(walltime == -1 || walltime >= 0, "invalid walltime %g (not -1 nor positive)", walltime);
+    BAT_ENFORCE(walltime == -1 || walltime >= 0, "invalid walltime %g (not positive nor -1)", walltime);
     _walltime = walltime;
     return *this;
 }

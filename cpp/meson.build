@@ -43,7 +43,7 @@ batprotocollib = library('batprotocol-cpp', src + inc,
   install: true
 )
 
-install_headers(inc)
+install_headers(inc, subdir:'batprotocol-cpp')
 
 # Generate a pkg-config file for the library.
 pkgc = import('pkgconfig')
