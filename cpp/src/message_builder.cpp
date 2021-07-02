@@ -1,5 +1,8 @@
 #include "message_builder.hpp"
 
+#include <unordered_set>
+#include <stack>
+
 #include "assert.hpp"
 
 namespace batprotocol
@@ -97,7 +100,47 @@ void MessageBuilder::add_execute_job(
     const ExecuteJobOptions & options)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_execute_job() while buffer is finished. Please call clear() first.");
-    BAT_ENFORCE(false, "UNIMPLEMENTED");
+
+    // (default) general placement
+    auto placement_type = fb::ExecutorPlacement_predefined_strategy;
+    if (options._placement != nullptr)
+        placement_type = options._placement->_type;
+    auto placement_s = serialize_placement(options._placement);
+
+    auto alloc_placement_s = fb::CreateAllocationPlacementDirect(*_builder, host_allocation.c_str(), placement_type, placement_s);
+
+    // placement override for specific profiles
+    std::vector<flatbuffers::Offset<fb::ProfileAllocationPlacement>> profile_overrides_s;
+    profile_overrides_s.reserve(options._profile_overrides.size());
+
+    for (const auto & kv : options._profile_overrides)
+    {
+        const auto & profile_id = kv.first;
+        const auto * profile_placement = kv.second;
+        BAT_ASSERT(profile_placement != nullptr, "Internal inconsistency: null profile placement");
+        BAT_ASSERT(profile_placement->placement != nullptr, "Internal inconsistency: null placement for a profile");
+
+        auto placement_s = serialize_placement(profile_placement->placement);
+        auto profile_placement_s = fb::CreateProfileAllocationPlacementDirect(*_builder, profile_id.c_str(), profile_placement->host_allocation.c_str(), profile_placement->placement->_type, placement_s);
+        profile_overrides_s.push_back(profile_placement_s);
+    }
+
+    // placement override for storages
+    std::vector<flatbuffers::Offset<batprotocol::fb::StorageHost>> storage_overrides_s;
+    storage_overrides_s.reserve(options._storage_overrides.size());
+
+    for (const auto & kv : options._storage_overrides)
+    {
+        const auto & storage_name = kv.first;
+        const auto & host_id = kv.second;
+
+        auto storage_placement_s = fb::CreateStorageHostDirect(*_builder, storage_name.c_str(), host_id);
+        storage_overrides_s.push_back(storage_placement_s);
+    }
+
+    auto execute_job = fb::CreateExecuteJobEventDirect(*_builder, job_id.c_str(), alloc_placement_s, &profile_overrides_s, &storage_overrides_s);
+    auto event = fb::CreateEvent(*_builder, _current_time, fb::EventUnion_ExecuteJobEvent, execute_job.Union());
+    _events.push_back(event);
 }
 
 void MessageBuilder::add_kill_jobs(const std::vector<std::string> & job_ids)
@@ -113,10 +156,104 @@ void MessageBuilder::add_kill_jobs(const std::vector<std::string> & job_ids)
 
 void MessageBuilder::add_jobs_killed(
     const std::vector<std::string> & job_ids,
-    const KillProgress & progress)
+    const std::vector<KillProgress> & progresses)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_jobs_killed() while buffer is finished. Please call clear() first.");
-    BAT_ENFORCE(false, "UNIMPLEMENTED");
+    BAT_ENFORCE(job_ids.size() == progresses.size(), "size of job_ids and progresses mismatch (job_ids=%lu, progresses=%lu)", job_ids.size(), progresses.size());
+
+    auto job_ids_s = serialize_string_vector(job_ids);
+
+    std::vector<flatbuffers::Offset<batprotocol::fb::JobAndProgress>> progress_vector;
+    progress_vector.reserve(job_ids.size());
+
+    // fun part is here.
+    // a tree must be created for every job killed (their progress is independent).
+    // the following code traverse the task tree of each job with unwinding to serialize all tasks in depth-first order.
+    for (auto i = 0u; i < job_ids.size(); ++i)
+    {
+        const auto & job_id = job_ids[i];
+        const auto & progress = progresses[i];
+
+        std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > serialized_tasks;
+
+        // task_ids already known are stored so that cycles (which are forbidden) can be detected.
+        // this is also used to serialize composed tasks while unwinding the stack.
+        std::unordered_set<std::string> visited_task_ids;
+
+        // serialization is done by traversing the progresses in depth-first order.
+        std::stack<std::string> tasks_to_explore;
+        tasks_to_explore.push(progress._root_task_id);
+
+        while (!tasks_to_explore.empty())
+        {
+            auto task_id = tasks_to_explore.top();
+            auto task_it = progress._tasks_progress.find(task_id);
+            BAT_ENFORCE(task_it != progress._tasks_progress.end(), "invalid KillProgress for job_id='%s': progress of task_id='%s' has not been set", job_id.c_str(), task_id.c_str());
+            const KillProgress::KillProgressVariant * variant = task_it->second;
+
+            BAT_ASSERT(variant->type != fb::KillProgress_NONE, "inconsistency KillProgress for task_id='%s' (job_id='%s'): creating untyped progresses should not be possible", task_id.c_str(), job_id.c_str());
+            BAT_ASSERT(variant->type >= fb::KillProgress_MIN && variant->type <= fb::KillProgress_MAX, "invalid KillProgress for task_id='%s' (job_id='%s'): kill progress type is invalid (%d)", task_id.c_str(), job_id.c_str(), variant->type);
+
+            if (variant->type == fb::KillProgress_KillProgressAtomicProfile)
+            {
+                // current task is a leaf (atomic progress). serialize it right away.
+                BAT_ENFORCE(visited_task_ids.find(task_id) == visited_task_ids.end(), "invalid KillProgress for job_id='%s': task_id='%s' is used several times while the graph is expected to contain no cycle.", job_id.c_str(), task_id.c_str());
+
+                tasks_to_explore.pop();
+                serialize_kill_progress(task_id, job_id, variant, serialized_tasks);
+            }
+            else
+            {
+                // current task is composed.
+                if (visited_task_ids.find(task_id) == visited_task_ids.end())
+                {
+                    // this is the first time this composed task is encountered.
+                    visited_task_ids.insert(task_id);
+
+                    // do not remove the task from the stack. it will be serialized when all its children have been serialized (stack unwinding).
+                    BAT_ASSERT(variant->data != nullptr, "inconsistent progress data (null) of task_id='%s' (job_id='%s')", task_id.c_str(), job_id.c_str());
+
+                    switch(variant->type)
+                    {
+                    case fb::KillProgress_NONE: // not breaking is not a mistake here.
+                    case fb::KillProgress_KillProgressAtomicProfile: {
+                        BAT_ASSERT(false, "inconsistency: kill progress type should not be %s", fb::EnumNamesKillProgress()[variant->type]);
+                    } break;
+                    case fb::KillProgress_KillProgressSequentialProfile: {
+                        const auto * kp = static_cast<KillProgress::Sequential*>(variant->data);
+                        tasks_to_explore.push(kp->current_subtask_id);
+                    } break;
+                    case fb::KillProgress_KillProgressForkJoinProfile: {
+                        const auto * kp = static_cast<KillProgress::ForkJoin*>(variant->data);
+                        for (const auto & child_task_id : kp->subtasks_id)
+                            tasks_to_explore.push(child_task_id);
+                    } break;
+                    case fb::KillProgress_KillProgressParallelTaskMergeProfile: {
+                        const auto * kp = static_cast<KillProgress::ParallelTaskMerge*>(variant->data);
+                        for (const auto & child_task_id : kp->subtasks_id)
+                            tasks_to_explore.push(child_task_id);
+                    } break;
+                    }
+                }
+                else
+                {
+                    // this composed task has already been encountered.
+                    // this should be because we are unwinding the stack.
+                    // if not (invalid graph defined, with cycles) the serialization will fail because all children have not been serialized.
+                    serialize_kill_progress(task_id, job_id, variant, serialized_tasks);
+                    tasks_to_explore.pop();
+                }
+            }
+        }
+
+        // all tasks should have been serialized
+        auto job_and_progress_s = fb::CreateJobAndProgressDirect(*_builder, job_id.c_str(), progress._tasks_progress.at(progress._root_task_id)->type, serialized_tasks[progress._root_task_id].Union());
+        progress_vector.push_back(job_and_progress_s);
+    }
+
+    auto jobs_killed = fb::CreateJobsKilledEventDirect(*_builder, &job_ids_s, &progress_vector);
+    auto event = fb::CreateEvent(*_builder, _current_time, fb::EventUnion_JobsKilledEvent, jobs_killed.Union());
+    _events.push_back(event);
 }
 
 void MessageBuilder::add_register_profile(
@@ -220,7 +357,29 @@ void MessageBuilder::add_external_decision_component_hello(
 void MessageBuilder::add_simulation_begins(SimulationBegins & simulation_begins)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_simulation_begins() while buffer is finished. Please call clear() first.");
-    BAT_ENFORCE(false, "UNIMPLEMENTED");
+    BAT_ENFORCE(simulation_begins._host_number >= simulation_begins._hosts.size(), "host_number=%u inconsistency: %lu hosts have been declared", simulation_begins._host_number, simulation_begins._hosts.size());
+
+    // Prepare send orders of computation and storage hosts
+    std::vector<uint32_t> computation_hosts, storage_hosts;
+    for (auto & kv : simulation_begins._hosts)
+    {
+        if (kv.second->is_storage)
+            storage_hosts.push_back(kv.first);
+        else
+            computation_hosts.push_back(kv.first);
+    }
+
+    std::sort(computation_hosts.begin(), computation_hosts.end());
+    std::sort(storage_hosts.begin(), storage_hosts.end());
+
+    auto computation_hosts_s = serialize_host_vector(simulation_begins, computation_hosts);
+    auto storage_hosts_s = serialize_host_vector(simulation_begins, storage_hosts);
+    auto profile_and_ids_s = serialize_profile_and_id_vector(simulation_begins._profiles);
+    auto workload_and_filenames_s = serialize_workload_and_filename_vector(simulation_begins._workloads);
+
+    auto simulation_begins_s = fb::CreateSimulationBeginsEventDirect(*_builder, simulation_begins._host_number, computation_hosts.size(), &computation_hosts_s, storage_hosts.size(), &storage_hosts_s, simulation_begins._batsim_execution_context.c_str(), &workload_and_filenames_s, &profile_and_ids_s);
+    auto event = fb::CreateEvent(*_builder, _current_time, fb::EventUnion_SimulationBeginsEvent, simulation_begins_s.Union());
+    _events.push_back(event);
 }
 
 void MessageBuilder::add_simulation_ends()
@@ -270,6 +429,101 @@ std::vector<flatbuffers::Offset<flatbuffers::String> > MessageBuilder::serialize
     }
     return vec_s;
 }
+
+std::vector<flatbuffers::Offset<batprotocol::fb::Host>> MessageBuilder::serialize_host_vector(const SimulationBegins & simulation_begins, const std::vector<uint32_t> host_ids)
+{
+    std::vector<flatbuffers::Offset<batprotocol::fb::Host>> hosts_s;
+    hosts_s.reserve(host_ids.size());
+    for (const auto & host_id : host_ids)
+    {
+        auto host_it = simulation_begins._hosts.find(host_id);
+        BAT_ASSERT(host_it != simulation_begins._hosts.end(), "Internal inconsistency: non-existing host_id");
+        const auto * host = host_it->second;
+
+        auto host_properties_s = serialize_host_property_vector(host->properties);
+        auto host_zone_properties_s = serialize_host_property_vector(host->zone_properties);
+
+        auto host_s = fb::CreateHostDirect(*_builder, host_id, host->name.c_str(), host->pstate, host->pstate_count, host->state, &host_properties_s, &host_zone_properties_s, host->core_count, host->computation_speed.get());
+        hosts_s.push_back(host_s);
+    }
+
+    return hosts_s;
+}
+
+std::vector<flatbuffers::Offset<batprotocol::fb::HostProperty>> MessageBuilder::serialize_host_property_vector(const std::unordered_map<std::string, std::string> & properties)
+{
+    std::vector<flatbuffers::Offset<batprotocol::fb::HostProperty>> property_vec_s;
+    property_vec_s.reserve(properties.size());
+
+    for (const auto & kv : properties)
+    {
+        auto property = fb::CreateHostPropertyDirect(*_builder, kv.first.c_str(), kv.second.c_str());
+        property_vec_s.push_back(property);
+    }
+
+    return property_vec_s;
+}
+
+std::vector<flatbuffers::Offset<batprotocol::fb::ProfileAndId>> MessageBuilder::serialize_profile_and_id_vector(std::unordered_map<std::string, std::shared_ptr<Profile> > & profiles)
+{
+    std::vector<flatbuffers::Offset<batprotocol::fb::ProfileAndId>> profile_vec_s;
+    profile_vec_s.reserve(profiles.size());
+
+    // Generate deterministic order
+    std::vector<std::string> profile_ids_vector;
+    profile_ids_vector.reserve(profiles.size());
+    for (const auto & kv : profiles)
+        profile_ids_vector.push_back(kv.first);
+    std::sort(profile_ids_vector.begin(), profile_ids_vector.end());
+
+    for (const auto & profile_id : profile_ids_vector)
+    {
+        auto profile = profiles[profile_id];
+        BAT_ENFORCE(profile != nullptr, "Invalid (null) profile received for profile_id='%s'", profile_id.c_str());
+        auto profile_and_id = serialize_profile_and_id(profile_id, profile);
+        profile_vec_s.push_back(profile_and_id);
+    }
+
+    return profile_vec_s;
+}
+
+std::vector<flatbuffers::Offset<batprotocol::fb::WorkloadAndFilename>> MessageBuilder::serialize_workload_and_filename_vector(std::unordered_map<std::string, std::string> & workloads)
+{
+    std::vector<flatbuffers::Offset<batprotocol::fb::WorkloadAndFilename>> workload_vec_s;
+    workload_vec_s.reserve(workloads.size());
+
+    // Generate deterministic order
+    std::vector<std::string> workload_ids_vector;
+    workload_ids_vector.reserve(workloads.size());
+    for (const auto & kv : workloads)
+        workload_ids_vector.push_back(kv.first);
+    std::sort(workload_ids_vector.begin(), workload_ids_vector.end());
+
+    for (const auto & workload_id : workload_ids_vector)
+    {
+        const auto & workload = workloads[workload_id];
+        auto workload_and_filename = fb::CreateWorkloadAndFilenameDirect(*_builder, workload_id.c_str(), workload.c_str());
+        workload_vec_s.push_back(workload_and_filename);
+    }
+
+    return workload_vec_s;
+}
+
+std::vector<flatbuffers::Offset<batprotocol::fb::KillProgressWrapper>> MessageBuilder::serialize_kill_progress_vector(const std::vector<std::string> & tasks_to_serialize, const std::string & task_id, const std::string & job_id, std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > & serialized_tasks)
+{
+    std::vector<flatbuffers::Offset<batprotocol::fb::KillProgressWrapper>> kp_vec_s;
+    kp_vec_s.reserve(tasks_to_serialize.size());
+
+    for (const auto & task_id_to_serialize : tasks_to_serialize)
+    {
+        auto it = serialized_tasks.find(task_id_to_serialize);
+        BAT_ENFORCE(it != serialized_tasks.end(), "invalid KillProgress of job_id='%s': while trying to serialize task_id='%s', its child task_id='%s' has not been already serialized: cycles are not allowed in your progress graph.", job_id.c_str(), task_id.c_str(), task_id_to_serialize.c_str());
+        kp_vec_s.push_back(it->second);
+    }
+
+    return kp_vec_s;
+}
+
 
 flatbuffers::Offset<fb::Job> MessageBuilder::serialize_job(const std::shared_ptr<Job> & job)
 {
@@ -352,6 +606,81 @@ flatbuffers::Offset<void> MessageBuilder::serialize_time_specifier(const std::sh
     }
 
     BAT_ENFORCE(false, "Unhandled TimeSpecifierUnion value: %d", time_specifier->_type);
+}
+
+flatbuffers::Offset<void> MessageBuilder::serialize_placement(ExecuteJobOptions::Placement * placement)
+{
+    // Default placement if unset (nullptr)
+    bool should_delete = false;
+    if (placement == nullptr)
+    {
+        placement = ExecuteJobOptions::Placement::make_predefined(fb::ExecutorPlacementStrategy_SpreadOverHostsFirst);
+        should_delete = true;
+    }
+
+    switch(placement->_type)
+    {
+    case fb::ExecutorPlacement_NONE: {
+        BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped placements");
+    } break;
+    case fb::ExecutorPlacement_predefined_strategy: {
+        auto strategy = fb::CreateExecutorPlacementStrategyTable(*_builder, placement->_predefined_strategy);
+        if (should_delete)
+            delete placement;
+        return strategy.Union();
+    } break;
+    case fb::ExecutorPlacement_custom_executor_to_host_mapping: {
+        auto mapping = fb::CreateCustomExecutorToHostMappingDirect(*_builder, placement->_custom_mapping.get());
+        return mapping.Union();
+    } break;
+    }
+
+    BAT_ENFORCE(false, "Unhandled ExecutorPlacement value: %d", placement->_type);
+}
+
+flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> MessageBuilder::serialize_kill_progress(const std::string & task_id, const std::string & job_id, const KillProgress::KillProgressVariant * variant, std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > & serialized_tasks)
+{
+    BAT_ASSERT(variant != nullptr, "inconsistent (null) kill progress variant received for task_id='%s' of job_id='%s'", task_id.c_str(), job_id.c_str());
+    BAT_ENFORCE(serialized_tasks.find(task_id) == serialized_tasks.end(), "invalid KillProgress of job_id='%s': trying to serialize task_id='%s' while it has already been serialized: cycles are not allowed in your progress graph.", job_id.c_str(), task_id.c_str());
+
+    switch (variant->type)
+    {
+    case fb::KillProgress_NONE: {
+        BAT_ASSERT(false, "inconsistency: kill progress type should not be %s", fb::EnumNamesKillProgress()[variant->type]);
+    } break;
+    case fb::KillProgress_KillProgressAtomicProfile: {
+        const auto * kp = static_cast<KillProgress::Atomic*>(variant->data);
+        auto kp_s = fb::CreateKillProgressAtomicProfileDirect(*_builder, kp->profile_id.c_str(), kp->progress);
+        auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
+        serialized_tasks[task_id] = wrapper_s;
+        return wrapper_s;
+    } break;
+    case fb::KillProgress_KillProgressSequentialProfile: {
+        const auto * kp = static_cast<KillProgress::Sequential*>(variant->data);
+        auto child_it = serialized_tasks.find(kp->current_subtask_id);
+        BAT_ENFORCE(child_it != serialized_tasks.end(), "invalid kill progress of job_id='%s': trying to serialize task_id='%s' while its child task_id='%s' has not been serialized yet. cycles are not allowed in your progress graph.", job_id.c_str(), task_id.c_str(), kp->current_subtask_id.c_str());
+        auto kp_s = fb::CreateKillProgressSequentialProfileDirect(*_builder, kp->profile_id.c_str(), kp->current_repetition, kp->current_task_index, child_it->second);
+        auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
+        serialized_tasks[task_id] = wrapper_s;
+        return wrapper_s;
+    } break;
+    case fb::KillProgress_KillProgressForkJoinProfile: {
+        const auto * kp = static_cast<KillProgress::ForkJoin*>(variant->data);
+        auto children_s = serialize_kill_progress_vector(kp->subtasks_id, task_id, job_id, serialized_tasks);
+        auto kp_s = fb::CreateKillProgressForkJoinProfileDirect(*_builder, kp->profile_id.c_str(), &children_s);
+        auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
+        serialized_tasks[task_id] = wrapper_s;
+    } break;
+    case fb::KillProgress_KillProgressParallelTaskMergeProfile: {
+        const auto * kp = static_cast<KillProgress::ParallelTaskMerge*>(variant->data);
+        auto children_s = serialize_kill_progress_vector(kp->subtasks_id, task_id, job_id, serialized_tasks);
+        auto kp_s = fb::CreateKillProgressParallelTaskMergeProfileDirect(*_builder, kp->profile_id.c_str(), &children_s);
+        auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
+        serialized_tasks[task_id] = wrapper_s;
+    } break;
+    }
+
+    BAT_ENFORCE(false, "Unhandled KillProgress variant type value: %d", variant->type);
 }
 
 

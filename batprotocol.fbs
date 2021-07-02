@@ -411,10 +411,10 @@ table Host {
   name: string (required);
 
   /// The host power state.
-  pstate: uint32;
+  pstate: uint32 = 0;
 
   /// The host power state count.
-  pstate_count: uint32;
+  pstate_count: uint32 = 1;
 
   /// The host state.
   state: HostState;
@@ -426,7 +426,7 @@ table Host {
   zone_properties: [HostProperty];
 
   /// The host core count.
-  core_count: uint32;
+  core_count: uint32 = 1;
 
   /// The host computation speeds in each power state. Vector is indexed by power state number in [0,pstate_count[.
   computation_speed: [float64];

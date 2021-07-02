@@ -9,6 +9,8 @@
 
 namespace batprotocol
 {
+    class MessageBuilder;
+
     class ExecuteJobOptions
     {
     public:
@@ -24,7 +26,7 @@ namespace batprotocol
         ExecuteJobOptions & override_storage_placement(const std::string & storage_name, uint32_t host_id);
 
     private:
-        friend class EventQueue;
+        friend class MessageBuilder;
 
         class Placement
         {
@@ -32,7 +34,7 @@ namespace batprotocol
             static Placement * make_predefined(fb::ExecutorPlacementStrategy predefined_strategy);
             static Placement * make_custom(const std::shared_ptr<std::vector<uint32_t> > & mapping);
 
-            fb::ExecutorPlacement _placement_type = fb::ExecutorPlacement_NONE;
+            fb::ExecutorPlacement _type = fb::ExecutorPlacement_NONE;
             fb::ExecutorPlacementStrategy _predefined_strategy;
             std::shared_ptr<std::vector<uint32_t> > _custom_mapping;
 
@@ -46,7 +48,7 @@ namespace batprotocol
             Placement * placement = nullptr;
         };
 
-        Placement * _placement = nullptr;
+        Placement * _placement = nullptr; // can remain null.
         std::unordered_map<std::string, ProfilePlacement*> _profile_overrides;
         std::unordered_map<std::string, uint32_t> _storage_overrides;
     };

@@ -53,7 +53,7 @@ namespace batprotocol
 
         void add_jobs_killed(
             const std::vector<std::string> & job_ids,
-            const KillProgress & progress
+            const std::vector<KillProgress> & progresses
         );
 
         void add_register_profile(
@@ -104,9 +104,17 @@ namespace batprotocol
 
     private:
         std::vector<flatbuffers::Offset<flatbuffers::String> > serialize_string_vector(const std::vector<std::string> & strings);
+        std::vector<flatbuffers::Offset<batprotocol::fb::Host>> serialize_host_vector(const SimulationBegins & simulation_begins, const std::vector<uint32_t> host_ids);
+        std::vector<flatbuffers::Offset<batprotocol::fb::HostProperty>> serialize_host_property_vector(const std::unordered_map<std::string, std::string> & properties);
+        std::vector<flatbuffers::Offset<batprotocol::fb::ProfileAndId>> serialize_profile_and_id_vector(std::unordered_map<std::string, std::shared_ptr<Profile> > & profiles);
+        std::vector<flatbuffers::Offset<batprotocol::fb::WorkloadAndFilename>> serialize_workload_and_filename_vector(std::unordered_map<std::string, std::string> & workloads);
+        std::vector<flatbuffers::Offset<batprotocol::fb::KillProgressWrapper>> serialize_kill_progress_vector(const std::vector<std::string> & tasks_to_serialize, const std::string & task_id, const std::string & job_id, std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > & serialized_tasks);
+
         flatbuffers::Offset<fb::Job> serialize_job(const std::shared_ptr<Job> & job);
         flatbuffers::Offset<fb::ProfileAndId> serialize_profile_and_id(const std::string & profile_id, const std::shared_ptr<Profile> & profile);
         flatbuffers::Offset<void> serialize_time_specifier(const std::shared_ptr<TimeSpecifier> & time_specifier);
+        flatbuffers::Offset<void> serialize_placement(ExecuteJobOptions::Placement * placement);
+        flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> serialize_kill_progress(const std::string & task_id, const std::string & job_id, const KillProgress::KillProgressVariant * variant, std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > & serialized_tasks);
 
     private:
         flatbuffers::FlatBufferBuilder * _builder = nullptr;
