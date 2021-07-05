@@ -24,7 +24,6 @@ src = [
 
 inc = [
   'src/assert.hpp',
-  'src/batprotocol.hpp',
   'src/execute_job.hpp',
   'src/job.hpp',
   'src/kill.hpp',
@@ -44,6 +43,7 @@ batprotocollib = library('batprotocol-cpp', src + inc,
 )
 
 install_headers(inc, subdir:'batprotocol-cpp')
+install_headers('src/batprotocol.hpp')
 
 # Generate a pkg-config file for the library.
 pkgc = import('pkgconfig')
