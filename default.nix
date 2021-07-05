@@ -49,7 +49,7 @@ let
       buildInputs = [
         batprotocol-cpp
       ];
-      src = pkgs.lib.sourceByRegex ./cpp/tests [
+      src = pkgs.lib.sourceByRegex ./cpp/test [
         "^meson\.build"
         "^.*?pp"
       ];
