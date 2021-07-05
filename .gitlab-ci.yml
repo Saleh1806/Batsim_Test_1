@@ -16,5 +16,4 @@ build_and_test:
     - nix-shell --pure -A batprotocol-cpp --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
     - nix-build -A batprotocol-cpp
     # Python library
-    - nix-shell --pure -A batprotocol-py --quiet --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
     - nix-build -A batprotocol-py
