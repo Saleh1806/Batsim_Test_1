@@ -1,0 +1,16 @@
+image: oarteam/batsim_ci:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: none
+
+stages:
+  - big_stage
+
+###############################################################################
+# Build and test
+###############################################################################
+build_and_test:
+  stage: big_stage
+  script:
+    # C++ binding
+    - nix-build -A batsim ${NIX_ARGS}
