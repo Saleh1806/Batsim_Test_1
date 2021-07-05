@@ -31,6 +31,9 @@ let
         "^batprotocol\.fbs"
         "^cpp"
         "^cpp/meson\.build"
+        "^cpp/src"
+        "^cpp/src/.*\.hpp"
+        "^cpp/src/.*\.cpp"
       ];
       preConfigure = "cd cpp";
     };
