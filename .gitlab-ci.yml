@@ -13,4 +13,4 @@ build_and_test:
   stage: big_stage
   script:
     # C++ binding
-    - nix-build -A batsim ${NIX_ARGS}
+    - nix-build -A batprotocol-cpp
