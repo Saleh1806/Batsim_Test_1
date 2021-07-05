@@ -12,6 +12,9 @@ stages:
 build_and_test:
   stage: big_stage
   script:
-    # C++ binding
+    # C++ library
     - nix-shell --pure -A batprotocol-cpp --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
     - nix-build -A batprotocol-cpp
+    # Python library
+    - nix-shell --pure -A batprotocol-py --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
+    - nix-build -A batprotocol-py
