@@ -45,6 +45,7 @@ let
         pkgs.meson
         pkgs.ninja
         pkgs.pkgconfig
+        pkgs.gtest.dev
       ];
       buildInputs = [
         batprotocol-cpp
