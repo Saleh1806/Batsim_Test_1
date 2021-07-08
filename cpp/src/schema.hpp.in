@@ -1,0 +1,7 @@
+namespace batprotocol
+{
+    namespace fb
+    {
+        const std::string schema = R"(@schema_file_content@)";
+    } // end of namespace batprotocol::fb
+} // end of namespace batprotocol

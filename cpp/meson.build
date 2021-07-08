@@ -1,14 +1,28 @@
 project('batprotocol-cpp', 'cpp',
   version: '0.1.0',
   license: 'LGPL-3.0',
-  meson_version: '>=0.47.0'
+  meson_version: '>=0.57.0'
 )
 
+fs = import('fs')
+
 flatc = find_program('flatc', required: true)
-flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.build_root(), '../batprotocol.fbs')
+fbs_file = '../batprotocol.fbs'
+flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.build_root(), fbs_file)
 if flatc_gen_cpp_cmd.returncode() != 0
   error('flatbuffers compiler (flatc) failed with the following output.\n' + flatc_gen_cpp_cmd.stdout().strip())
 endif
+
+# transform the fbs file into a C++ string
+fbs_content = fs.read(fbs_file)
+conf_data = configuration_data()
+conf_data.set('schema_file_content', fbs_content)
+configure_file(
+  input: 'src/schema.hpp.in',
+  output: 'schema.hpp',
+  configuration: conf_data,
+)
+
 
 flatbuffers_dep = dependency('flatbuffers')
 deps = [
@@ -34,7 +48,8 @@ inc = [
   'src/profile.hpp',
   'src/simulation_begins.hpp',
   'src/time_specifier.hpp',
-  meson.build_root() + '/batprotocol_generated.h'
+  meson.build_root() + '/batprotocol_generated.h',
+  meson.build_root() + '/schema.hpp',
 ]
 
 include_dirs = include_directories('src')

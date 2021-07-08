@@ -33,6 +33,7 @@ let
         "^cpp/meson\.build"
         "^cpp/src"
         "^cpp/src/.*\.hpp"
+        "^cpp/src/.*\.hpp\.in"
         "^cpp/src/.*\.cpp"
       ];
       preConfigure = "cd cpp";
