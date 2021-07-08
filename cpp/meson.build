@@ -26,7 +26,7 @@ configure_file(
 
 flatbuffers_dep = dependency('flatbuffers')
 deps = [
-  flatbuffers_dep
+  flatbuffers_dep,
 ]
 
 src = [
@@ -36,7 +36,7 @@ src = [
   'src/message_builder.cpp',
   'src/profile.cpp',
   'src/simulation_begins.cpp',
-  'src/time_specifier.cpp'
+  'src/time_specifier.cpp',
 ]
 
 inc = [
@@ -57,7 +57,7 @@ include_dirs = include_directories('src')
 batprotocollib = library('batprotocol-cpp', src + inc,
   include_directories: include_dirs,
   dependencies: deps,
-  install: true
+  install: true,
 )
 
 install_headers(inc, subdir:'batprotocol-cpp')
@@ -69,5 +69,5 @@ pkgc.generate(name: 'batprotocol-cpp',
   libraries: batprotocollib,
   version: meson.project_version(),
   requires_private: 'flatbuffers>=2.0.0',
-  description: 'Batsim Protocol C++ Library.'
+  description: 'Batsim Protocol C++ Library.',
 )
