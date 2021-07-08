@@ -5,7 +5,10 @@ project('batprotocol-cpp', 'cpp',
 )
 
 flatc = find_program('flatc', required: true)
-flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.build_root(), '../batprotocol.fbs', check: true)
+flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.build_root(), '../batprotocol.fbs')
+if flatc_gen_cpp_cmd.returncode() != 0
+  error('flatbuffers compiler (flatc) failed with the following output.\n' + flatc_gen_cpp_cmd.stdout().strip())
+endif
 
 flatbuffers_dep = dependency('flatbuffers')
 deps = [
