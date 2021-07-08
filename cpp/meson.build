@@ -8,7 +8,7 @@ fs = import('fs')
 
 flatc = find_program('flatc', required: true)
 fbs_file = '../batprotocol.fbs'
-flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.build_root(), fbs_file)
+flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.project_build_root(), fbs_file)
 if flatc_gen_cpp_cmd.returncode() != 0
   error('flatbuffers compiler (flatc) failed with the following output.\n' + flatc_gen_cpp_cmd.stdout().strip())
 endif
@@ -48,8 +48,8 @@ inc = [
   'src/profile.hpp',
   'src/simulation_begins.hpp',
   'src/time_specifier.hpp',
-  meson.build_root() + '/batprotocol_generated.h',
-  meson.build_root() + '/schema.hpp',
+  meson.project_build_root() + '/batprotocol_generated.h',
+  meson.project_build_root() + '/schema.hpp',
 ]
 
 include_dirs = include_directories('src')
