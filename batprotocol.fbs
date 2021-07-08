@@ -336,17 +336,35 @@ table OneShot {
   time: float64;
 }
 
+table Infinite {}
+
+table FinitePeriodNumber {
+  nb_periods: uint32;
+}
+
+union PeriodicMode {
+  Infinite
+, FinitePeriodNumber
+}
+
 table Periodic {
   /// The point in time at which the first event should occur.
   start_time: float64;
 
   /// The duration between two consecutive events.
   period: float64;
+
+  mode: PeriodicMode;
 }
 
 union TemporalTrigger {
   OneShot
 , Periodic
+}
+
+/// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
+table TemporalTriggerWrapper {
+  temporal_trigger: TemporalTrigger;
 }
 
 table CallMeLaterEvent {
@@ -395,7 +413,7 @@ table HostProperty {
   value: string (required);
 }
 
-enum HostState: byte {
+enum HostState : byte {
   SLEEPING
 , IDLE
 , COMPUTING
@@ -517,3 +535,200 @@ table Message {
 }
 
 root_type Message;
+
+/// Probe Creation
+
+union ProbeMeasurementTriggeringPolicy {
+  /// Union because later we will implement other kind of trigger (as react to an other probe event)
+  TemporalTriggerWrapper
+}
+
+union ProbeDataAccumulationStrategy {
+  NoProbeDataAccumulation
+  ,ProbeDataAccumulation
+}
+
+table NoProbeDataAccumulation {}
+
+union ResetMode {
+  NoReset
+  ,ProbeAccumulationReset
+}
+
+table NoReset {}
+
+table ProbeAccumulationReset {
+  new_value: float64;
+}
+
+enum CumulativeFunction : byte {
+  Sum
+  ,Minimum
+  ,Maximum
+}
+
+table ProbeDataAccumulation {
+  reset_mode: ResetMode;
+  cumulative_function: CumulativeFunction;
+  temporal_normalization: bool;
+}
+
+enum Metrics : byte {
+  /// The power in J/s
+  Power
+
+  /// The load in bytes/s
+  ,NetworkLoad
+
+  /// The normalized load, between 0 and 1
+  ,NormalizedLoad
+}
+
+union TemporalAggregation {
+  NoTemporalAggregation
+  ,ExponentialMovingAverage
+  ,SlidingWindowOperation
+}
+
+table NoTemporalAggregation {}
+
+table ExponentialMovingAverage {
+  /// TODO
+}
+
+table SlidingWindowOperation {
+  /// TODO
+}
+
+table Quantile {
+  /// A value between 0 and 1
+  param: float64;
+}
+
+table Sum {}
+
+table Average {}
+
+table NoResourcesAggregation {}
+
+union ResourcesAggregationFunction {
+  Average
+  ,Quantile
+  ,Sum
+  ,NoResourcesAggregation
+}
+
+union ProbeEmissionFilteringPolicy {
+  NoFiltering
+  ,ThresholdFilteringFunction
+}
+
+enum BooleanComparisonOperator : byte {
+  GreaterThan
+  ,GreaterThanOrEqual
+  ,LessThan
+  ,LessThanOrEqual
+}
+
+table NoFiltering {}
+
+table ThresholdFilteringFunction {
+  /// The threshold
+  threshold: float64;
+
+  /// The operator for our filter
+  operator: BooleanComparisonOperator;
+}
+
+table CreateProbe {
+  /// The name of the probe
+  probe_id: string;
+
+  data_accumulation: ProbeDataAccumulationStrategy;
+
+  /// The metrics that we want to study
+  metrics: Metrics;
+
+  /// When our probe is taking measures
+  measurement_triggering_policy: ProbeMeasurementTriggeringPolicy;
+
+  /// The ressources aggregation function
+  ressources_aggregation_function: ResourcesAggregationFunction;
+
+  temporal_aggregation: TemporalAggregation;
+
+  /// The condition that has to be respected to emited data
+  emission_filtering_policy: ProbeEmissionFilteringPolicy;
+}
+
+table StopProbe {
+  /// The name of the probe
+  probe_id: string;
+}
+
+table ResetProbe {
+  /// The name of the probe
+  probe_id: string;
+
+  /// The new desired value
+  new_value: float64;
+}
+
+table TriggerProbe {
+  /// The name of the probe
+  probe_id: string;
+
+  force_data_emission: bool;
+}
+
+/// Probe Data Event
+
+union Resources {
+  HostResources
+  ,LinkResources
+}
+
+table HostResources {
+  /// The intervalset of host ids
+  host_ids: string;
+}
+
+table LinkResources {
+  /// The list of links ids (name of link)
+  link_ids: [string];
+}
+
+union ProbeData {
+  AggregatedProbeData
+  ,VectorialProbeData
+}
+
+table AggregatedProbeData {
+  /// The value aggregated on all the ressources
+  data: float64;
+}
+
+table VectorialProbeData {
+  /// The list of value associated to the id ressources list
+  data: [float64];
+}
+
+table ProbeDataEmittedEvent {
+  /// The name of the probe
+  probe_id: string;
+
+  /// The link or host resources
+  resources: Resources;
+
+  /// The returned value
+  data: ProbeData;
+
+  /// True if the Event has been asked by the user, false otherwise
+  manually_triggered: bool;
+
+  /// The number of times that the probe emmited data
+  nb_emited: uint32;
+
+  /// The number of times that the probe has been triggered
+  nb_trigger: uint32;
+}
