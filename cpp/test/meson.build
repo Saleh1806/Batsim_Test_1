@@ -18,7 +18,8 @@ src = [
   'test_timestamp.cpp',
 ]
 batprotocol_cpp_test = executable('batprotocol-cpp-test', src,
-    dependencies: deps,
-    include_directories: [incdir]
+  dependencies: deps,
+  include_directories: [incdir],
+  install: true
 )
 test('all-tests', batprotocol_cpp_test)
