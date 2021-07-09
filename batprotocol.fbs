@@ -343,7 +343,7 @@ table Periodic {
   period: float64;
 }
 
-union TimeSpecifierUnion {
+union TemporalTrigger {
   OneTime,
   Periodic
 }
@@ -353,7 +353,7 @@ table CallMeLaterEvent {
   call_me_later_id: string (required);
 
   /// Defines when the future call will be done.
-  when: TimeSpecifierUnion (required);
+  when: TemporalTrigger (required);
 }
 
 table RequestedCallEvent {

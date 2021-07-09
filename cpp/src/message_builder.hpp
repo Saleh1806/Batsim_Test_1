@@ -8,7 +8,7 @@
 #include "kill.hpp"
 #include "profile.hpp"
 #include "simulation_begins.hpp"
-#include "time_specifier.hpp"
+#include "temporal_trigger.hpp"
 
 namespace batprotocol
 {
@@ -71,7 +71,7 @@ namespace batprotocol
         // Simulation management events
         void add_call_me_later(
             const std::string & call_me_later_id,
-            const std::shared_ptr<TimeSpecifier> & when
+            const std::shared_ptr<TemporalTrigger> & when
         );
 
         void add_requested_call(
@@ -112,7 +112,7 @@ namespace batprotocol
 
         flatbuffers::Offset<fb::Job> serialize_job(const std::shared_ptr<Job> & job);
         flatbuffers::Offset<fb::ProfileAndId> serialize_profile_and_id(const std::string & profile_id, const std::shared_ptr<Profile> & profile);
-        flatbuffers::Offset<void> serialize_time_specifier(const std::shared_ptr<TimeSpecifier> & time_specifier);
+        flatbuffers::Offset<void> serialize_temporal_trigger(const std::shared_ptr<TemporalTrigger> & temporal_trigger);
         flatbuffers::Offset<void> serialize_placement(ExecuteJobOptions::Placement * placement);
         flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> serialize_kill_progress(const std::string & task_id, const std::string & job_id, const KillProgress::KillProgressVariant * variant, std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > & serialized_tasks);
 

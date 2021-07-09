@@ -284,13 +284,13 @@ void MessageBuilder::add_register_job(
 
 void MessageBuilder::add_call_me_later(
     const std::string & call_me_later_id,
-    const std::shared_ptr<TimeSpecifier> & when)
+    const std::shared_ptr<TemporalTrigger> & when)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_call_me_later() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!call_me_later_id.empty(), "Invalid (empty) call_me_later_id received");
-    BAT_ENFORCE(when.get() != nullptr, "Invalid (null) TimeSpecifier received");
+    BAT_ENFORCE(when.get() != nullptr, "Invalid (null) TemporalTrigger received");
 
-    auto ts_s = serialize_time_specifier(when);
+    auto ts_s = serialize_temporal_trigger(when);
 
     auto call_me_later = fb::CreateCallMeLaterEventDirect(*_builder, call_me_later_id.c_str(), when->_type, ts_s);
     auto event = fb::CreateEvent(*_builder, _current_time, fb::EventUnion_CallMeLaterEvent, call_me_later.Union());
@@ -588,24 +588,24 @@ flatbuffers::Offset<fb::ProfileAndId> MessageBuilder::serialize_profile_and_id(c
     BAT_ENFORCE(false, "Unhandled Profile value: %d", profile->_profile_type);
 }
 
-flatbuffers::Offset<void> MessageBuilder::serialize_time_specifier(const std::shared_ptr<TimeSpecifier> & time_specifier)
+flatbuffers::Offset<void> MessageBuilder::serialize_temporal_trigger(const std::shared_ptr<TemporalTrigger> & temporal_trigger)
 {
-    BAT_ENFORCE(time_specifier.get() != nullptr, "Invalid (null) TimeSpecifier received");
+    BAT_ENFORCE(temporal_trigger.get() != nullptr, "Invalid (null) TemporalTrigger received");
 
-    switch(time_specifier->_type)
+    switch(temporal_trigger->_type)
     {
-    case fb::TimeSpecifierUnion_NONE: {
+    case fb::TemporalTrigger_NONE: {
         BAT_ASSERT(false, "Internal inconsistency: should not be able to created untyped time specifiers");
     } break;
-    case fb::TimeSpecifierUnion_OneTime: {
-        return fb::CreateOneTime(*_builder, time_specifier->_time_point).Union();
+    case fb::TemporalTrigger_OneTime: {
+        return fb::CreateOneTime(*_builder, temporal_trigger->_time_point).Union();
     } break;
-    case fb::TimeSpecifierUnion_Periodic: {
-        return fb::CreatePeriodic(*_builder, time_specifier->_time_point, time_specifier->_period).Union();
+    case fb::TemporalTrigger_Periodic: {
+        return fb::CreatePeriodic(*_builder, temporal_trigger->_time_point, temporal_trigger->_period).Union();
     } break;
     }
 
-    BAT_ENFORCE(false, "Unhandled TimeSpecifierUnion value: %d", time_specifier->_type);
+    BAT_ENFORCE(false, "Unhandled TemporalTrigger value: %d", temporal_trigger->_type);
 }
 
 flatbuffers::Offset<void> MessageBuilder::serialize_placement(ExecuteJobOptions::Placement * placement)

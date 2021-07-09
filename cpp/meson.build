@@ -36,7 +36,7 @@ src = [
   'src/message_builder.cpp',
   'src/profile.cpp',
   'src/simulation_begins.cpp',
-  'src/time_specifier.cpp',
+  'src/temporal_trigger.cpp',
 ]
 
 inc = [
@@ -47,7 +47,7 @@ inc = [
   'src/message_builder.hpp',
   'src/profile.hpp',
   'src/simulation_begins.hpp',
-  'src/time_specifier.hpp',
+  'src/temporal_trigger.hpp',
   meson.project_build_root() + '/batprotocol_generated.h',
   meson.project_build_root() + '/schema.hpp',
 ]
