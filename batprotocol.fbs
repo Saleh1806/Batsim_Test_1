@@ -345,8 +345,8 @@ table Periodic {
 }
 
 union TemporalTrigger {
-  OneShot,
-  Periodic
+  OneShot
+, Periodic
 }
 
 table CallMeLaterEvent {
