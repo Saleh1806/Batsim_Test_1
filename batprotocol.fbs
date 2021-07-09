@@ -379,7 +379,7 @@ enum Metrics : byte {
 , NormalizedComputationLoad
 }
 
-union TemporalAggregation {
+union TemporalAggregationFunction {
   NoTemporalAggregation
 , ExponentialMovingAverage
 , SlidingWindowOperation
@@ -439,7 +439,7 @@ table CreateProbeEvent {
   /// The name of the probe
   probe_id: string;
 
-  data_accumulation: ProbeDataAccumulationStrategy;
+  data_accumulation_strategy: ProbeDataAccumulationStrategy;
 
   /// The metrics that we want to study
   metrics: Metrics;
@@ -447,10 +447,10 @@ table CreateProbeEvent {
   /// When our probe is taking measures
   measurement_triggering_policy: ProbeMeasurementTriggeringPolicy;
 
-  /// The ressources aggregation function
-  ressources_aggregation_function: ResourcesAggregationFunction;
+  /// The resources aggregation function
+  resources_aggregation_function: ResourcesAggregationFunction;
 
-  temporal_aggregation: TemporalAggregation;
+  temporal_aggregation_function: TemporalAggregationFunction;
 
   /// The condition that has to be respected to emited data
   emission_filtering_policy: ProbeEmissionFilteringPolicy;
@@ -473,7 +473,8 @@ table TriggerProbeEvent {
   /// The name of the probe
   probe_id: string;
 
-  force_data_emission: bool;
+  /// If set to true, the triggering will always result in a ProbeDataEmittedEvent regardless of the Probe data emitting filtering policy.
+  force_data_emission: bool = true;
 }
 
 // Probe Data
@@ -488,7 +489,7 @@ table HostResources {
 }
 
 table LinkResources {
-  /// The list of links ids (name of link)
+  /// The names of the links
   link_ids: [string];
 }
 
@@ -498,12 +499,12 @@ union ProbeData {
 }
 
 table AggregatedProbeData {
-  /// The value aggregated on all the ressources
+  /// The value aggregated over all the resources
   data: float64;
 }
 
 table VectorialProbeData {
-  /// The list of value associated to the id ressources list
+  /// The values (one value per resource with the same order as in the probe resources)
   data: [float64];
 }
 
@@ -511,20 +512,23 @@ table ProbeDataEmittedEvent {
   /// The name of the probe
   probe_id: string;
 
-  /// The link or host resources
+  /// The resources observed by the probe
   resources: Resources;
+
+  /// The metrics measured by the probe
+  metrics: Metrics;
 
   /// The returned value
   data: ProbeData;
 
-  /// True if the Event has been asked by the user, false otherwise
+  /// True if the Event has been directly requested by the user via a TriggerProbeEvent, false otherwise
   manually_triggered: bool;
 
-  /// The number of times that the probe emmited data
-  nb_emited: uint32;
+  /// The number of times that the probe has emitted data
+  nb_emitted: uint32;
 
   /// The number of times that the probe has been triggered
-  nb_trigger: uint32;
+  nb_triggered: uint32;
 }
 
 ///
