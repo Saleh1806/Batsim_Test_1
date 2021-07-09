@@ -326,6 +326,211 @@ table RegisterJobEvent {
 /// Resource management events
 ///
 
+// Probe Creation
+union ProbeMeasurementTriggeringPolicy {
+  /// Union because later we will implement other kind of trigger (as react to an other probe event)
+  TemporalTriggerWrapper
+}
+
+union ProbeDataAccumulationStrategy {
+  NoProbeDataAccumulation
+, ProbeDataAccumulation
+}
+
+table NoProbeDataAccumulation {}
+
+union ResetMode {
+  NoReset
+, ProbeAccumulationReset
+}
+
+table NoReset {}
+
+table ProbeAccumulationReset {
+  new_value: float64;
+}
+
+enum CumulativeFunction : byte {
+  Sum
+, Minimum
+, Maximum
+}
+
+table ProbeDataAccumulation {
+  reset_mode: ResetMode;
+  cumulative_function: CumulativeFunction;
+  temporal_normalization: bool;
+}
+
+enum Metrics : byte {
+  /// The power in J/s
+  Power
+
+  /// The network load in bytes/s
+, NetworkLoad
+
+  /// The load in flop/s (amount of computing operations per second)
+, ComputationLoad
+
+  /// The normalized network load in [0,1]. Cannot be accumulated over time as this metrics is not defined per unit of time.
+, NormalizedNetworkLoad
+
+  /// The normalized network load in [0,1]. Cannot be accumulated over time as this metrics is not defined per unit of time.
+, NormalizedComputationLoad
+}
+
+union TemporalAggregationFunction {
+  NoTemporalAggregation
+, ExponentialMovingAverage
+, SlidingWindowOperation
+}
+
+table NoTemporalAggregation {}
+
+table ExponentialMovingAverage {
+  // TODO
+}
+
+table SlidingWindowOperation {
+  // TODO
+}
+
+table QuantileFunction {
+  /// The normalized threshold (in [0,1]) whose value of the quantile function (AKA inverse cumulative distribution function) is sought. threshold=1/2 means that we want the value of the median. threshold=1/4 means that we want the value of the first quartile.
+  threshold: float64;
+}
+
+table Sum {}
+
+table ArithmeticMean {}
+
+table NoResourcesAggregation {}
+
+union ResourcesAggregationFunction {
+  NoResourcesAggregation
+, Sum
+, ArithmeticMean
+, QuantileFunction
+}
+
+union ProbeEmissionFilteringPolicy {
+  NoFiltering
+, ThresholdFilteringFunction
+}
+
+enum BooleanComparisonOperator : byte {
+  GreaterThan
+, GreaterThanOrEqual
+, LessThan
+, LessThanOrEqual
+}
+
+table NoFiltering {}
+
+table ThresholdFilteringFunction {
+  /// The threshold
+  threshold: float64;
+
+  /// The operator for our filter
+  operator: BooleanComparisonOperator;
+}
+
+table CreateProbeEvent {
+  /// The name of the probe
+  probe_id: string;
+
+  data_accumulation_strategy: ProbeDataAccumulationStrategy;
+
+  /// The metrics that we want to study
+  metrics: Metrics;
+
+  /// When our probe is taking measures
+  measurement_triggering_policy: ProbeMeasurementTriggeringPolicy;
+
+  /// The resources aggregation function
+  resources_aggregation_function: ResourcesAggregationFunction;
+
+  temporal_aggregation_function: TemporalAggregationFunction;
+
+  /// The condition that has to be respected to emited data
+  emission_filtering_policy: ProbeEmissionFilteringPolicy;
+}
+
+table StopProbeEvent {
+  /// The name of the probe
+  probe_id: string;
+}
+
+table ResetProbeEvent {
+  /// The name of the probe
+  probe_id: string;
+
+  /// The new desired value
+  new_value: float64;
+}
+
+table TriggerProbeEvent {
+  /// The name of the probe
+  probe_id: string;
+
+  /// If set to true, the triggering will always result in a ProbeDataEmittedEvent regardless of the Probe data emitting filtering policy.
+  force_data_emission: bool = true;
+}
+
+// Probe Data
+union Resources {
+  HostResources
+, LinkResources
+}
+
+table HostResources {
+  /// The intervalset of host ids
+  host_ids: string;
+}
+
+table LinkResources {
+  /// The names of the links
+  link_ids: [string];
+}
+
+union ProbeData {
+  AggregatedProbeData
+, VectorialProbeData
+}
+
+table AggregatedProbeData {
+  /// The value aggregated over all the resources
+  data: float64;
+}
+
+table VectorialProbeData {
+  /// The values (one value per resource with the same order as in the probe resources)
+  data: [float64];
+}
+
+table ProbeDataEmittedEvent {
+  /// The name of the probe
+  probe_id: string;
+
+  /// The resources observed by the probe
+  resources: Resources;
+
+  /// The metrics measured by the probe
+  metrics: Metrics;
+
+  /// The returned value
+  data: ProbeData;
+
+  /// True if the Event has been directly requested by the user via a TriggerProbeEvent, false otherwise
+  manually_triggered: bool;
+
+  /// The number of times that the probe has emitted data
+  nb_emitted: uint32;
+
+  /// The number of times that the probe has been triggered
+  nb_triggered: uint32;
+}
+
 ///
 /// Simulation management events
 ///
@@ -336,17 +541,35 @@ table OneShot {
   time: float64;
 }
 
+table Infinite {}
+
+table FinitePeriodNumber {
+  nb_periods: uint32;
+}
+
+union PeriodicMode {
+  Infinite
+, FinitePeriodNumber
+}
+
 table Periodic {
   /// The point in time at which the first event should occur.
   start_time: float64;
 
   /// The duration between two consecutive events.
   period: float64;
+
+  mode: PeriodicMode;
 }
 
 union TemporalTrigger {
   OneShot
 , Periodic
+}
+
+/// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725
+table TemporalTriggerWrapper {
+  temporal_trigger: TemporalTrigger;
 }
 
 table CallMeLaterEvent {
@@ -395,7 +618,7 @@ table HostProperty {
   value: string (required);
 }
 
-enum HostState: byte {
+enum HostState : byte {
   SLEEPING
 , IDLE
 , COMPUTING
@@ -492,6 +715,12 @@ union Event {
 
 , RegisterProfileEvent
 , RegisterJobEvent
+
+, CreateProbeEvent
+, StopProbeEvent
+, TriggerProbeEvent
+, ResetProbeEvent
+, ProbeDataEmittedEvent
 
 , CallMeLaterEvent
 , RequestedCallEvent
