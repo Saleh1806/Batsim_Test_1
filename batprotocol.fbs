@@ -337,14 +337,16 @@ union ProbeDataAccumulationStrategy {
 , ProbeDataAccumulation
 }
 
-table NoProbeDataAccumulation {}
+table NoProbeDataAccumulation {
+}
 
 union ResetMode {
   NoReset
 , ProbeAccumulationReset
 }
 
-table NoReset {}
+table NoReset {
+}
 
 table ProbeAccumulationReset {
   new_value: float64;
@@ -385,7 +387,8 @@ union TemporalAggregationFunction {
 , SlidingWindowOperation
 }
 
-table NoTemporalAggregation {}
+table NoTemporalAggregation {
+}
 
 table ExponentialMovingAverage {
   // TODO
@@ -395,16 +398,19 @@ table SlidingWindowOperation {
   // TODO
 }
 
+table NoResourcesAggregation {
+}
+
+table Sum {
+}
+
+table ArithmeticMean {
+}
+
 table QuantileFunction {
   /// The normalized threshold (in [0,1]) whose value of the quantile function (AKA inverse cumulative distribution function) is sought. threshold=1/2 means that we want the value of the median. threshold=1/4 means that we want the value of the first quartile.
   threshold: float64;
 }
-
-table Sum {}
-
-table ArithmeticMean {}
-
-table NoResourcesAggregation {}
 
 union ResourcesAggregationFunction {
   NoResourcesAggregation
@@ -425,7 +431,8 @@ enum BooleanComparisonOperator : byte {
 , LessThanOrEqual
 }
 
-table NoFiltering {}
+table NoFiltering {
+}
 
 table ThresholdFilteringFunction {
   /// The threshold
