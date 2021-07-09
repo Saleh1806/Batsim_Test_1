@@ -614,7 +614,7 @@ flatbuffers::Offset<void> MessageBuilder::serialize_placement(ExecuteJobOptions:
     bool should_delete = false;
     if (placement == nullptr)
     {
-        placement = ExecuteJobOptions::Placement::make_predefined(fb::ExecutorPlacementStrategy_SpreadOverHostsFirst);
+        placement = ExecuteJobOptions::Placement::make_predefined(fb::PredefinedExecutorPlacementStrategy_SpreadOverHostsFirst);
         should_delete = true;
     }
 
@@ -624,7 +624,7 @@ flatbuffers::Offset<void> MessageBuilder::serialize_placement(ExecuteJobOptions:
         BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped placements");
     } break;
     case fb::ExecutorPlacement_predefined_strategy: {
-        auto strategy = fb::CreateExecutorPlacementStrategyTable(*_builder, placement->_predefined_strategy);
+        auto strategy = fb::CreatePredefinedExecutorPlacementStrategyWrapper(*_builder, placement->_predefined_strategy);
         if (should_delete)
             delete placement;
         return strategy.Union();

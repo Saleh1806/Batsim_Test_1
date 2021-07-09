@@ -20,7 +20,7 @@ ExecuteJobOptions::~ExecuteJobOptions()
     _storage_overrides.clear();
 }
 
-ExecuteJobOptions & ExecuteJobOptions::set_predefined_placement_strategy(fb::ExecutorPlacementStrategy strategy)
+ExecuteJobOptions & ExecuteJobOptions::set_predefined_placement_strategy(fb::PredefinedExecutorPlacementStrategy strategy)
 {
     BAT_ENFORCE(_placement == nullptr, "placement has already been set");
     _placement = Placement::make_predefined(strategy);
@@ -36,7 +36,7 @@ ExecuteJobOptions & ExecuteJobOptions::set_custom_placement(const std::shared_pt
     return *this;
 }
 
-ExecuteJobOptions & ExecuteJobOptions::override_profile_alloc_predefined_placement(const std::string & profile_id, const std::string & host_allocation, fb::ExecutorPlacementStrategy strategy)
+ExecuteJobOptions & ExecuteJobOptions::override_profile_alloc_predefined_placement(const std::string & profile_id, const std::string & host_allocation, fb::PredefinedExecutorPlacementStrategy strategy)
 {
     BAT_ENFORCE(_profile_overrides.find(profile_id) == _profile_overrides.end(), "placement has already been set for profile '%s'", profile_id.c_str());
     auto profile_placement = new ProfilePlacement;
@@ -66,7 +66,7 @@ ExecuteJobOptions & ExecuteJobOptions::override_storage_placement(const std::str
     return *this;
 }
 
-ExecuteJobOptions::Placement * ExecuteJobOptions::Placement::make_predefined(fb::ExecutorPlacementStrategy predefined_strategy)
+ExecuteJobOptions::Placement * ExecuteJobOptions::Placement::make_predefined(fb::PredefinedExecutorPlacementStrategy predefined_strategy)
 {
     auto placement = new Placement;
     placement->_type = fb::ExecutorPlacement_predefined_strategy;

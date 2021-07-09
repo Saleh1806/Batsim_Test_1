@@ -176,7 +176,7 @@ table RejectJobEvent {
 }
 
 // Execution
-enum ExecutorPlacementStrategy : byte {
+enum PredefinedExecutorPlacementStrategy : byte {
   /// Host1 will be used, then Host2, ..., then HostN, then Host1...
   SpreadOverHostsFirst
 
@@ -184,8 +184,8 @@ enum ExecutorPlacementStrategy : byte {
 , FillOneHostCoresFirst
 }
 
-table ExecutorPlacementStrategyTable {
-  strategy: ExecutorPlacementStrategy = SpreadOverHostsFirst;
+table PredefinedExecutorPlacementStrategyWrapper {
+  strategy: PredefinedExecutorPlacementStrategy = SpreadOverHostsFirst;
 }
 
 table CustomExecutorToHostMapping {
@@ -195,7 +195,7 @@ table CustomExecutorToHostMapping {
 
 union ExecutorPlacement {
   /// Use a predefined placement strategy.
-  predefined_strategy: ExecutorPlacementStrategyTable
+  predefined_strategy: PredefinedExecutorPlacementStrategyWrapper
 
   /// Use a precise manual placement.
 , custom_executor_to_host_mapping: CustomExecutorToHostMapping

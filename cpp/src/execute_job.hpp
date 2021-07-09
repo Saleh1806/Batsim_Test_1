@@ -17,10 +17,10 @@ namespace batprotocol
         ExecuteJobOptions() = default;
         ~ExecuteJobOptions();
 
-        ExecuteJobOptions & set_predefined_placement_strategy(fb::ExecutorPlacementStrategy strategy);
+        ExecuteJobOptions & set_predefined_placement_strategy(fb::PredefinedExecutorPlacementStrategy strategy);
         ExecuteJobOptions & set_custom_placement(const std::shared_ptr<std::vector<uint32_t> > & mapping);
 
-        ExecuteJobOptions & override_profile_alloc_predefined_placement(const std::string & profile_id, const std::string & host_allocation, fb::ExecutorPlacementStrategy strategy);
+        ExecuteJobOptions & override_profile_alloc_predefined_placement(const std::string & profile_id, const std::string & host_allocation, fb::PredefinedExecutorPlacementStrategy strategy);
         ExecuteJobOptions & override_profile_alloc_custom_placement(const std::string & profile_id, const std::string & host_allocation, const std::shared_ptr<std::vector<uint32_t> > & mapping);
 
         ExecuteJobOptions & override_storage_placement(const std::string & storage_name, uint32_t host_id);
@@ -31,11 +31,11 @@ namespace batprotocol
         class Placement
         {
         public:
-            static Placement * make_predefined(fb::ExecutorPlacementStrategy predefined_strategy);
+            static Placement * make_predefined(fb::PredefinedExecutorPlacementStrategy predefined_strategy);
             static Placement * make_custom(const std::shared_ptr<std::vector<uint32_t> > & mapping);
 
             fb::ExecutorPlacement _type = fb::ExecutorPlacement_NONE;
-            fb::ExecutorPlacementStrategy _predefined_strategy;
+            fb::PredefinedExecutorPlacementStrategy _predefined_strategy;
             std::shared_ptr<std::vector<uint32_t> > _custom_mapping;
 
         private:
