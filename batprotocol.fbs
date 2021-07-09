@@ -545,14 +545,14 @@ union ProbeMeasurementTriggeringPolicy {
 
 union ProbeDataAccumulationStrategy {
   NoProbeDataAccumulation
-  ,ProbeDataAccumulation
+, ProbeDataAccumulation
 }
 
 table NoProbeDataAccumulation {}
 
 union ResetMode {
   NoReset
-  ,ProbeAccumulationReset
+, ProbeAccumulationReset
 }
 
 table NoReset {}
@@ -563,8 +563,8 @@ table ProbeAccumulationReset {
 
 enum CumulativeFunction : byte {
   Sum
-  ,Minimum
-  ,Maximum
+, Minimum
+, Maximum
 }
 
 table ProbeDataAccumulation {
@@ -578,16 +578,16 @@ enum Metrics : byte {
   Power
 
   /// The load in bytes/s
-  ,NetworkLoad
+, NetworkLoad
 
   /// The normalized load, between 0 and 1
-  ,NormalizedLoad
+, NormalizedLoad
 }
 
 union TemporalAggregation {
   NoTemporalAggregation
-  ,ExponentialMovingAverage
-  ,SlidingWindowOperation
+, ExponentialMovingAverage
+, SlidingWindowOperation
 }
 
 table NoTemporalAggregation {}
@@ -613,21 +613,21 @@ table NoResourcesAggregation {}
 
 union ResourcesAggregationFunction {
   Average
-  ,Quantile
-  ,Sum
-  ,NoResourcesAggregation
+, Quantile
+, Sum
+, NoResourcesAggregation
 }
 
 union ProbeEmissionFilteringPolicy {
   NoFiltering
-  ,ThresholdFilteringFunction
+, ThresholdFilteringFunction
 }
 
 enum BooleanComparisonOperator : byte {
   GreaterThan
-  ,GreaterThanOrEqual
-  ,LessThan
-  ,LessThanOrEqual
+, GreaterThanOrEqual
+, LessThan
+, LessThanOrEqual
 }
 
 table NoFiltering {}
@@ -685,7 +685,7 @@ table TriggerProbe {
 
 union Resources {
   HostResources
-  ,LinkResources
+, LinkResources
 }
 
 table HostResources {
@@ -700,7 +700,7 @@ table LinkResources {
 
 union ProbeData {
   AggregatedProbeData
-  ,VectorialProbeData
+, VectorialProbeData
 }
 
 table AggregatedProbeData {
