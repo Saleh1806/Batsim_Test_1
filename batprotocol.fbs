@@ -506,14 +506,14 @@ union EventUnion {
 , FinishRegistrationEvent
 }
 
-table Event {
+table EventAndTimestamp {
   timestamp: float64;
   event: EventUnion;
 }
 
 table Message {
   now: float64;
-  events: [Event];
+  events: [EventAndTimestamp];
 }
 
 root_type Message;

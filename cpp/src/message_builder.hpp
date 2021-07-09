@@ -120,6 +120,6 @@ namespace batprotocol
         flatbuffers::FlatBufferBuilder * _builder = nullptr;
         bool _is_buffer_finished = false;
         double _current_time = 0.0;
-        std::vector<flatbuffers::Offset<fb::Event>> _events;
+        std::vector<flatbuffers::Offset<fb::EventAndTimestamp>> _events;
     };
 } // end of namespace batprotocol
