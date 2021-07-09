@@ -65,7 +65,7 @@ void MessageBuilder::add_job_submitted(
     auto job_s = serialize_job(job);
 
     auto job_submitted = fb::CreateJobSubmittedEvent(*_builder, job_id_s, job_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_JobSubmittedEvent, job_submitted.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_JobSubmittedEvent, job_submitted.Union());
     _events.push_back(event);
 }
 
@@ -79,7 +79,7 @@ void MessageBuilder::add_job_completed(
     auto job_id_s = _builder->CreateString(job_id);
 
     auto job_completed = fb::CreateJobCompletedEvent(*_builder, job_id_s, state, return_code);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_JobCompletedEvent, job_completed.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_JobCompletedEvent, job_completed.Union());
     _events.push_back(event);
 }
 
@@ -90,7 +90,7 @@ void MessageBuilder::add_reject_job(const std::string & job_id)
     auto job_id_s = _builder->CreateString(job_id);
 
     auto reject_job = fb::CreateRejectJobEvent(*_builder, job_id_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_RejectJobEvent, reject_job.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_RejectJobEvent, reject_job.Union());
     _events.push_back(event);
 }
 
@@ -139,7 +139,7 @@ void MessageBuilder::add_execute_job(
     }
 
     auto execute_job = fb::CreateExecuteJobEventDirect(*_builder, job_id.c_str(), alloc_placement_s, &profile_overrides_s, &storage_overrides_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_ExecuteJobEvent, execute_job.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ExecuteJobEvent, execute_job.Union());
     _events.push_back(event);
 }
 
@@ -150,7 +150,7 @@ void MessageBuilder::add_kill_jobs(const std::vector<std::string> & job_ids)
     auto job_ids_s = serialize_string_vector(job_ids);
 
     auto kill_jobs = fb::CreateKillJobsEventDirect(*_builder, &job_ids_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_KillJobsEvent, kill_jobs.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_KillJobsEvent, kill_jobs.Union());
     _events.push_back(event);
 }
 
@@ -252,7 +252,7 @@ void MessageBuilder::add_jobs_killed(
     }
 
     auto jobs_killed = fb::CreateJobsKilledEventDirect(*_builder, &job_ids_s, &progress_vector);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_JobsKilledEvent, jobs_killed.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_JobsKilledEvent, jobs_killed.Union());
     _events.push_back(event);
 }
 
@@ -264,7 +264,7 @@ void MessageBuilder::add_register_profile(
 
     auto profile_and_id = serialize_profile_and_id(profile_id, profile);
     auto register_profile = fb::CreateRegisterProfileEvent(*_builder, profile_and_id);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_RegisterProfileEvent, register_profile.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_RegisterProfileEvent, register_profile.Union());
     _events.push_back(event);
 }
 
@@ -278,7 +278,7 @@ void MessageBuilder::add_register_job(
     auto job_s = serialize_job(job);
 
     auto register_job = fb::CreateRegisterJobEvent(*_builder, job_id_s, job_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_RegisterJobEvent, register_job.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_RegisterJobEvent, register_job.Union());
     _events.push_back(event);
 }
 
@@ -293,7 +293,7 @@ void MessageBuilder::add_call_me_later(
     auto ts_s = serialize_temporal_trigger(when);
 
     auto call_me_later = fb::CreateCallMeLaterEventDirect(*_builder, call_me_later_id.c_str(), when->_type, ts_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_CallMeLaterEvent, call_me_later.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_CallMeLaterEvent, call_me_later.Union());
     _events.push_back(event);
 }
 
@@ -305,7 +305,7 @@ void MessageBuilder::add_requested_call(const std::string & call_me_later_id)
     auto call_me_later_id_s = _builder->CreateString(call_me_later_id);
 
     auto requested_call = fb::CreateRequestedCallEvent(*_builder, call_me_later_id_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_RequestedCallEvent, requested_call.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_RequestedCallEvent, requested_call.Union());
     _events.push_back(event);
 }
 
@@ -317,7 +317,7 @@ void MessageBuilder::add_stop_call_me_later(const std::string & call_me_later_id
     auto call_me_later_id_s = _builder->CreateString(call_me_later_id);
 
     auto stop_call_me_later = fb::CreateStopCallMeLaterEvent(*_builder, call_me_later_id_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_StopCallMeLaterEvent, stop_call_me_later.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_StopCallMeLaterEvent, stop_call_me_later.Union());
     _events.push_back(event);
 }
 
@@ -332,7 +332,7 @@ void MessageBuilder::add_batsim_hello(
     auto batsim_commit_s = _builder->CreateString(batsim_commit);
 
     auto batsim_hello = fb::CreateBatsimHelloEvent(*_builder, batsim_version_s, batsim_commit_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_BatsimHelloEvent, batsim_hello.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_BatsimHelloEvent, batsim_hello.Union());
     _events.push_back(event);
 }
 
@@ -350,7 +350,7 @@ void MessageBuilder::add_external_decision_component_hello(
     auto dc_commit_s = _builder->CreateString(decision_component_commit);
 
     auto dc_hello = fb::CreateExternalDecisionComponentHelloEvent(*_builder, dc_name_s, dc_version_s, dc_commit_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_ExternalDecisionComponentHelloEvent, dc_hello.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ExternalDecisionComponentHelloEvent, dc_hello.Union());
     _events.push_back(event);
 }
 
@@ -378,7 +378,7 @@ void MessageBuilder::add_simulation_begins(SimulationBegins & simulation_begins)
     auto workload_and_filenames_s = serialize_workload_and_filename_vector(simulation_begins._workloads);
 
     auto simulation_begins_s = fb::CreateSimulationBeginsEventDirect(*_builder, simulation_begins._host_number, computation_hosts.size(), &computation_hosts_s, storage_hosts.size(), &storage_hosts_s, simulation_begins._batsim_execution_context.c_str(), &workload_and_filenames_s, &profile_and_ids_s);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_SimulationBeginsEvent, simulation_begins_s.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_SimulationBeginsEvent, simulation_begins_s.Union());
     _events.push_back(event);
 }
 
@@ -387,7 +387,7 @@ void MessageBuilder::add_simulation_ends()
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_simulation_ends() while buffer is finished. Please call clear() first.");
 
     auto simulation_ends = fb::CreateSimulationEndsEvent(*_builder);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_SimulationEndsEvent, simulation_ends.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_SimulationEndsEvent, simulation_ends.Union());
     _events.push_back(event);
 }
 
@@ -396,7 +396,7 @@ void MessageBuilder::add_all_static_jobs_have_been_submitted()
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_all_static_jobs_have_been_submitted() while buffer is finished. Please call clear() first.");
 
     auto all_submit = fb::CreateAllStaticJobsHaveBeenSubmittedEvent(*_builder);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_AllStaticJobsHaveBeenSubmittedEvent, all_submit.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_AllStaticJobsHaveBeenSubmittedEvent, all_submit.Union());
     _events.push_back(event);
 }
 
@@ -405,7 +405,7 @@ void MessageBuilder::add_all_static_external_events_have_been_injected()
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_all_static_external_events_have_been_injected() while buffer is finished. Please call clear() first.");
 
     auto all_injected = fb::CreateAllStaticExternalEventsHaveBeenInjectedEvent(*_builder);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_AllStaticExternalEventsHaveBeenInjectedEvent, all_injected.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_AllStaticExternalEventsHaveBeenInjectedEvent, all_injected.Union());
     _events.push_back(event);
 }
 
@@ -414,7 +414,7 @@ void MessageBuilder::add_finish_registration()
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_finish_registration() while buffer is finished. Please call clear() first.");
 
     auto finish_registration = fb::CreateFinishRegistrationEvent(*_builder);
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::EventUnion_FinishRegistrationEvent, finish_registration.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_FinishRegistrationEvent, finish_registration.Union());
     _events.push_back(event);
 }
 

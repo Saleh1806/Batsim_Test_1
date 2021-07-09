@@ -482,7 +482,7 @@ table FinishRegistrationEvent {
 ///
 /// Main message type
 ///
-union EventUnion {
+union Event {
   JobSubmittedEvent
 , JobCompletedEvent
 , RejectJobEvent
@@ -508,7 +508,7 @@ union EventUnion {
 
 table EventAndTimestamp {
   timestamp: float64;
-  event: EventUnion;
+  event: Event;
 }
 
 table Message {
