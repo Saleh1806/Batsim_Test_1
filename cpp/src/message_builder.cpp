@@ -538,54 +538,54 @@ flatbuffers::Offset<fb::ProfileAndId> MessageBuilder::serialize_profile_and_id(c
 
     switch(profile->_profile_type)
     {
-    case fb::ProfileUnion_NONE: {
+    case fb::Profile_NONE: {
         BAT_ENFORCE(false, "Internal inconsistency: should not be possible to create untyped profiles");
     } break;
-    case fb::ProfileUnion_DelayProfile: {
+    case fb::Profile_DelayProfile: {
         auto delay = fb::CreateDelayProfile(*_builder, profile->_delay);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, delay.Union());
     } break;
-    case fb::ProfileUnion_ParallelTaskProfile: {
+    case fb::Profile_ParallelTaskProfile: {
         auto ptask = fb::CreateParallelTaskProfileDirect(*_builder, profile->_computation_vector.get(), profile->_communication_matrix.get());
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, ptask.Union());
     } break;
-    case fb::ProfileUnion_ParallelTaskHomogeneousProfile: {
+    case fb::Profile_ParallelTaskHomogeneousProfile: {
         auto ptask_hg = fb::CreateParallelTaskHomogeneousProfile(*_builder, profile->_computation_amount, profile->_communication_amount, profile->_generation_strategy);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, ptask_hg.Union());
     } break;
-    case fb::ProfileUnion_SequentialCompositionProfile: {
+    case fb::Profile_SequentialCompositionProfile: {
         BAT_ASSERT(profile->_sub_profiles.get() != nullptr, "Internal inconsistency: profile->_sub_profiles is null");
         auto sub_profiles = serialize_string_vector(*profile->_sub_profiles);
         auto seq = fb::CreateSequentialCompositionProfileDirect(*_builder, profile->_repetition_count, &sub_profiles);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, seq.Union());
     } break;
-    case fb::ProfileUnion_ForkJoinCompositionProfile: {
+    case fb::Profile_ForkJoinCompositionProfile: {
         BAT_ASSERT(profile->_sub_profiles.get() != nullptr, "Internal inconsistency: profile->_sub_profiles is null");
         auto sub_profiles = serialize_string_vector(*profile->_sub_profiles);
         auto fork_join = fb::CreateForkJoinCompositionProfileDirect(*_builder, &sub_profiles);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, fork_join.Union());
     } break;
-    case fb::ProfileUnion_ParallelTaskMergeCompositionProfile: {
+    case fb::Profile_ParallelTaskMergeCompositionProfile: {
         BAT_ASSERT(profile->_sub_profiles.get() != nullptr, "Internal inconsistency: profile->_sub_profiles is null");
         auto sub_profiles = serialize_string_vector(*profile->_sub_profiles);
         auto ptask_merge = fb::CreateParallelTaskMergeCompositionProfileDirect(*_builder, &sub_profiles);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, ptask_merge.Union());
     } break;
-    case fb::ProfileUnion_ParallelTaskOnStorageHomogeneousProfile: {
+    case fb::Profile_ParallelTaskOnStorageHomogeneousProfile: {
         auto ptask_storage_hg = fb::CreateParallelTaskOnStorageHomogeneousProfileDirect(*_builder, profile->_storage_name.c_str(), profile->_bytes_to_read, profile->_bytes_to_write, profile->_generation_strategy);
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, ptask_storage_hg.Union());
     } break;
-    case fb::ProfileUnion_ParallelTaskDataStagingBetweenStoragesProfile: {
+    case fb::Profile_ParallelTaskDataStagingBetweenStoragesProfile: {
         auto ptask_data_staging = fb::CreateParallelTaskDataStagingBetweenStoragesProfileDirect(*_builder, profile->_bytes_to_transfer, profile->_emitter_storage_name.c_str(), profile->_receiver_storage_name.c_str());
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, ptask_data_staging.Union());
     } break;
-    case fb::ProfileUnion_TraceReplayProfile: {
+    case fb::Profile_TraceReplayProfile: {
         auto trace_replay = fb::CreateTraceReplayProfileDirect(*_builder, profile->_trace_type, profile->_filename.c_str());
         return fb::CreateProfileAndId(*_builder, profile_id_s, profile->_profile_type, trace_replay.Union());
     } break;
     }
 
-    BAT_ENFORCE(false, "Unhandled ProfileUnion value: %d", profile->_profile_type);
+    BAT_ENFORCE(false, "Unhandled Profile value: %d", profile->_profile_type);
 }
 
 flatbuffers::Offset<void> MessageBuilder::serialize_time_specifier(const std::shared_ptr<TimeSpecifier> & time_specifier)

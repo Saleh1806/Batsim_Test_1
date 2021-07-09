@@ -11,7 +11,7 @@ std::shared_ptr<Profile> Profile::make_delay(double delay)
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_DelayProfile;
+    profile->_profile_type = fb::Profile_DelayProfile;
     profile->_delay = delay;
 
     return profile;
@@ -23,7 +23,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task(
 {
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskProfile;
+    profile->_profile_type = fb::Profile_ParallelTaskProfile;
     profile->_computation_vector = computation_vector;
     profile->_communication_matrix = communication_matrix;
 
@@ -43,7 +43,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task_homogeneous(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskHomogeneousProfile;
+    profile->_profile_type = fb::Profile_ParallelTaskHomogeneousProfile;
     profile->_generation_strategy = generation_strategy;
     profile->_computation_amount = computation_amount;
     profile->_communication_amount = communication_amount;
@@ -62,7 +62,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task_data_staging_between_storag
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskDataStagingBetweenStoragesProfile;
+    profile->_profile_type = fb::Profile_ParallelTaskDataStagingBetweenStoragesProfile;
     profile->_bytes_to_transfer = bytes_to_transfer;
     profile->_emitter_storage_name = emitter_storage_name;
     profile->_receiver_storage_name = receiver_storage_name;
@@ -85,7 +85,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task_on_storage_homogeneous(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskOnStorageHomogeneousProfile;
+    profile->_profile_type = fb::Profile_ParallelTaskOnStorageHomogeneousProfile;
     profile->_storage_name = storage_name;
     profile->_bytes_to_read = bytes_to_read;
     profile->_bytes_to_write = bytes_to_write;
@@ -99,7 +99,7 @@ std::shared_ptr<Profile> Profile::make_trace_replay_smpi(const std::string & fil
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_TraceReplayProfile;
+    profile->_profile_type = fb::Profile_TraceReplayProfile;
     profile->_trace_type = fb::TraceType_SMPI;
     profile->_filename = filename;
 
@@ -113,7 +113,7 @@ std::shared_ptr<Profile> Profile::make_trace_replay_fractional_computation(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_TraceReplayProfile;
+    profile->_profile_type = fb::Profile_TraceReplayProfile;
     profile->_trace_type = fb::TraceType_FractionalComputation;
     profile->_filename = filename;
 
@@ -128,7 +128,7 @@ std::shared_ptr<Profile> Profile::make_sequential_composition(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_SequentialCompositionProfile;
+    profile->_profile_type = fb::Profile_SequentialCompositionProfile;
     profile->_sub_profiles = sub_profiles;
     profile->_repetition_count = repetition_count;
 
@@ -142,7 +142,7 @@ std::shared_ptr<Profile> Profile::make_forkjoin_composition(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ForkJoinCompositionProfile;
+    profile->_profile_type = fb::Profile_ForkJoinCompositionProfile;
     profile->_sub_profiles = sub_profiles;
 
     return profile;
@@ -155,7 +155,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task_merge_composition(
 
     std::shared_ptr<Profile> profile(new Profile());
 
-    profile->_profile_type = fb::ProfileUnion_ParallelTaskMergeCompositionProfile;
+    profile->_profile_type = fb::Profile_ParallelTaskMergeCompositionProfile;
     profile->_sub_profiles = sub_profiles;
 
     return profile;

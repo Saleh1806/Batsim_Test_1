@@ -4,7 +4,7 @@ namespace batprotocol.fb;
 ///
 
 // Groups of profiles
-union ProfileUnion {
+union Profile {
   DelayProfile
 , ParallelTaskProfile
 , ParallelTaskHomogeneousProfile
@@ -31,15 +31,15 @@ table ParallelTaskProfile {
 table SequentialCompositionProfile {
   /// The number of times the whole sequence should be executed.
   repetition_count: uint32 = 1;
-  profiles: [string] (required);
+  profile_ids: [string] (required);
 }
 
 table ForkJoinCompositionProfile {
-  profiles: [string] (required);
+  profile_ids: [string] (required);
 }
 
 table ParallelTaskMergeCompositionProfile {
-  profiles: [string] (required);
+  profile_ids: [string] (required);
 }
 
 enum HomogeneousParallelTaskGenerationStrategy : byte {
@@ -120,7 +120,7 @@ table Job {
   rigid: bool = true;
 
   /// The job's profile, which defines how the job should be simulated by Batsim. Expecting a "workload!name" syntax, but "name" is also allowed (in this case, only profiles from the job's workload can be used).
-  profile: string;
+  profile_id: string;
 }
 
 // Submission
@@ -309,7 +309,7 @@ table JobsKilledEvent {
 table ProfileAndId {
   /// Using "workload!name" syntax.
   id: string (required);
-  profile: ProfileUnion (required);
+  profile: Profile (required);
 }
 
 table RegisterProfileEvent {

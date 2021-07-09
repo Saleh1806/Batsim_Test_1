@@ -66,7 +66,7 @@ namespace batprotocol
     private:
         friend class MessageBuilder;
         Profile() = default;
-        fb::ProfileUnion _profile_type = fb::ProfileUnion_NONE;
+        fb::Profile _profile_type = fb::Profile_NONE;
         std::shared_ptr<std::vector<std::string> > _sub_profiles = nullptr;
         uint32_t _repetition_count = 1;
 
