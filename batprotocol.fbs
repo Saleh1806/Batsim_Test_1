@@ -388,29 +388,29 @@ union TemporalAggregation {
 table NoTemporalAggregation {}
 
 table ExponentialMovingAverage {
-  /// TODO
+  // TODO
 }
 
 table SlidingWindowOperation {
-  /// TODO
+  // TODO
 }
 
-table Quantile {
-  /// A value between 0 and 1
-  param: float64;
+table QuantileFunction {
+  /// The normalized threshold (in [0,1]) whose value of the quantile function (AKA inverse cumulative distribution function) is sought. threshold=1/2 means that we want the value of the median. threshold=1/4 means that we want the value of the first quartile.
+  threshold: float64;
 }
 
 table Sum {}
 
-table Average {}
+table ArithmeticMean {}
 
 table NoResourcesAggregation {}
 
 union ResourcesAggregationFunction {
-  Average
-, Quantile
+  NoResourcesAggregation
 , Sum
-, NoResourcesAggregation
+, ArithmeticMean
+, QuantileFunction
 }
 
 union ProbeEmissionFilteringPolicy {
