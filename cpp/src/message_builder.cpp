@@ -102,7 +102,7 @@ void MessageBuilder::add_execute_job(
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_execute_job() while buffer is finished. Please call clear() first.");
 
     // (default) general placement
-    auto placement_type = fb::ExecutorPlacement_predefined_strategy;
+    auto placement_type = fb::ExecutorPlacement_PredefinedExecutorPlacementStrategyWrapper;
     if (options._placement != nullptr)
         placement_type = options._placement->_type;
     auto placement_s = serialize_placement(options._placement);
@@ -623,13 +623,13 @@ flatbuffers::Offset<void> MessageBuilder::serialize_placement(ExecuteJobOptions:
     case fb::ExecutorPlacement_NONE: {
         BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped placements");
     } break;
-    case fb::ExecutorPlacement_predefined_strategy: {
+    case fb::ExecutorPlacement_PredefinedExecutorPlacementStrategyWrapper: {
         auto strategy = fb::CreatePredefinedExecutorPlacementStrategyWrapper(*_builder, placement->_predefined_strategy);
         if (should_delete)
             delete placement;
         return strategy.Union();
     } break;
-    case fb::ExecutorPlacement_custom_executor_to_host_mapping: {
+    case fb::ExecutorPlacement_CustomExecutorToHostMapping: {
         auto mapping = fb::CreateCustomExecutorToHostMappingDirect(*_builder, placement->_custom_mapping.get());
         return mapping.Union();
     } break;

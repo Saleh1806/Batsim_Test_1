@@ -69,7 +69,7 @@ ExecuteJobOptions & ExecuteJobOptions::override_storage_placement(const std::str
 ExecuteJobOptions::Placement * ExecuteJobOptions::Placement::make_predefined(fb::PredefinedExecutorPlacementStrategy predefined_strategy)
 {
     auto placement = new Placement;
-    placement->_type = fb::ExecutorPlacement_predefined_strategy;
+    placement->_type = fb::ExecutorPlacement_PredefinedExecutorPlacementStrategyWrapper;
     placement->_predefined_strategy = predefined_strategy;
     return placement;
 }
@@ -77,7 +77,7 @@ ExecuteJobOptions::Placement * ExecuteJobOptions::Placement::make_predefined(fb:
 ExecuteJobOptions::Placement * ExecuteJobOptions::Placement::make_custom(const std::shared_ptr<std::vector<uint32_t> > & mapping)
 {
     auto placement = new Placement;
-    placement->_type = fb::ExecutorPlacement_custom_executor_to_host_mapping;
+    placement->_type = fb::ExecutorPlacement_CustomExecutorToHostMapping;
     placement->_custom_mapping = mapping;
     return placement;
 }

@@ -195,10 +195,10 @@ table CustomExecutorToHostMapping {
 
 union ExecutorPlacement {
   /// Use a predefined placement strategy.
-  predefined_strategy: PredefinedExecutorPlacementStrategyWrapper
+  PredefinedExecutorPlacementStrategyWrapper
 
   /// Use a precise manual placement.
-, custom_executor_to_host_mapping: CustomExecutorToHostMapping
+, CustomExecutorToHostMapping
 }
 
 table StorageHost {
