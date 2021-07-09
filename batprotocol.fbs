@@ -366,11 +366,17 @@ enum Metrics : byte {
   /// The power in J/s
   Power
 
-  /// The load in bytes/s
+  /// The network load in bytes/s
 , NetworkLoad
 
-  /// The normalized load, between 0 and 1
-, NormalizedLoad
+  /// The load in flop/s (amount of computing operations per second)
+, ComputationLoad
+
+  /// The normalized network load in [0,1]. Cannot be accumulated over time as this metrics is not defined per unit of time.
+, NormalizedNetworkLoad
+
+  /// The normalized network load in [0,1]. Cannot be accumulated over time as this metrics is not defined per unit of time.
+, NormalizedComputationLoad
 }
 
 union TemporalAggregation {
