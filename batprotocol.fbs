@@ -330,7 +330,8 @@ table RegisterJobEvent {
 /// Simulation management events
 ///
 
-table OneTime {
+/// A temporal trigger that happens only once, at a given time.
+table OneShot {
   /// The point in time at which the event should occur.
   time: float64;
 }
@@ -344,7 +345,7 @@ table Periodic {
 }
 
 union TemporalTrigger {
-  OneTime,
+  OneShot,
   Periodic
 }
 

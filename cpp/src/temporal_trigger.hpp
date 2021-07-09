@@ -13,7 +13,7 @@ namespace batprotocol
     public:
         ~TemporalTrigger() = default;
 
-        static std::shared_ptr<TemporalTrigger> make_one_time(double time_point);
+        static std::shared_ptr<TemporalTrigger> make_one_shot(double time_point);
         static std::shared_ptr<TemporalTrigger> make_periodic(double start_time_point, double period);
 
     private:

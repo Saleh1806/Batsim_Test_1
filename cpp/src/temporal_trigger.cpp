@@ -5,10 +5,10 @@
 namespace batprotocol
 {
 
-std::shared_ptr<TemporalTrigger> TemporalTrigger::make_one_time(double time_point)
+std::shared_ptr<TemporalTrigger> TemporalTrigger::make_one_shot(double time_point)
 {
     std::shared_ptr<TemporalTrigger> temporal_trigger(new TemporalTrigger());
-    temporal_trigger->_type = fb::TemporalTrigger_OneTime;
+    temporal_trigger->_type = fb::TemporalTrigger_OneShot;
     temporal_trigger->_time_point = time_point;
 
     return temporal_trigger;
