@@ -26,7 +26,7 @@ namespace batprotocol
         void finish_message(double now);
         void set_current_time(double now);
         const uint8_t * const buffer_pointer() const;
-        const uint32_t buffer_size() const;
+        uint32_t buffer_size() const;
 
         const std::string * const buffer_as_json();
         void parse_json_message(

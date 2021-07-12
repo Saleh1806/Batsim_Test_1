@@ -65,7 +65,7 @@ const uint8_t * const MessageBuilder::buffer_pointer() const
     return _builder->GetBufferPointer();
 }
 
-const uint32_t MessageBuilder::buffer_size() const
+uint32_t MessageBuilder::buffer_size() const
 {
     BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_size() while buffer is not finished. Please call finish_message() first.");
     return static_cast<uint32_t>(_builder->GetSize());
