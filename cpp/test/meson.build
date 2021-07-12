@@ -15,6 +15,7 @@ deps = [
 
 incdir = include_directories('.')
 src = [
+  'test_json.cpp',
   'test_timestamp.cpp',
 ]
 batprotocol_cpp_test = executable('batprotocol-cpp-test', src,

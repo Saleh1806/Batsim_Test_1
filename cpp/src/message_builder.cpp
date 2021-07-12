@@ -4,19 +4,35 @@
 #include <stack>
 
 #include "assert.hpp"
+#include "schema.hpp"
 
 namespace batprotocol
 {
 
-MessageBuilder::MessageBuilder()
+MessageBuilder::MessageBuilder(bool enable_json)
 {
+    _is_json_enabled = enable_json;
     _builder = new flatbuffers::FlatBufferBuilder();
+
+    if (enable_json)
+    {
+        flatbuffers::IDLOptions parser_options;
+        parser_options.strict_json = true;
+        parser_options.output_default_scalars_in_json = true;
+        _parser = new flatbuffers::Parser(parser_options);
+
+        bool ret = _parser->Parse(batprotocol::fb::schema.c_str());
+        BAT_ENFORCE(ret, "Could not parse batprotocol's flatbuffers schema");
+    }
 }
 
 MessageBuilder::~MessageBuilder()
 {
     delete _builder;
     _builder = nullptr;
+
+    delete _parser;
+    _parser = nullptr;
 }
 
 
@@ -53,6 +69,35 @@ const uint32_t MessageBuilder::buffer_size() const
 {
     BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_size() while buffer is not finished. Please call finish_message() first.");
     return static_cast<uint32_t>(_builder->GetSize());
+}
+
+const std::string * const MessageBuilder::buffer_as_json()
+{
+    BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
+    BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_as_json() while buffer is not finished. Please call finish_message() first.");
+    GenerateText(*_parser, _builder->GetBufferPointer(), &_json_buffer);
+    return &_json_buffer;
+}
+
+void MessageBuilder::parse_json_message(
+    const std::string & json_msg,
+    uint8_t *& buffer_pointer,
+    uint32_t & buffer_size)
+{
+    parse_json_message(json_msg.c_str(), buffer_pointer, buffer_size);
+}
+
+void MessageBuilder::parse_json_message(
+    const char * json_msg,
+    uint8_t *& buffer_pointer,
+    uint32_t & buffer_size)
+{
+    BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
+
+    bool ret = _parser->Parse(json_msg);
+    BAT_ENFORCE(ret, "Could not parse the provided json message with batprotocol's flatbuffers schema: %s", _parser->error_.c_str());
+    buffer_pointer = _parser->builder_.GetBufferPointer();
+    buffer_size = _parser->builder_.GetSize();
 }
 
 void MessageBuilder::add_job_submitted(

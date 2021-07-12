@@ -3,6 +3,9 @@
 #include <memory>
 #include <vector>
 
+#include <flatbuffers/flatbuffers.h>
+#include <flatbuffers/idl.h>
+
 #include "execute_job.hpp"
 #include "job.hpp"
 #include "kill.hpp"
@@ -15,7 +18,7 @@ namespace batprotocol
     class MessageBuilder
     {
     public:
-        MessageBuilder();
+        MessageBuilder(bool enable_json = false);
         ~MessageBuilder();
 
         // Message serialization API
@@ -24,6 +27,18 @@ namespace batprotocol
         void set_current_time(double now);
         const uint8_t * const buffer_pointer() const;
         const uint32_t buffer_size() const;
+
+        const std::string * const buffer_as_json();
+        void parse_json_message(
+            const std::string & json_msg,
+            uint8_t *& buffer_pointer,
+            uint32_t & buffer_size
+        );
+        void parse_json_message(
+            const char * json_msg,
+            uint8_t *& buffer_pointer,
+            uint32_t & buffer_size
+        );
 
         // Job management events
         void add_job_submitted(
@@ -118,7 +133,10 @@ namespace batprotocol
 
     private:
         flatbuffers::FlatBufferBuilder * _builder = nullptr;
+        flatbuffers::Parser * _parser = nullptr;
+        std::string _json_buffer;
         bool _is_buffer_finished = false;
+        bool _is_json_enabled = false;
         double _current_time = 0.0;
         std::vector<flatbuffers::Offset<fb::EventAndTimestamp>> _events;
     };
