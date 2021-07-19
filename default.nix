@@ -39,8 +39,8 @@ let
       preConfigure = "cd cpp";
     };
 
-    cpp-test = pkgs.stdenv.mkDerivation rec {
-      name = "cpp-test";
+    cpp-test-binary = pkgs.stdenv.mkDerivation rec {
+      name = "cpp-test-binary";
       version = "0.1.0";
       nativeBuildInputs = [
         pkgs.meson
@@ -55,6 +55,20 @@ let
         "^meson\.build"
         "^.*?pp"
       ];
+    };
+
+    cpp-test = pkgs.stdenv.mkDerivation rec {
+      name = "cpp-test";
+      buildInputs = [ cpp-test-binary ];
+      unpackPhase = "true"; # no src for this package
+      buildPhase = ''
+        mkdir output-files
+        BATPROTOCOL_TEST_OUTPUT_PATH=output-files batprotocol-cpp-test
+      '';
+      installPhase = ''
+        mkdir -p $out
+        cp -r output-files $out/
+      '';
     };
 
     batprotocol-py = pkgs.python3Packages.buildPythonPackage rec {

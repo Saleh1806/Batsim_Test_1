@@ -43,5 +43,5 @@ TEST(example_execute_job, simple)
     EXPECT_NE(placement, nullptr);
     EXPECT_EQ(placement->strategy(), fb::PredefinedExecutorPlacementStrategy_SpreadOverHostsFirst);
 
-    write_message_buffer_json_file(mb);
+    write_test_mb(mb);
 }
