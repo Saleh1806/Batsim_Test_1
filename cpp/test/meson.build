@@ -31,3 +31,9 @@ batprotocol_cpp_test = executable('batprotocol-cpp-test', src,
   install: true
 )
 test('all-tests', batprotocol_cpp_test)
+
+getting_started = executable('getting-started', ['getting-started.cpp'],
+  dependencies: [batprotocol_cpp_dep],
+  include_directories: [incdir],
+  install: true
+)

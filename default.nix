@@ -62,6 +62,7 @@ let
       buildInputs = [ cpp-test-binary ];
       unpackPhase = "true"; # no src for this package
       buildPhase = ''
+        getting-started
         mkdir output-files
         BATPROTOCOL_TEST_OUTPUT_PATH=output-files batprotocol-cpp-test
       '';
