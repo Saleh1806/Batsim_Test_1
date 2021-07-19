@@ -155,13 +155,21 @@ void MessageBuilder::add_execute_job(
     auto alloc_placement_s = fb::CreateAllocationPlacementDirect(*_builder, host_allocation.c_str(), placement_type, placement_s);
 
     // placement override for specific profiles
+    std::vector<std::string> profile_ids_to_override;
     std::vector<flatbuffers::Offset<fb::ProfileAllocationPlacement>> profile_overrides_s;
+    profile_ids_to_override.reserve(options._profile_overrides.size());
     profile_overrides_s.reserve(options._profile_overrides.size());
 
     for (const auto & kv : options._profile_overrides)
     {
         const auto & profile_id = kv.first;
-        const auto * profile_placement = kv.second;
+        profile_ids_to_override.push_back(profile_id);
+    }
+    std::sort(profile_ids_to_override.begin(), profile_ids_to_override.end());
+
+    for (const auto & profile_id : profile_ids_to_override)
+    {
+        const auto * profile_placement = options._profile_overrides.at(profile_id);
         BAT_ASSERT(profile_placement != nullptr, "Internal inconsistency: null profile placement");
         BAT_ASSERT(profile_placement->placement != nullptr, "Internal inconsistency: null placement for a profile");
 
@@ -171,13 +179,21 @@ void MessageBuilder::add_execute_job(
     }
 
     // placement override for storages
+    std::vector<std::string> storage_names_to_override;
     std::vector<flatbuffers::Offset<batprotocol::fb::StorageHost>> storage_overrides_s;
+    storage_names_to_override.reserve(options._storage_overrides.size());
     storage_overrides_s.reserve(options._storage_overrides.size());
 
     for (const auto & kv : options._storage_overrides)
     {
         const auto & storage_name = kv.first;
-        const auto & host_id = kv.second;
+        storage_names_to_override.push_back(storage_name);
+    }
+    std::sort(storage_names_to_override.begin(), storage_names_to_override.end());
+
+    for (const auto & storage_name : storage_names_to_override)
+    {
+        const auto & host_id = options._storage_overrides.at(storage_name);
 
         auto storage_placement_s = fb::CreateStorageHostDirect(*_builder, storage_name.c_str(), host_id);
         storage_overrides_s.push_back(storage_placement_s);
