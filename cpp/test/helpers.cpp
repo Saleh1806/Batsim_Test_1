@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <fstream>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <batprotocol.hpp>
@@ -75,4 +74,3 @@ void write_test_mb_json_file(MessageBuilder & mb)
     out.flush();
     free(filename);
 }
-
