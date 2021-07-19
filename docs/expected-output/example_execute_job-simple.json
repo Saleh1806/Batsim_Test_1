@@ -1,0 +1,25 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!0",
+        "allocation": {
+          "host_allocation": "0-1",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!3",
+        "allocation": {
+          "host_allocation": "13 17",
+          "executor_placement_type": "CustomExecutorToHostMapping",
+          "executor_placement": {
+            "mapping": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "profile_allocation_override": [
+
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    },
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!4",
+        "allocation": {
+          "host_allocation": "37 51",
+          "executor_placement_type": "CustomExecutorToHostMapping",
+          "executor_placement": {
+            "mapping": [
+              0,
+              1,
+              1,
+              0
+            ]
+          }
+        },
+        "profile_allocation_override": [
+
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    }
+  ]
+}

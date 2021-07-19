@@ -1,0 +1,55 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!5",
+        "allocation": {
+          "host_allocation": "0-3 19",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+
+        ],
+        "storage_placement": [
+          {
+            "storage_name": "pfs",
+            "host_id": 19
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!6",
+        "allocation": {
+          "host_allocation": "0-3 13 21",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+
+        ],
+        "storage_placement": [
+          {
+            "storage_name": "burst_buffer",
+            "host_id": 13
+          },
+          {
+            "storage_name": "pfs",
+            "host_id": 19
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!7",
+        "allocation": {
+          "host_allocation": "0-3",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+          {
+            "profile_id": "w0!ptask1",
+            "host_allocation": "0-3",
+            "executor_placement_type": "CustomExecutorToHostMapping",
+            "executor_placement": {
+              "mapping": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    },
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!8",
+        "allocation": {
+          "host_allocation": "13 21",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+          {
+            "profile_id": "w0!ptask1!0",
+            "host_allocation": "13",
+            "executor_placement_type": "CustomExecutorToHostMapping",
+            "executor_placement": {
+              "mapping": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "profile_id": "w0!ptask1!1",
+            "host_allocation": "21",
+            "executor_placement_type": "CustomExecutorToHostMapping",
+            "executor_placement": {
+              "mapping": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    },
+    {
+      "timestamp": 0.0,
+      "event_type": "ExecuteJobEvent",
+      "event": {
+        "job_id": "w0!9",
+        "allocation": {
+          "host_allocation": "13 21",
+          "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+          "executor_placement": {
+            "strategy": "SpreadOverHostsFirst"
+          }
+        },
+        "profile_allocation_override": [
+          {
+            "profile_id": "w0!ptask1!0",
+            "host_allocation": "13 21",
+            "executor_placement_type": "PredefinedExecutorPlacementStrategyWrapper",
+            "executor_placement": {
+              "strategy": "FillOneHostCoresFirst"
+            }
+          }
+        ],
+        "storage_placement": [
+
+        ]
+      }
+    }
+  ]
+}

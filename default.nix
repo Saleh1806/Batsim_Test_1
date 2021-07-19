@@ -182,6 +182,50 @@ let
         sha256 = "0426nirqv8wzj56ppk6m0316lvwan8sn28iyj40kfdsy5mr9mfv3";
       };
     };
+
+    sphinx-tabs = pkgs.python3Packages.buildPythonPackage rec {
+      pname = "sphinx-tabs";
+      version = "3.1.0";
+      name = "${pname}-${version}";
+
+      src = pkgs.python3Packages.fetchPypi {
+        inherit pname version;
+        sha256 = "0kv935qhml40mly33rk5am128g2ygqkfvizh33vf29hjkf32mvjy";
+      };
+
+      propagatedBuildInputs = with pkgs.python3Packages; [
+        docutils
+        pygments
+        sphinx
+      ];
+    };
+
+    sphinx_doc = pkgs.stdenv.mkDerivation rec {
+      name = "batprotocol-sphinx-documentation";
+      src = pkgs.lib.sourceByRegex ./. [
+        "^docs"
+        "^docs/conf.py"
+        "^docs/Makefile"
+        "^docs/.*\.rst"
+        "^docs/expected-output"
+        "^docs/expected-output/.*\.json"
+        "^batprotocol.fbs"
+        "^cpp"
+        "^cpp/test"
+        "^cpp/test/getting-started\.cpp"
+        "^cpp/test/example_.*\.cpp"
+      ];
+      buildInputs = with pkgs.python3Packages; [
+        sphinx
+        sphinx_rtd_theme
+        sphinx-tabs
+      ];
+      buildPhase = "cd docs && make html";
+      installPhase = ''
+        mkdir -p $out
+        cp -r _build/html $out/
+      '';
+    };
   };
 in
   jobs
