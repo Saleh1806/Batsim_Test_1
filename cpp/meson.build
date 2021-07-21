@@ -30,6 +30,7 @@ deps = [
 ]
 
 src = [
+  'src/create_probe.cpp',
   'src/execute_job.cpp',
   'src/job.cpp',
   'src/kill.cpp',
@@ -41,6 +42,7 @@ src = [
 
 inc = [
   'src/assert.hpp',
+  'src/create_probe.hpp',
   'src/execute_job.hpp',
   'src/job.hpp',
   'src/kill.hpp',

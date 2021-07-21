@@ -343,6 +343,54 @@ void MessageBuilder::add_register_job(
     _events.push_back(event);
 }
 
+void MessageBuilder::add_create_probe(
+    const std::string & probe_id,
+    fb::Metrics metrics,
+    const std::shared_ptr<CreateProbe> & create_probe)
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_create_probe() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
+    BAT_ENFORCE(false, "NOT IMPLEMENTED");
+}
+
+void MessageBuilder::add_stop_probe(
+    const std::string & probe_id)
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_stop_probe() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
+
+    auto stop_probe = fb::CreateStopProbeEventDirect(*_builder, probe_id.c_str());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_StopProbeEvent, stop_probe.Union());
+
+    _events.push_back(event);
+}
+
+void MessageBuilder::add_reset_probe(
+    const std::string & probe_id,
+    double reset_value)
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_reset_probe() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
+
+    auto reset_probe = fb::CreateResetProbeEventDirect(*_builder, probe_id.c_str(), reset_value);
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ResetProbeEvent, reset_probe.Union());
+
+    _events.push_back(event);
+}
+
+void MessageBuilder::add_trigger_probe(
+    const std::string & probe_id,
+    bool force_data_emission)
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_trigger_probe() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
+
+    auto trigger_probe = fb::CreateTriggerProbeEventDirect(*_builder, probe_id.c_str(), force_data_emission);
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_TriggerProbeEvent, trigger_probe.Union());
+
+    _events.push_back(event);
+}
+
 void MessageBuilder::add_call_me_later(
     const std::string & call_me_later_id,
     const std::shared_ptr<TemporalTrigger> & when)

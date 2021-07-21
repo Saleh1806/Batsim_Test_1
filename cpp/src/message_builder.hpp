@@ -6,6 +6,7 @@
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/idl.h>
 
+#include "create_probe.hpp"
 #include "execute_job.hpp"
 #include "job.hpp"
 #include "kill.hpp"
@@ -82,6 +83,25 @@ namespace batprotocol
         );
 
         // Resource management events
+        void add_create_probe(
+            const std::string & probe_id,
+            fb::Metrics metrics,
+            const std::shared_ptr<CreateProbe> & create_probe
+        );
+
+        void add_stop_probe(
+            const std::string & probe_id
+        );
+
+        void add_reset_probe(
+            const std::string & probe_id,
+            double reset_value = 0.0
+        );
+
+        void add_trigger_probe(
+            const std::string & probe_id,
+            bool force_data_emission = true
+        );
 
         // Simulation management events
         void add_call_me_later(
