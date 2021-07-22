@@ -36,3 +36,18 @@ Execute job
 
       .. literalinclude:: expected-output/example_execute_job-subprofile_placement.json
          :language: json
+
+Reject job
+~~~~~~~~~~
+
+.. tabs::
+
+   .. group-tab:: C++
+
+      .. literalinclude:: ../cpp/test/example_reject_job.cpp
+         :language: cpp
+
+   .. group-tab:: JSON
+
+      .. literalinclude:: expected-output/example_reject_job-simple.json
+         :language: json

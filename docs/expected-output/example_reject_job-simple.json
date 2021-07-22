@@ -1,0 +1,12 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RejectJobEvent",
+      "event": {
+        "job_id": "w0!0"
+      }
+    }
+  ]
+}
