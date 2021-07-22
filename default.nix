@@ -1,7 +1,16 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz") {}
+{ kapack ? import
+    (fetchTarball "https://github.com/oar-team/nur-kapack/archive/master.tar.gz") {}
+, werror ? false
+, doCoverage ? true
+, coverageCobertura ? false
+, coverageCoveralls ? false
+, coverageGcovTxt ? true
+, coverageHtml ? true
+, coverageSonarqube ? false
 }:
 
 let
+  pkgs = kapack.pkgs;
   batprotocol_version = "0.1.0";
   jobs = rec {
     inherit pkgs;
@@ -37,6 +46,13 @@ let
         "^cpp/src/.*\.cpp"
       ];
       preConfigure = "cd cpp";
+      mesonFlags = [ "--warnlevel=3" ]
+        ++ pkgs.lib.optional werror [ "--werror" ]
+        ++ pkgs.lib.optional doCoverage [ "-Db_coverage=true" ];
+      postInstall = pkgs.lib.optionalString doCoverage ''
+        mkdir -p $out/gcno
+        cp libbatprotocol-cpp.so.p/*.gcno $out/gcno/
+      '';
     };
 
     cpp-test-binary = pkgs.stdenv.mkDerivation rec {
@@ -61,7 +77,11 @@ let
       name = "cpp-test";
       buildInputs = [ cpp-test-binary ];
       unpackPhase = "true"; # no src for this package
-      buildPhase = ''
+      buildPhase = pkgs.lib.optionalString doCoverage ''
+        mkdir -p gcda
+        export GCOV_PREFIX=$(realpath gcda)
+        export GCOV_PREFIX_STRIP=5
+      '' + ''
         getting-started
         mkdir output-files
         BATPROTOCOL_TEST_OUTPUT_PATH=output-files batprotocol-cpp-test
@@ -69,6 +89,48 @@ let
       installPhase = ''
         mkdir -p $out
         cp -r output-files $out/
+      '' + pkgs.lib.optionalString doCoverage ''
+        mv gcda $out/
+      '';
+    };
+
+    cpp-coverage-report = pkgs.stdenv.mkDerivation rec {
+      name = "cpp-coverage-report";
+      buildInputs = batprotocol-cpp.buildInputs ++ [ kapack.gcovr ]
+        ++ [ batprotocol-cpp cpp-test ];
+      src = batprotocol-cpp.src;
+
+      buildPhase = ''
+        cd cpp
+        mkdir cov-merged
+        cd cov-merged
+        cp ${batprotocol-cpp}/gcno/* ${cpp-test}/gcda/* ./
+        gcov -p *.gcno
+        mkdir report
+      '' + pkgs.lib.optionalString coverageHtml ''
+        mkdir -p report/html
+      '' + pkgs.lib.optionalString coverageGcovTxt ''
+        mkdir -p report/gcov-txt
+        cp \^\#src\#*.gcov report/gcov-txt/
+      '' + ''
+        gcovr -g -k -r .. --filter '\.\./src/' \
+          --txt report/file-summary.txt \
+          --csv report/file-summary.csv \
+          --json-summary report/file-summary.json \
+        '' + pkgs.lib.optionalString coverageCobertura ''
+          --xml report/cobertura.xml \
+        '' + pkgs.lib.optionalString coverageCoveralls ''
+          --coveralls report/coveralls.json \
+        '' + pkgs.lib.optionalString coverageHtml ''
+          --html-details report/html/index.html \
+        '' + pkgs.lib.optionalString coverageSonarqube ''
+          --sonarqube report/sonarqube.xml \
+        '' + ''
+          --print-summary
+      '';
+      installPhase = ''
+        mkdir -p $out
+        cp -r report/* $out/
       '';
     };
 
