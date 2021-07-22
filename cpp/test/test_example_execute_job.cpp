@@ -13,15 +13,6 @@ void execute_job_custom_placement(MessageBuilder &);
 void execute_job_storage_mapping(MessageBuilder &);
 void execute_job_subprofile_placement(MessageBuilder &);
 
-void all_examples_execute_job(MessageBuilder & mb)
-{
-    execute_job_simple(mb);
-    execute_job_predefined_placement(mb);
-    execute_job_custom_placement(mb);
-    execute_job_storage_mapping(mb);
-    execute_job_subprofile_placement(mb);
-}
-
 TEST(example_execute_job, simple)
 {
     MessageBuilder mb(true);
