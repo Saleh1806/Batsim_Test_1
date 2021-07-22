@@ -51,3 +51,21 @@ Reject job
 
       .. literalinclude:: expected-output/example_reject_job-simple.json
          :language: json
+
+Kill jobs
+~~~~~~~~~
+
+.. tabs::
+
+   .. group-tab:: C++
+
+      .. literalinclude:: ../cpp/test/example_kill_jobs.cpp
+         :language: cpp
+
+   .. group-tab:: JSON
+
+      .. literalinclude:: expected-output/example_kill_jobs-simple.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_kill_jobs-multiple.json
+         :language: json

@@ -20,9 +20,11 @@ src = [
   'helpers.cpp',
 
   'example_execute_job.cpp',
+  'example_kill_jobs.cpp',
   'example_reject_job.cpp',
 
   'test_example_execute_job.cpp',
+  'test_example_kill_jobs.cpp',
   'test_example_reject_job.cpp',
   'test_json.cpp',
   'test_timestamp.cpp',

@@ -1,0 +1,16 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "KillJobsEvent",
+      "event": {
+        "job_ids": [
+          "w0!3",
+          "w0!7",
+          "dyn!0"
+        ]
+      }
+    }
+  ]
+}
