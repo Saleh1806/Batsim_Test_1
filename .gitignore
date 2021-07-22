@@ -4,3 +4,4 @@ tests/union-vector
 build
 install
 result
+result-*
