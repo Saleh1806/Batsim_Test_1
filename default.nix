@@ -1,5 +1,6 @@
 { kapack ? import
     (fetchTarball "https://github.com/oar-team/nur-kapack/archive/master.tar.gz") {}
+, debug ? true
 , werror ? false
 , doCoverage ? true
 , coverageCobertura ? false
@@ -46,6 +47,9 @@ let
         "^cpp/src/.*\.cpp"
       ];
       preConfigure = "cd cpp";
+      mesonBuildType = if debug then "debug" else "release";
+      dontStrip = debug;
+      CXXFLAGS = if debug then "-O0" else "";
       mesonFlags = [ "--warnlevel=3" ]
         ++ pkgs.lib.optional werror [ "--werror" ]
         ++ pkgs.lib.optional doCoverage [ "-Db_coverage=true" ];
@@ -67,6 +71,9 @@ let
       buildInputs = [
         batprotocol-cpp
       ];
+      mesonBuildType = if debug then "debug" else "release";
+      dontStrip = debug;
+      CXXFLAGS = if debug then "-O0" else "";
       src = pkgs.lib.sourceByRegex ./cpp/test [
         "^meson\.build"
         "^.*?pp"
