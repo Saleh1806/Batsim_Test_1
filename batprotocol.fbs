@@ -297,12 +297,12 @@ table KillProgressWrapper {
 
 table JobAndProgress {
   job_id: string (required);
-  progress: KillProgress (required);
+  wrapper: KillProgressWrapper (required);
 }
 
 table JobsKilledEvent {
   job_ids: [string] (required);
-  progress: [JobAndProgress] (required);
+  progresses: [JobAndProgress] (required);
 }
 
 // Dynamic registration

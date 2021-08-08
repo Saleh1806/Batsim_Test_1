@@ -217,9 +217,10 @@ void MessageBuilder::add_kill_jobs(const std::vector<std::string> & job_ids)
 
 void MessageBuilder::add_jobs_killed(
     const std::vector<std::string> & job_ids,
-    const std::vector<KillProgress> & progresses)
+    const std::vector<std::shared_ptr<KillProgress> > & progresses)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_jobs_killed() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!job_ids.empty(), "Invalid (empty) job_ids received.");
     BAT_ENFORCE(job_ids.size() == progresses.size(), "size of job_ids and progresses mismatch (job_ids=%lu, progresses=%lu)", job_ids.size(), progresses.size());
 
     auto job_ids_s = serialize_string_vector(job_ids);
@@ -233,7 +234,8 @@ void MessageBuilder::add_jobs_killed(
     for (auto i = 0u; i < job_ids.size(); ++i)
     {
         const auto & job_id = job_ids[i];
-        const auto & progress = progresses[i];
+        BAT_ENFORCE(progresses[i].get() != nullptr, "Invalid (null at index=%u) progresses received", i);
+        const auto & progress = *progresses[i];
 
         std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > serialized_tasks;
 
@@ -308,7 +310,7 @@ void MessageBuilder::add_jobs_killed(
         }
 
         // all tasks should have been serialized
-        auto job_and_progress_s = fb::CreateJobAndProgressDirect(*_builder, job_id.c_str(), progress._tasks_progress.at(progress._root_task_id)->type, serialized_tasks[progress._root_task_id].Union());
+        auto job_and_progress_s = fb::CreateJobAndProgressDirect(*_builder, job_id.c_str(), serialized_tasks[progress._root_task_id]);
         progress_vector.push_back(job_and_progress_s);
     }
 

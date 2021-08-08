@@ -69,7 +69,7 @@ namespace batprotocol
 
         void add_jobs_killed(
             const std::vector<std::string> & job_ids,
-            const std::vector<KillProgress> & progresses
+            const std::vector<std::shared_ptr<KillProgress> > & progresses
         );
 
         void add_register_profile(
