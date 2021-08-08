@@ -776,6 +776,7 @@ flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> MessageBuilder::serial
         auto kp_s = fb::CreateKillProgressForkJoinProfileDirect(*_builder, kp->profile_id.c_str(), &children_s);
         auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
         serialized_tasks[task_id] = wrapper_s;
+        return wrapper_s;
     } break;
     }
 
