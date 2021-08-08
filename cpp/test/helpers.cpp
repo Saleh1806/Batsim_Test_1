@@ -20,7 +20,7 @@ void write_test_mb_binary(batprotocol::MessageBuilder & mb)
 {
     auto test_info = ::testing::UnitTest::GetInstance()->current_test_info();
 
-    const std::string default_base_dir = ".";
+    const std::string default_base_dir = "/tmp";
     char * base_dir = getenv("BATPROTOCOL_TEST_OUTPUT_PATH");
     if (base_dir == nullptr)
     {
@@ -50,7 +50,7 @@ void write_test_mb_json_file(MessageBuilder & mb)
     auto json = mb.buffer_as_json();
     auto test_info = ::testing::UnitTest::GetInstance()->current_test_info();
 
-    const std::string default_base_dir = ".";
+    const std::string default_base_dir = "/tmp";
     char * base_dir = getenv("BATPROTOCOL_TEST_OUTPUT_PATH");
     if (base_dir == nullptr)
     {
