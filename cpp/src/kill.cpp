@@ -37,7 +37,10 @@ KillProgress::~KillProgress()
     _tasks_progress.clear();
 }
 
-KillProgress & KillProgress::add_atomic(const std::string & task_id, const std::string & profile_id, double progress)
+KillProgress & KillProgress::add_atomic(
+    const std::string & task_id,
+    const std::string & profile_id,
+    double progress)
 {
     BAT_ENFORCE(_tasks_progress.find(task_id) == _tasks_progress.end(), "task_id '%s' already exists", task_id.c_str());
 
@@ -53,7 +56,12 @@ KillProgress & KillProgress::add_atomic(const std::string & task_id, const std::
     return *this;
 }
 
-KillProgress & KillProgress::add_sequential(const std::string & task_id, const std::string & profile_id, uint32_t current_repetition, uint32_t current_task_index, const std::string & current_subtask_id)
+KillProgress & KillProgress::add_sequential(
+    const std::string & task_id,
+    const std::string & profile_id,
+    uint32_t current_repetition,
+    uint32_t current_task_index,
+    const std::string & current_subtask_id)
 {
     BAT_ENFORCE(_tasks_progress.find(task_id) == _tasks_progress.end(), "task_id '%s' already exists", task_id.c_str());
 
@@ -71,7 +79,10 @@ KillProgress & KillProgress::add_sequential(const std::string & task_id, const s
     return *this;
 }
 
-KillProgress & KillProgress::add_forkjoin(const std::string & task_id, const std::string & profile_id, const std::vector<std::string> & subtasks_id)
+KillProgress & KillProgress::add_forkjoin(
+    const std::string & task_id,
+    const std::string & profile_id,
+    const std::vector<std::string> & subtasks_id)
 {
     BAT_ENFORCE(_tasks_progress.find(task_id) == _tasks_progress.end(), "task_id '%s' already exists", task_id.c_str());
 
