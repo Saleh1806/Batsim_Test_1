@@ -30,9 +30,6 @@ KillProgress::~KillProgress()
             case fb::KillProgress_KillProgressForkJoinProfile: {
                 delete static_cast<ForkJoin*>(kv.second->data);
             } break;
-            case fb::KillProgress_KillProgressParallelTaskMergeProfile: {
-                delete static_cast<ParallelTaskMerge*>(kv.second->data);
-            } break;
         }
         delete kv.second;
     }
@@ -85,22 +82,6 @@ KillProgress & KillProgress::add_forkjoin(const std::string & task_id, const std
     auto variant = new KillProgressVariant;
     variant->type = fb::KillProgress_KillProgressForkJoinProfile;
     variant->data = static_cast<void*>(forkjoin);
-    _tasks_progress[task_id] = variant;
-
-    return *this;
-}
-
-KillProgress & KillProgress::add_parallel_task_merge(const std::string & task_id, const std::string & profile_id, const std::vector<std::string> & subtasks_id)
-{
-    BAT_ENFORCE(_tasks_progress.find(task_id) == _tasks_progress.end(), "task_id '%s' already exists", task_id.c_str());
-
-    auto ptask_merge = new ParallelTaskMerge;
-    ptask_merge->profile_id = profile_id;
-    ptask_merge->subtasks_id = subtasks_id;
-
-    auto variant = new KillProgressVariant;
-    variant->type = fb::KillProgress_KillProgressParallelTaskMergeProfile;
-    variant->data = static_cast<void*>(ptask_merge);
     _tasks_progress[task_id] = variant;
 
     return *this;

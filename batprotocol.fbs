@@ -275,19 +275,10 @@ table KillProgressForkJoinProfile {
   tasks_progress: [KillProgressWrapper] (required);
 }
 
-table KillProgressParallelTaskMergeProfile {
-  /// The profile that has been killed. Syntax is "workload!name".
-  profile_id: string (required);
-
-  /// The (recursively defined) progress of the tasks of the associated ParallelTaskMergeCompositionProfile.
-  tasks_progress: [KillProgressWrapper] (required);
-}
-
 union KillProgress {
   KillProgressAtomicProfile
 , KillProgressSequentialProfile
 , KillProgressForkJoinProfile
-, KillProgressParallelTaskMergeProfile
 }
 
 /// Wrapping needed because of a missing flatbuffers feature: https://github.com/google/flatbuffers/issues/4725

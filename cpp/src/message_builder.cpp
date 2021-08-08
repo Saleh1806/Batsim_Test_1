@@ -291,11 +291,6 @@ void MessageBuilder::add_jobs_killed(
                         for (const auto & child_task_id : kp->subtasks_id)
                             tasks_to_explore.push(child_task_id);
                     } break;
-                    case fb::KillProgress_KillProgressParallelTaskMergeProfile: {
-                        const auto * kp = static_cast<KillProgress::ParallelTaskMerge*>(variant->data);
-                        for (const auto & child_task_id : kp->subtasks_id)
-                            tasks_to_explore.push(child_task_id);
-                    } break;
                     }
                 }
                 else
@@ -779,13 +774,6 @@ flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> MessageBuilder::serial
         const auto * kp = static_cast<KillProgress::ForkJoin*>(variant->data);
         auto children_s = serialize_kill_progress_vector(kp->subtasks_id, task_id, job_id, serialized_tasks);
         auto kp_s = fb::CreateKillProgressForkJoinProfileDirect(*_builder, kp->profile_id.c_str(), &children_s);
-        auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
-        serialized_tasks[task_id] = wrapper_s;
-    } break;
-    case fb::KillProgress_KillProgressParallelTaskMergeProfile: {
-        const auto * kp = static_cast<KillProgress::ParallelTaskMerge*>(variant->data);
-        auto children_s = serialize_kill_progress_vector(kp->subtasks_id, task_id, job_id, serialized_tasks);
-        auto kp_s = fb::CreateKillProgressParallelTaskMergeProfileDirect(*_builder, kp->profile_id.c_str(), &children_s);
         auto wrapper_s = fb::CreateKillProgressWrapper(*_builder, variant->type, kp_s.Union());
         serialized_tasks[task_id] = wrapper_s;
     } break;
