@@ -560,11 +560,20 @@ std::vector<flatbuffers::Offset<batprotocol::fb::Host>> MessageBuilder::serializ
 std::vector<flatbuffers::Offset<batprotocol::fb::HostProperty>> MessageBuilder::serialize_host_property_vector(const std::unordered_map<std::string, std::string> & properties)
 {
     std::vector<flatbuffers::Offset<batprotocol::fb::HostProperty>> property_vec_s;
+    std::vector<std::string> keys;
     property_vec_s.reserve(properties.size());
+    keys.reserve(properties.size());
 
     for (const auto & kv : properties)
     {
-        auto property = fb::CreateHostPropertyDirect(*_builder, kv.first.c_str(), kv.second.c_str());
+        keys.push_back(kv.first);
+    }
+    std::sort(keys.begin(), keys.end());
+
+    for (auto key : keys)
+    {
+        const auto & value = properties.at(key);
+        auto property = fb::CreateHostPropertyDirect(*_builder, key.c_str(), value.c_str());
         property_vec_s.push_back(property);
     }
 
