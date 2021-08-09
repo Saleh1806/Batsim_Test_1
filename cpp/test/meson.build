@@ -24,6 +24,7 @@ src = [
   'example_jobs_killed.cpp',
   'example_kill_jobs.cpp',
   'example_register_job.cpp',
+  'example_register_profile.cpp',
   'example_reject_job.cpp',
 
   'test_example_execute_job.cpp',
@@ -31,6 +32,7 @@ src = [
   'test_example_jobs_killed.cpp',
   'test_example_kill_jobs.cpp',
   'test_example_register_job.cpp',
+  'test_example_register_profile.cpp',
   'test_example_reject_job.cpp',
   'test_json.cpp',
   'test_timestamp.cpp',
