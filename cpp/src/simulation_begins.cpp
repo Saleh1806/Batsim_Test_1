@@ -32,6 +32,8 @@ SimulationBegins & SimulationBegins::add_host(uint32_t id, const std::string & n
     host->computation_speed = computation_speed;
     host->is_storage = false;
 
+    _hosts[id] = host;
+
     return *this;
 }
 
@@ -60,7 +62,7 @@ SimulationBegins & SimulationBegins::set_host_as_storage(uint32_t id)
     auto host_it = _hosts.find(id);
     BAT_ENFORCE(host_it != _hosts.end(), "Host with id=%u does not exist", id);
 
-    host_it->second->is_storage = false;
+    host_it->second->is_storage = true;
 
     return *this;
 }

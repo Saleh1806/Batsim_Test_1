@@ -14,6 +14,7 @@ namespace batprotocol
 
     class SimulationBegins
     {
+    public:
         SimulationBegins() = default;
         ~SimulationBegins();
 
