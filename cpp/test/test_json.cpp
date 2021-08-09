@@ -108,7 +108,7 @@ TEST(json, deserialize)
 
     uint8_t * buffer_pointer;
     uint32_t buffer_size;
-    mb.parse_json_message(json_msg, buffer_pointer, buffer_size);
+    mb.parse_json_message(std::string(json_msg), buffer_pointer, buffer_size);
     EXPECT_GT(buffer_size, 0);
     auto parsed = flatbuffers::GetRoot<fb::Message>(buffer_pointer);
     EXPECT_EQ(parsed->now(), 2.0);
