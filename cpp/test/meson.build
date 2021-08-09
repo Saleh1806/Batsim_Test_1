@@ -37,6 +37,7 @@ src = [
   'example_simulation_begins.cpp',
   'example_stop_call_me_later.cpp',
   'example_stop_probe.cpp',
+  'example_trigger_probe.cpp',
 
   'test_example_all_static_external_events_injected.cpp',
   'test_example_all_static_jobs_submitted.cpp',
@@ -56,6 +57,7 @@ src = [
   'test_example_simulation_begins.cpp',
   'test_example_stop_call_me_later.cpp',
   'test_example_stop_probe.cpp',
+  'test_example_trigger_probe.cpp',
   'test_json.cpp',
   'test_timestamp.cpp',
 ]
