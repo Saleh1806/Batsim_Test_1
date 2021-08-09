@@ -19,6 +19,7 @@ src = [
   'helpers.hpp',
   'helpers.cpp',
 
+  'example_call_me_later.cpp',
   'example_execute_job.cpp',
   'example_job_submitted.cpp',
   'example_jobs_killed.cpp',
@@ -27,6 +28,7 @@ src = [
   'example_register_profile.cpp',
   'example_reject_job.cpp',
 
+  'test_example_call_me_later.cpp',
   'test_example_execute_job.cpp',
   'test_example_job_submitted.cpp',
   'test_example_jobs_killed.cpp',
