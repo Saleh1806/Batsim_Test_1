@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -23,3 +24,8 @@ void check_identical_vectors(
         EXPECT_EQ(actual->Get(i), expected[i]) << "vectors differ at index=" << i;
     }
 }
+
+void check_identical_str_vectors(
+    const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> * actual,
+    const std::vector<std::string> & expected
+);

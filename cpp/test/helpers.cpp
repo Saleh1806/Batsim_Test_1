@@ -74,3 +74,16 @@ void write_test_mb_json_file(MessageBuilder & mb)
     out.flush();
     free(filename);
 }
+
+void check_identical_str_vectors(
+    const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> * actual,
+    const std::vector<std::string> & expected)
+{
+    EXPECT_NE(actual, nullptr);
+    EXPECT_EQ(actual->size(), expected.size());
+
+    for (unsigned int i = 0; i < actual->size(); ++i)
+    {
+        EXPECT_EQ(actual->Get(i)->str(), expected[i]) << "vectors differ at index=" << i;
+    }
+}
