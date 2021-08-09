@@ -20,6 +20,7 @@ src = [
   'helpers.cpp',
 
   'example_all_static_external_events_injected.cpp',
+  'example_all_static_jobs_submitted.cpp',
   'example_batsim_hello.cpp',
   'example_call_me_later.cpp',
   'example_edc_hello.cpp',
@@ -35,6 +36,7 @@ src = [
   'example_stop_call_me_later.cpp',
 
   'test_example_all_static_external_events_injected.cpp',
+  'test_example_all_static_jobs_submitted.cpp',
   'test_example_batsim_hello.cpp',
   'test_example_call_me_later.cpp',
   'test_example_edc_hello.cpp',
