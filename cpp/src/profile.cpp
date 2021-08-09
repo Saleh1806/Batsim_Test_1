@@ -87,6 +87,7 @@ std::shared_ptr<Profile> Profile::make_parallel_task_on_storage_homogeneous(
 
     profile->_profile_type = fb::Profile_ParallelTaskOnStorageHomogeneousProfile;
     profile->_storage_name = storage_name;
+    profile->_generation_strategy = generation_strategy;
     profile->_bytes_to_read = bytes_to_read;
     profile->_bytes_to_write = bytes_to_write;
 
