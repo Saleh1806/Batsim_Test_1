@@ -722,7 +722,20 @@ flatbuffers::Offset<void> MessageBuilder::serialize_temporal_trigger(const std::
         return fb::CreateOneShot(*_builder, temporal_trigger->_time_point).Union();
     } break;
     case fb::TemporalTrigger_Periodic: {
-        return fb::CreatePeriodic(*_builder, temporal_trigger->_time_point, temporal_trigger->_period).Union();
+        flatbuffers::Offset<void> periodic_mode_s;
+        fb::PeriodicMode periodic_mode = fb::PeriodicMode_NONE;
+        if (temporal_trigger->_is_finite)
+        {
+            periodic_mode = fb::PeriodicMode_FinitePeriodNumber;
+            periodic_mode_s = fb::CreateFinitePeriodNumber(*_builder, temporal_trigger->_nb_periods).Union();
+        }
+        else
+        {
+            periodic_mode = fb::PeriodicMode_Infinite;
+            periodic_mode_s = fb::CreateInfinite(*_builder).Union();
+        }
+
+        return fb::CreatePeriodic(*_builder, temporal_trigger->_time_point, temporal_trigger->_period, periodic_mode, periodic_mode_s).Union();
     } break;
     }
 
