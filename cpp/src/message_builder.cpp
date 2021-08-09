@@ -5,6 +5,7 @@
 
 #include "assert.hpp"
 #include "schema.hpp"
+#include "version.hpp"
 
 namespace batprotocol
 {
@@ -435,10 +436,7 @@ void MessageBuilder::add_batsim_hello(
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_batsim_hello() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!batsim_version.empty(), "Invalid (empty) batsim_version received");
 
-    auto batsim_version_s = _builder->CreateString(batsim_version);
-    auto batsim_commit_s = _builder->CreateString(batsim_commit);
-
-    auto batsim_hello = fb::CreateBatsimHelloEvent(*_builder, batsim_version_s, batsim_commit_s);
+    auto batsim_hello = fb::CreateBatsimHelloEventDirect(*_builder, version().c_str(), batsim_version.c_str(), batsim_commit.c_str());
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_BatsimHelloEvent, batsim_hello.Union());
     _events.push_back(event);
 }
@@ -452,11 +450,12 @@ void MessageBuilder::add_external_decision_component_hello(
     BAT_ENFORCE(!decision_component_name.empty(), "Invalid (empty) decision_component_name received");
     BAT_ENFORCE(!decision_component_version.empty(), "Invalid (empty) decision_component_version received");
 
-    auto dc_name_s = _builder->CreateString(decision_component_name);
-    auto dc_version_s = _builder->CreateString(decision_component_version);
-    auto dc_commit_s = _builder->CreateString(decision_component_commit);
-
-    auto dc_hello = fb::CreateExternalDecisionComponentHelloEvent(*_builder, dc_name_s, dc_version_s, dc_commit_s);
+    auto dc_hello = fb::CreateExternalDecisionComponentHelloEventDirect(*_builder,
+        version().c_str(),
+        decision_component_name.c_str(),
+        decision_component_version.c_str(),
+        decision_component_commit.c_str()
+    );
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ExternalDecisionComponentHelloEvent, dc_hello.Union());
     _events.push_back(event);
 }
