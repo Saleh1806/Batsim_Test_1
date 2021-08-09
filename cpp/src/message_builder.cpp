@@ -102,14 +102,15 @@ void MessageBuilder::parse_json_message(
 
 void MessageBuilder::add_job_submitted(
     const std::string & job_id,
-    const std::shared_ptr<Job> & job)
+    const std::shared_ptr<Job> & job,
+    double submission_time)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_job_submitted() while buffer is finished. Please call clear() first.");
 
     auto job_id_s = _builder->CreateString(job_id);
     auto job_s = serialize_job(job);
 
-    auto job_submitted = fb::CreateJobSubmittedEvent(*_builder, job_id_s, job_s);
+    auto job_submitted = fb::CreateJobSubmittedEvent(*_builder, job_id_s, job_s, submission_time);
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_JobSubmittedEvent, job_submitted.Union());
     _events.push_back(event);
 }
@@ -633,7 +634,21 @@ std::vector<flatbuffers::Offset<batprotocol::fb::KillProgressWrapper>> MessageBu
 
 flatbuffers::Offset<fb::Job> MessageBuilder::serialize_job(const std::shared_ptr<Job> & job)
 {
-    auto job_s = fb::CreateJobDirect(*_builder, job->_request_type, job->_resource_number, job->_walltime, job->_extra_data.c_str(), job->_rigid, job->_profile_id.c_str());
+    flatbuffers::Offset<void> res_request_s = 0;
+    switch(job->_request_type) {
+    case fb::ComputationResourceRequest_NONE: {
+        // No computation resource request for this job.
+        // This is NOT invalid, as it is convenient to create "ghost"/"virtual" jobs.
+    } break;
+    case fb::ComputationResourceRequest_HostNumber: {
+        res_request_s = fb::CreateHostNumber(*_builder, job->_resource_number).Union();
+    } break;
+    case fb::ComputationResourceRequest_CoreNumber: {
+        res_request_s = fb::CreateCoreNumber(*_builder, job->_resource_number).Union();
+    } break;
+    }
+
+    auto job_s = fb::CreateJobDirect(*_builder, job->_request_type, res_request_s, job->_walltime, job->_extra_data.c_str(), job->_rigid, job->_profile_id.c_str());
     return job_s;
 }
 

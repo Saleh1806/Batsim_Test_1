@@ -44,7 +44,8 @@ namespace batprotocol
         // Job management events
         void add_job_submitted(
             const std::string & job_id,
-            const std::shared_ptr<Job> & job
+            const std::shared_ptr<Job> & job,
+            double submission_time
         );
 
         void add_job_completed(
