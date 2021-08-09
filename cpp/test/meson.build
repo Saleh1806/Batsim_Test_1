@@ -19,6 +19,7 @@ src = [
   'helpers.hpp',
   'helpers.cpp',
 
+  'example_batsim_hello.cpp',
   'example_call_me_later.cpp',
   'example_execute_job.cpp',
   'example_job_submitted.cpp',
@@ -31,6 +32,7 @@ src = [
   'example_simulation_begins.cpp',
   'example_stop_call_me_later.cpp',
 
+  'test_example_batsim_hello.cpp',
   'test_example_call_me_later.cpp',
   'test_example_execute_job.cpp',
   'test_example_job_submitted.cpp',
