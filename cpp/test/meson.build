@@ -21,6 +21,7 @@ src = [
 
   'example_batsim_hello.cpp',
   'example_call_me_later.cpp',
+  'example_edc_hello.cpp',
   'example_execute_job.cpp',
   'example_job_submitted.cpp',
   'example_jobs_killed.cpp',
@@ -34,6 +35,7 @@ src = [
 
   'test_example_batsim_hello.cpp',
   'test_example_call_me_later.cpp',
+  'test_example_edc_hello.cpp',
   'test_example_execute_job.cpp',
   'test_example_job_submitted.cpp',
   'test_example_jobs_killed.cpp',
