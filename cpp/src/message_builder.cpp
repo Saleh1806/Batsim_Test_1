@@ -349,7 +349,126 @@ void MessageBuilder::add_create_probe(
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_create_probe() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
-    BAT_ENFORCE(false, "NOT IMPLEMENTED");
+
+    auto resources_s = serialize_resources(
+        create_probe->_resources_type,
+        create_probe->_hosts_resources,
+        create_probe->_links_resources
+    );
+
+    flatbuffers::Offset<void> data_accumulation_strategy_s = 0;
+    switch(create_probe->_data_accumulation_strategy)
+    {
+    case fb::ProbeDataAccumulationStrategy_NONE: {
+        BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped probe accumulation strategy");
+    } break;
+    case fb::ProbeDataAccumulationStrategy_NoProbeDataAccumulation: {
+        data_accumulation_strategy_s = fb::CreateNoProbeDataAccumulation(*_builder).Union();
+    } break;
+    case fb::ProbeDataAccumulationStrategy_ProbeDataAccumulation: {
+        flatbuffers::Offset<void> reset_mode = 0;
+        switch(create_probe->_data_accumulation_reset_mode) {
+            case fb::ResetMode_NONE: {
+                BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped reset mode");
+            } break;
+            case fb::ResetMode_NoReset: {
+                reset_mode = fb::CreateNoReset(*_builder).Union();
+            } break;
+            case fb::ResetMode_ProbeAccumulationReset: {
+                reset_mode = fb::CreateProbeAccumulationReset(*_builder, create_probe->_data_accumulation_reset_value).Union();
+            } break;
+        }
+
+        data_accumulation_strategy_s = fb::CreateProbeDataAccumulation(*_builder,
+            create_probe->_data_accumulation_reset_mode,
+            reset_mode,
+            create_probe->_data_accumulation_cumulative_function,
+            create_probe->_data_accumulation_temporal_normalization
+        ).Union();
+    } break;
+    }
+
+    flatbuffers::Offset<void> measurement_triggering_policy_s = 0;
+    switch(create_probe->_measurement_triggering_policy) {
+        case fb::ProbeMeasurementTriggeringPolicy_NONE: {
+            BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped measurement triggering policy");
+        } break;
+        case fb::ProbeMeasurementTriggeringPolicy_TemporalTriggerWrapper: {
+            auto temporal_trigger_s = serialize_temporal_trigger(create_probe->_temporal_trigger);
+            measurement_triggering_policy_s = fb::CreateTemporalTriggerWrapper(*_builder, create_probe->_temporal_trigger->_type, temporal_trigger_s).Union();
+        } break;
+    }
+
+    flatbuffers::Offset<void> resources_aggregation_function_s = 0;
+    switch(create_probe->_resource_aggregation_function) {
+        case fb::ResourcesAggregationFunction_NONE: {
+            BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped resource aggregation function");
+        } break;
+        case fb::ResourcesAggregationFunction_NoResourcesAggregation: {
+            resources_aggregation_function_s = fb::CreateNoResourcesAggregation(*_builder).Union();
+        } break;
+        case fb::ResourcesAggregationFunction_Sum: {
+            resources_aggregation_function_s = fb::CreateSum(*_builder).Union();
+        } break;
+        case fb::ResourcesAggregationFunction_ArithmeticMean: {
+            resources_aggregation_function_s = fb::CreateArithmeticMean(*_builder).Union();
+        } break;
+        case fb::ResourcesAggregationFunction_QuantileFunction: {
+            resources_aggregation_function_s = fb::CreateQuantileFunction(*_builder, create_probe->_resource_aggregation_quantile_threshold).Union();
+        } break;
+    }
+
+    flatbuffers::Offset<void> temporal_aggregation_function_s = 0;
+    switch(create_probe->_temporal_aggregation_function) {
+        case fb::TemporalAggregationFunction_NONE: {
+            BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped temporal aggregation function");
+        } break;
+        case fb::TemporalAggregationFunction_NoTemporalAggregation: {
+            temporal_aggregation_function_s = fb::CreateNoTemporalAggregation(*_builder).Union();
+        } break;
+        case fb::TemporalAggregationFunction_ExponentialMovingAverage: {
+            BAT_ENFORCE(false, "NOT IMPLEMENTED");
+        } break;
+        case fb::TemporalAggregationFunction_SlidingWindowOperation: {
+            BAT_ENFORCE(false, "NOT IMPLEMENTED");
+        } break;
+    }
+
+    flatbuffers::Offset<void> emission_filtering_policy_s = 0;
+    switch(create_probe->_emission_filtering_policy) {
+        case fb::ProbeEmissionFilteringPolicy_NONE: {
+            BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped probe emission filtering policy");
+        } break;
+        case fb::ProbeEmissionFilteringPolicy_NoFiltering: {
+            emission_filtering_policy_s = fb::CreateNoFiltering(*_builder).Union();
+        } break;
+        case fb::ProbeEmissionFilteringPolicy_ThresholdFilteringFunction: {
+            emission_filtering_policy_s = fb::CreateThresholdFilteringFunction(*_builder,
+                create_probe->_emission_filtering_threshold,
+                create_probe->_emission_filtering_threshold_operator
+            ).Union();
+        } break;
+    }
+
+    auto create_probe_s = fb::CreateCreateProbeEventDirect(*_builder,
+        probe_id.c_str(),
+        metrics,
+        create_probe->_resources_type,
+        resources_s,
+        create_probe->_data_accumulation_strategy,
+        data_accumulation_strategy_s,
+        create_probe->_measurement_triggering_policy,
+        measurement_triggering_policy_s,
+        create_probe->_resource_aggregation_function,
+        resources_aggregation_function_s,
+        create_probe->_temporal_aggregation_function,
+        temporal_aggregation_function_s,
+        create_probe->_emission_filtering_policy,
+        emission_filtering_policy_s
+    );
+
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_CreateProbeEvent, create_probe_s.Union());
+    _events.push_back(event);
 }
 
 void MessageBuilder::add_stop_probe(
@@ -716,6 +835,29 @@ flatbuffers::Offset<fb::ProfileAndId> MessageBuilder::serialize_profile_and_id(c
 
     BAT_ENFORCE(false, "Unhandled Profile value: %d", profile->_profile_type);
 }
+
+flatbuffers::Offset<void> MessageBuilder::serialize_resources(
+    fb::Resources resources_type,
+    const std::string & hosts_intervalset,
+    const std::shared_ptr<std::vector<std::string> > & links)
+{
+    switch(resources_type) {
+        case fb::Resources_NONE: {
+            BAT_ENFORCE(false, "Invalid call to serialize_resources: resources have not been set");
+        } break;
+        case fb::Resources_HostResources: {
+            return fb::CreateHostResourcesDirect(*_builder, hosts_intervalset.c_str()).Union();
+        } break;
+        case fb::Resources_LinkResources: {
+            BAT_ENFORCE(links.get() != nullptr, "Invalid (null) links received");
+            auto links_s = serialize_string_vector(*links.get());
+            return fb::CreateLinkResourcesDirect(*_builder, &links_s).Union();
+        } break;
+    }
+
+    BAT_ENFORCE(false, "Unhandled resources type value: %d", resources_type);
+}
+
 
 flatbuffers::Offset<void> MessageBuilder::serialize_temporal_trigger(const std::shared_ptr<TemporalTrigger> & temporal_trigger)
 {

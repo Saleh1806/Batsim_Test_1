@@ -317,6 +317,21 @@ table RegisterJobEvent {
 /// Resource management events
 ///
 
+union Resources {
+  HostResources
+, LinkResources
+}
+
+table HostResources {
+  /// The intervalset of host ids
+  host_ids: string;
+}
+
+table LinkResources {
+  /// The names of the links
+  link_ids: [string];
+}
+
 // Probe Creation
 union ProbeMeasurementTriggeringPolicy {
   /// Union because later we will implement other kind of trigger (as react to an other probe event)
@@ -437,10 +452,13 @@ table CreateProbeEvent {
   /// The name of the probe
   probe_id: string;
 
-  data_accumulation_strategy: ProbeDataAccumulationStrategy;
-
   /// The metrics that we want to study
   metrics: Metrics;
+
+  /// The resources onto which the probe should be set
+  resources: Resources;
+
+  data_accumulation_strategy: ProbeDataAccumulationStrategy;
 
   /// When our probe is taking measures
   measurement_triggering_policy: ProbeMeasurementTriggeringPolicy;
@@ -476,21 +494,6 @@ table TriggerProbeEvent {
 }
 
 // Probe Data
-union Resources {
-  HostResources
-, LinkResources
-}
-
-table HostResources {
-  /// The intervalset of host ids
-  host_ids: string;
-}
-
-table LinkResources {
-  /// The names of the links
-  link_ids: [string];
-}
-
 union ProbeData {
   AggregatedProbeData
 , VectorialProbeData

@@ -19,6 +19,9 @@ namespace batprotocol
         );
         // other make_ functions will be done for future measurement triggering policies
 
+        CreateProbe & set_resources_as_hosts(const std::string & intervalset);
+        CreateProbe & set_resources_as_links(const std::shared_ptr<std::vector<std::string> > & links);
+
         CreateProbe & set_resource_aggregation_as_sum();
         CreateProbe & set_resource_aggregation_as_arithmetic_mean();
         CreateProbe & set_resource_aggregation_as_median();
@@ -49,8 +52,15 @@ namespace batprotocol
         CreateProbe() = default;
         friend class MessageBuilder;
 
+        fb::ProbeMeasurementTriggeringPolicy _measurement_triggering_policy = fb::ProbeMeasurementTriggeringPolicy_NONE;
+        std::shared_ptr<TemporalTrigger> _temporal_trigger;
+
+        fb::Resources _resources_type = fb::Resources_NONE;
+        std::string _hosts_resources;
+        std::shared_ptr<std::vector<std::string> > _links_resources = nullptr;
+
         fb::ResourcesAggregationFunction _resource_aggregation_function = fb::ResourcesAggregationFunction_NoResourcesAggregation;
-        double resource_aggregation_quantile_threshold;
+        double _resource_aggregation_quantile_threshold;
 
         fb::TemporalAggregationFunction _temporal_aggregation_function = fb::TemporalAggregationFunction_NoTemporalAggregation;
 
@@ -59,8 +69,9 @@ namespace batprotocol
         fb::BooleanComparisonOperator _emission_filtering_threshold_operator;
 
         fb::ProbeDataAccumulationStrategy _data_accumulation_strategy = fb::ProbeDataAccumulationStrategy_NoProbeDataAccumulation;
-        double reset_value = 0;
-        bool temporal_normalization = false;
-        fb::CumulativeFunction cumulative_function = fb::CumulativeFunction_Sum;
+        fb::ResetMode _data_accumulation_reset_mode = fb::ResetMode_NONE;
+        double _data_accumulation_reset_value = 0;
+        bool _data_accumulation_temporal_normalization = false;
+        fb::CumulativeFunction _data_accumulation_cumulative_function = fb::CumulativeFunction_Sum;
     };
 } // end of namespace batprotocol
