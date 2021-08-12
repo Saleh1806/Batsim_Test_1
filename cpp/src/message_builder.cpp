@@ -509,6 +509,52 @@ void MessageBuilder::add_trigger_probe(
     _events.push_back(event);
 }
 
+void MessageBuilder::add_probe_data_emitted(
+    const std::string & probe_id,
+    fb::Metrics metrics,
+    const std::shared_ptr<ProbeData> & probe_data,
+    bool manually_triggered,
+    uint32_t nb_emitted,
+    uint32_t nb_triggered)
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_probe_data_emitted() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!probe_id.empty(), "Invalid (empty) probe_id received");
+
+    auto resources_s = serialize_resources(
+        probe_data->_resources_type,
+        probe_data->_hosts_resources,
+        probe_data->_links_resources
+    );
+
+    flatbuffers::Offset<void> data_s = 0;
+    switch(probe_data->_type) {
+        case fb::ProbeData_NONE: {
+            BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped probe data");
+        } break;
+        case fb::ProbeData_AggregatedProbeData: {
+            data_s = fb::CreateAggregatedProbeData(*_builder, probe_data->_aggregated_data).Union();
+        } break;
+        case fb::ProbeData_VectorialProbeData: {
+            data_s = fb::CreateVectorialProbeDataDirect(*_builder, probe_data->_vectorial_data.get()).Union();
+        } break;
+    }
+
+    auto probe_data_emitted = CreateProbeDataEmittedEventDirect(*_builder,
+        probe_id.c_str(),
+        probe_data->_resources_type,
+        resources_s,
+        metrics,
+        probe_data->_type,
+        data_s,
+        manually_triggered,
+        nb_emitted,
+        nb_triggered
+    );
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ProbeDataEmittedEvent, probe_data_emitted.Union());
+
+    _events.push_back(event);
+}
+
 void MessageBuilder::add_call_me_later(
     const std::string & call_me_later_id,
     const std::shared_ptr<TemporalTrigger> & when)

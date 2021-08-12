@@ -10,6 +10,7 @@
 #include "execute_job.hpp"
 #include "job.hpp"
 #include "kill.hpp"
+#include "probe_data.hpp"
 #include "profile.hpp"
 #include "simulation_begins.hpp"
 #include "temporal_trigger.hpp"
@@ -102,6 +103,15 @@ namespace batprotocol
         void add_trigger_probe(
             const std::string & probe_id,
             bool force_data_emission = true
+        );
+
+        void add_probe_data_emitted(
+            const std::string & probe_id,
+            fb::Metrics metrics,
+            const std::shared_ptr<ProbeData> & probe_data,
+            bool manually_triggered,
+            uint32_t nb_emitted,
+            uint32_t nb_triggered
         );
 
         // Simulation management events
