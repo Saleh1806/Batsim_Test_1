@@ -13,7 +13,7 @@ namespace batprotocol
     class CreateProbe
     {
     public:
-        ~CreateProbe();
+        ~CreateProbe() = default;
         static std::shared_ptr<CreateProbe> make_temporal_triggerred(
             std::shared_ptr<TemporalTrigger> & temporal_trigger
         );

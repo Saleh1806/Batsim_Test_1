@@ -5,11 +5,6 @@
 namespace batprotocol
 {
 
-CreateProbe::~CreateProbe()
-{
-
-}
-
 std::shared_ptr<CreateProbe> CreateProbe::make_temporal_triggerred(
     std::shared_ptr<TemporalTrigger> & temporal_trigger)
 {
