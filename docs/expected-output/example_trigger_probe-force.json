@@ -1,0 +1,13 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "TriggerProbeEvent",
+      "event": {
+        "probe_id": "power-all-hosts",
+        "force_data_emission": true
+      }
+    }
+  ]
+}

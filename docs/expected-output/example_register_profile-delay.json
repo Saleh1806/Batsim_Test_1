@@ -1,0 +1,18 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!delay0",
+          "profile_type": "DelayProfile",
+          "profile": {
+            "delay": 10.0
+          }
+        }
+      }
+    }
+  ]
+}

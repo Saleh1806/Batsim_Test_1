@@ -1,0 +1,20 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!ptask_hg0",
+          "profile_type": "ParallelTaskHomogeneousProfile",
+          "profile": {
+            "computation_amount": 10000000.0,
+            "communication_amount": 8192.0,
+            "generation_strategy": "DefinedAmountsUsedForEachValue"
+          }
+        }
+      }
+    }
+  ]
+}

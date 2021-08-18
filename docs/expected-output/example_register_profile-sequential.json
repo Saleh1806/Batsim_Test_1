@@ -1,0 +1,22 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!sequential0",
+          "profile_type": "SequentialCompositionProfile",
+          "profile": {
+            "repetition_count": 3,
+            "profile_ids": [
+              "w0!ptask",
+              "dyn!ptask_hg0"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

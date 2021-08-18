@@ -1,0 +1,17 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!ptask3",
+          "profile_type": "ParallelTaskProfile",
+          "profile": {
+          }
+        }
+      }
+    }
+  ]
+}

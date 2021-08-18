@@ -1,0 +1,21 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!ptask_hg_storage1",
+          "profile_type": "ParallelTaskOnStorageHomogeneousProfile",
+          "profile": {
+            "storage_name": "pfs",
+            "bytes_to_read": 1000000000.0,
+            "bytes_to_write": 0.0,
+            "generation_strategy": "DefinedAmountsSpreadUniformly"
+          }
+        }
+      }
+    }
+  ]
+}

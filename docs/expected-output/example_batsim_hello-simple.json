@@ -1,0 +1,14 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "BatsimHelloEvent",
+      "event": {
+        "batprotocol_version": "0.1.0+unknown-please-define-me-properly",
+        "batsim_version": "5.0.0",
+        "batsim_commit": "unknown"
+      }
+    }
+  ]
+}

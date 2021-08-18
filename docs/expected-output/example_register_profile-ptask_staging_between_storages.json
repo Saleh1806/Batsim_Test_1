@@ -1,0 +1,20 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!ptask_staging_storages0",
+          "profile_type": "ParallelTaskDataStagingBetweenStoragesProfile",
+          "profile": {
+            "bytes_to_transfer": 1000000.0,
+            "emitter_storage_name": "pfs",
+            "receiver_storage_name": "burst_buffer"
+          }
+        }
+      }
+    }
+  ]
+}

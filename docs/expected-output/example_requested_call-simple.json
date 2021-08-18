@@ -1,0 +1,12 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RequestedCallEvent",
+      "event": {
+        "call_me_later_id": "example_one_shot"
+      }
+    }
+  ]
+}

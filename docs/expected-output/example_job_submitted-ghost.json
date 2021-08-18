@@ -1,0 +1,20 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "JobSubmittedEvent",
+      "event": {
+        "job_id": "w0!2",
+        "job": {
+          "computation_resource_request_type": "NONE",
+          "walltime": -1.0,
+          "extra_data": "... (some data to do dynamic registrations)",
+          "rigid": true,
+          "profile_id": ""
+        },
+        "submission_time": 2.0
+      }
+    }
+  ]
+}

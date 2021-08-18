@@ -1,0 +1,19 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!replay_frac_comp0",
+          "profile_type": "TraceReplayProfile",
+          "profile": {
+            "trace_type": "FractionalComputation",
+            "filename": "npb-lu/traces-fractional-comp.txt"
+          }
+        }
+      }
+    }
+  ]
+}

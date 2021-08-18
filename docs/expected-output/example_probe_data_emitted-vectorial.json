@@ -1,0 +1,30 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ProbeDataEmittedEvent",
+      "event": {
+        "probe_id": "power-switches",
+        "resources_type": "LinkResources",
+        "resources": {
+          "link_ids": [
+            "switch0",
+            "switch1"
+          ]
+        },
+        "metrics": "Power",
+        "data_type": "VectorialProbeData",
+        "data": {
+          "data": [
+            50.0,
+            30.0
+          ]
+        },
+        "manually_triggered": true,
+        "nb_emitted": 5,
+        "nb_triggered": 7
+      }
+    }
+  ]
+}

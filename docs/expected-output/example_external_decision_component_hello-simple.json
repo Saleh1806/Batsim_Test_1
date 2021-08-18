@@ -1,0 +1,15 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "ExternalDecisionComponentHelloEvent",
+      "event": {
+        "batprotocol_version": "0.1.0+unknown-please-define-me-properly",
+        "decision_component_name": "cpp-unit-test",
+        "decision_component_version": "0.1.0",
+        "decision_component_commit": "unknown"
+      }
+    }
+  ]
+}

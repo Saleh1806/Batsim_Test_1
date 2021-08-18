@@ -1,0 +1,117 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "SimulationBeginsEvent",
+      "event": {
+        "host_number": 3,
+        "computation_host_number": 2,
+        "computation_hosts": [
+          {
+            "id": 0,
+            "name": "host0",
+            "pstate": 0,
+            "pstate_count": 1,
+            "state": "IDLE",
+            "properties": [
+              {
+                "key": "a",
+                "value": "0"
+              },
+              {
+                "key": "b",
+                "value": "1"
+              }
+            ],
+            "zone_properties": [
+              {
+                "key": "zone_key",
+                "value": "g5k"
+              }
+            ],
+            "core_count": 1,
+            "computation_speed": [
+              1000000000.0
+            ]
+          },
+          {
+            "id": 1,
+            "name": "host1",
+            "pstate": 0,
+            "pstate_count": 2,
+            "state": "SLEEPING",
+            "properties": [
+              {
+                "key": "a",
+                "value": "1"
+              },
+              {
+                "key": "b",
+                "value": "3"
+              }
+            ],
+            "zone_properties": [
+              {
+                "key": "zone_key",
+                "value": "g5k"
+              }
+            ],
+            "core_count": 8,
+            "computation_speed": [
+              1000000000.0,
+              100000000.0
+            ]
+          }
+        ],
+        "storage_host_number": 1,
+        "storage_hosts": [
+          {
+            "id": 2,
+            "name": "pfs",
+            "pstate": 0,
+            "pstate_count": 1,
+            "state": "IDLE",
+            "properties": [
+
+            ],
+            "zone_properties": [
+
+            ],
+            "core_count": 1,
+            "computation_speed": [
+              1000000000.0
+            ]
+          }
+        ],
+        "batsim_execution_context_json": "another JSON string",
+        "workloads": [
+          {
+            "name": "w0",
+            "filename": "/tmp/workload0.json"
+          },
+          {
+            "name": "w1",
+            "filename": "/tmp/workload1.json"
+          }
+        ],
+        "profiles": [
+          {
+            "id": "w0!delay0",
+            "profile_type": "DelayProfile",
+            "profile": {
+              "delay": 60.0
+            }
+          },
+          {
+            "id": "w1!delay0",
+            "profile_type": "DelayProfile",
+            "profile": {
+              "delay": 60.0
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

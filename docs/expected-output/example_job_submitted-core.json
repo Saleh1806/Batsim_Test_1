@@ -1,0 +1,23 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "JobSubmittedEvent",
+      "event": {
+        "job_id": "w0!1",
+        "job": {
+          "computation_resource_request_type": "CoreNumber",
+          "computation_resource_request": {
+            "core_number": 16
+          },
+          "walltime": -1.0,
+          "extra_data": "\"application\": \"npb-lu\"",
+          "rigid": false,
+          "profile_id": "w0!prof"
+        },
+        "submission_time": 1.0
+      }
+    }
+  ]
+}

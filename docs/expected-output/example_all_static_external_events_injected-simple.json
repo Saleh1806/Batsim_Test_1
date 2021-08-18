@@ -1,0 +1,11 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "AllStaticExternalEventsHaveBeenInjectedEvent",
+      "event": {
+      }
+    }
+  ]
+}

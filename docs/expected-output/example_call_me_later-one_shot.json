@@ -1,0 +1,16 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "CallMeLaterEvent",
+      "event": {
+        "call_me_later_id": "example_one_shot",
+        "when_type": "OneShot",
+        "when": {
+          "time": 42.0
+        }
+      }
+    }
+  ]
+}

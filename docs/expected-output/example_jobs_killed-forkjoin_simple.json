@@ -1,0 +1,41 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "JobsKilledEvent",
+      "event": {
+        "job_ids": [
+          "w0!5"
+        ],
+        "progresses": [
+          {
+            "job_id": "w0!5",
+            "wrapper": {
+              "kill_progress_type": "KillProgressForkJoinProfile",
+              "kill_progress": {
+                "profile_id": "w0!prof_forkjoin",
+                "tasks_progress": [
+                  {
+                    "kill_progress_type": "KillProgressAtomicProfile",
+                    "kill_progress": {
+                      "profile_id": "w0!prof",
+                      "progress": 0.4
+                    }
+                  },
+                  {
+                    "kill_progress_type": "KillProgressAtomicProfile",
+                    "kill_progress": {
+                      "profile_id": "w0!prof2",
+                      "progress": 0.8
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

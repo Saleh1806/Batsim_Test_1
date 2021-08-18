@@ -1,0 +1,35 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterProfileEvent",
+      "event": {
+        "profile": {
+          "id": "dyn!ptask2",
+          "profile_type": "ParallelTaskProfile",
+          "profile": {
+            "communication_matrix": [
+              0.0,
+              8192.0,
+              8192.0,
+              0.0,
+              8192.0,
+              0.0,
+              0.0,
+              8192.0,
+              8192.0,
+              0.0,
+              0.0,
+              8192.0,
+              0.0,
+              8192.0,
+              8192.0,
+              0.0
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

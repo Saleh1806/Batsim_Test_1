@@ -1,0 +1,45 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "CreateProbeEvent",
+      "event": {
+        "probe_id": "power",
+        "metrics": "Power",
+        "resources_type": "HostResources",
+        "resources": {
+          "host_ids": "0-3"
+        },
+        "data_accumulation_strategy_type": "ProbeDataAccumulation",
+        "data_accumulation_strategy": {
+          "reset_mode_type": "NoReset",
+          "reset_mode": {
+          },
+          "cumulative_function": "Sum",
+          "temporal_normalization": true
+        },
+        "measurement_triggering_policy_type": "TemporalTriggerWrapper",
+        "measurement_triggering_policy": {
+          "temporal_trigger_type": "Periodic",
+          "temporal_trigger": {
+            "start_time": 30.0,
+            "period": 5.0,
+            "mode_type": "Infinite",
+            "mode": {
+            }
+          }
+        },
+        "resources_aggregation_function_type": "NoResourcesAggregation",
+        "resources_aggregation_function": {
+        },
+        "temporal_aggregation_function_type": "NoTemporalAggregation",
+        "temporal_aggregation_function": {
+        },
+        "emission_filtering_policy_type": "NoFiltering",
+        "emission_filtering_policy": {
+        }
+      }
+    }
+  ]
+}

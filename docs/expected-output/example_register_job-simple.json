@@ -1,0 +1,22 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "RegisterJobEvent",
+      "event": {
+        "job_id": "dyn!0",
+        "job": {
+          "computation_resource_request_type": "HostNumber",
+          "computation_resource_request": {
+            "host_number": 8
+          },
+          "walltime": 600.0,
+          "extra_data": "",
+          "rigid": false,
+          "profile_id": "w0!prof"
+        }
+      }
+    }
+  ]
+}
