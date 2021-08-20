@@ -448,9 +448,17 @@ Simulation begins
 Simulation ends
 ~~~~~~~~~~~~~~~
 
-.. todo::
+.. tabs::
 
-   Test and document ``SimulationEndsEvent``
+   .. group-tab:: C++
+
+      .. literalinclude:: ../cpp/test/example_simulation_ends.cpp
+         :language: cpp
+
+   .. group-tab:: JSON
+
+      .. literalinclude:: expected-output/example_simulation_ends-simple.json
+         :language: json
 
 Requested call
 ~~~~~~~~~~~~~~
