@@ -183,9 +183,23 @@ Job submitted
 Job completed
 ~~~~~~~~~~~~~
 
-.. todo::
+.. tabs::
 
-   Test and document ``JobCompletedEvent``
+   .. group-tab:: C++
+
+      .. literalinclude:: ../cpp/test/example_job_completed.cpp
+         :language: cpp
+
+   .. group-tab:: JSON
+
+      .. literalinclude:: expected-output/example_job_completed-success.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_job_completed-failure.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_job_completed-killed.json
+         :language: json
 
 Jobs killed
 ~~~~~~~~~~~

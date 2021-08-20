@@ -1,0 +1,14 @@
+{
+  "now": 0.0,
+  "events": [
+    {
+      "timestamp": 0.0,
+      "event_type": "JobCompletedEvent",
+      "event": {
+        "job_id": "w0!0",
+        "state": "COMPLETED_SUCCESSFULLY",
+        "return_code": 0
+      }
+    }
+  ]
+}
