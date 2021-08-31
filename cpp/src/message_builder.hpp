@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -71,7 +72,7 @@ namespace batprotocol
 
         void add_jobs_killed(
             const std::vector<std::string> & job_ids,
-            const std::vector<std::shared_ptr<KillProgress> > & progresses
+            const std::map<std::string, std::shared_ptr<KillProgress> > & progresses
         );
 
         void add_register_profile(

@@ -219,25 +219,25 @@ void MessageBuilder::add_kill_jobs(const std::vector<std::string> & job_ids)
 
 void MessageBuilder::add_jobs_killed(
     const std::vector<std::string> & job_ids,
-    const std::vector<std::shared_ptr<KillProgress> > & progresses)
+    const std::map<std::string, std::shared_ptr<KillProgress> > & progresses)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_jobs_killed() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!job_ids.empty(), "Invalid (empty) job_ids received.");
-    BAT_ENFORCE(job_ids.size() == progresses.size(), "size of job_ids and progresses mismatch (job_ids=%lu, progresses=%lu)", job_ids.size(), progresses.size());
+    BAT_ENFORCE(job_ids.size() >= progresses.size(), "size of job_ids and progresses is invalid (job_ids=%lu, progresses=%lu)", job_ids.size(), progresses.size());
 
     auto job_ids_s = serialize_string_vector(job_ids);
 
     std::vector<flatbuffers::Offset<batprotocol::fb::JobAndProgress>> progress_vector;
-    progress_vector.reserve(job_ids.size());
+    progress_vector.reserve(progresses.size());
 
     // fun part is here.
     // a tree must be created for every job killed (their progress is independent).
     // the following code traverse the task tree of each job with unwinding to serialize all tasks in depth-first order.
-    for (auto i = 0u; i < job_ids.size(); ++i)
+    for (auto it : progresses)
     {
-        const auto & job_id = job_ids[i];
-        BAT_ENFORCE(progresses[i].get() != nullptr, "Invalid (null at index=%u) progresses received", i);
-        const auto & progress = *progresses[i];
+        const std::string & job_id = it.first;
+        BAT_ENFORCE(it.second.get() != nullptr, "Invalid (null) progress received for job '%s'", job_id.c_str());
+        const auto & progress = *it.second;
 
         std::unordered_map<std::string, flatbuffers::Offset<batprotocol::fb::KillProgressWrapper> > serialized_tasks;
 
