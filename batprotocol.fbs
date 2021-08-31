@@ -681,6 +681,9 @@ table SimulationBeginsEvent {
   /// The storage hosts.
   storage_hosts: [Host];
 
+  /// Batsim's command-line arguments as received by Batsim.
+  batsim_arguments: [string];
+
   /// Batsim's execution context, similar to what you would obtain via Batsim's command-line interface.
   batsim_execution_context_json: string (required);
 

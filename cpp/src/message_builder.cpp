@@ -648,7 +648,10 @@ void MessageBuilder::add_simulation_begins(SimulationBegins & simulation_begins)
     auto profile_and_ids_s = serialize_profile_and_id_vector(simulation_begins._profiles);
     auto workload_and_filenames_s = serialize_workload_and_filename_vector(simulation_begins._workloads);
 
-    auto simulation_begins_s = fb::CreateSimulationBeginsEventDirect(*_builder, simulation_begins._host_number, computation_hosts.size(), &computation_hosts_s, storage_hosts.size(), &storage_hosts_s, simulation_begins._batsim_execution_context.c_str(), &workload_and_filenames_s, &profile_and_ids_s);
+    BAT_ENFORCE(simulation_begins._batsim_arguments.get() != nullptr, "Invalid (null) batsim arguments. Please set them via SimulationBegins::set_batsim_arguments");
+    auto batsim_arguments_s = serialize_string_vector(*(simulation_begins._batsim_arguments.get()));
+
+    auto simulation_begins_s = fb::CreateSimulationBeginsEventDirect(*_builder, simulation_begins._host_number, computation_hosts.size(), &computation_hosts_s, storage_hosts.size(), &storage_hosts_s, &batsim_arguments_s, simulation_begins._batsim_execution_context.c_str(), &workload_and_filenames_s, &profile_and_ids_s);
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_SimulationBeginsEvent, simulation_begins_s.Union());
     _events.push_back(event);
 }

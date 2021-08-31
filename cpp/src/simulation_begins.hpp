@@ -27,6 +27,7 @@ namespace batprotocol
 
         SimulationBegins & add_profile(const std::string & profile_id, const std::shared_ptr<Profile> & profile);
 
+        SimulationBegins & set_batsim_arguments(const std::shared_ptr<std::vector<std::string> > & arguments);
         SimulationBegins & set_batsim_execution_context(const std::string & json);
         SimulationBegins & set_host_number(uint32_t host_number);
     private:
@@ -49,6 +50,7 @@ namespace batprotocol
         std::unordered_map<uint32_t, Host*> _hosts;
         std::unordered_map<std::string, std::string> _workloads;
         std::unordered_map<std::string, std::shared_ptr<Profile> > _profiles;
+        std::shared_ptr<std::vector<std::string> > _batsim_arguments = nullptr;
         std::string _batsim_execution_context;
     };
 } // end of namespace batprotocol

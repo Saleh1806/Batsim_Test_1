@@ -26,6 +26,15 @@ TEST(example_simulation_begins, full)
     EXPECT_EQ(event0->storage_host_number(), 1);
     EXPECT_EQ(event0->batsim_execution_context_json()->str(), "another JSON string");
 
+    auto batsim_arguments = std::vector<std::string>({
+        "batsim",
+        "-p", "cluster_energy_128.xml",
+        "-w", "test_energy_minimal_load0.json",
+        "-e" "batres",
+        "--energy"
+    });
+    check_identical_str_vectors(event0->batsim_arguments(), batsim_arguments);
+
     // computation hosts
     auto hosts = event0->computation_hosts();
     EXPECT_EQ(hosts->size(), 2);

@@ -84,6 +84,14 @@ SimulationBegins & SimulationBegins::add_profile(const std::string & profile_id,
     return *this;
 }
 
+SimulationBegins & SimulationBegins::set_batsim_arguments(const std::shared_ptr<std::vector<std::string> > & arguments)
+{
+    BAT_ENFORCE(arguments != nullptr, "Invalid (null) arguments received");
+    _batsim_arguments = arguments;
+
+    return *this;
+}
+
 SimulationBegins & SimulationBegins::set_batsim_execution_context(const std::string & json)
 {
     BAT_ENFORCE(!json.empty(), "Invalid (empty) json batsim execution context received");

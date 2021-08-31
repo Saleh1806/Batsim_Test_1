@@ -33,6 +33,17 @@ void example_simulation_begins_full(batprotocol::MessageBuilder & builder)
     begins.add_profile("w0!delay0", profile);
     begins.add_profile("w1!delay0", profile);
 
+    auto batsim_arguments = std::vector<std::string>({
+        "batsim",
+        "-p", "cluster_energy_128.xml",
+        "-w", "test_energy_minimal_load0.json",
+        "-e" "batres",
+        "--energy"
+    });
+    begins.set_batsim_arguments(
+        std::make_shared<std::vector<std::string> >(std::move(batsim_arguments))
+    );
+
     begins.set_batsim_execution_context("another JSON string");
 
     builder.add_simulation_begins(begins);
