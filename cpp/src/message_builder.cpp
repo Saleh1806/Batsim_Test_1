@@ -72,6 +72,16 @@ uint32_t MessageBuilder::buffer_size() const
     return static_cast<uint32_t>(_builder->GetSize());
 }
 
+int MessageBuilder::nb_events() const
+{
+    return _events.size();
+}
+
+bool MessageBuilder::has_events() const
+{
+    return !_events.empty();
+}
+
 const std::string * const MessageBuilder::buffer_as_json()
 {
     BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
