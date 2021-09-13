@@ -36,13 +36,11 @@ namespace batprotocol
         const std::string * const buffer_as_json();
         void parse_json_message(
             const std::string & json_msg,
-            uint8_t *& buffer_pointer,
-            uint32_t & buffer_size
+            uint8_t *& buffer_pointer
         );
         void parse_json_message(
             const char * json_msg,
-            uint8_t *& buffer_pointer,
-            uint32_t & buffer_size
+            uint8_t *& buffer_pointer
         );
 
         // Job management events

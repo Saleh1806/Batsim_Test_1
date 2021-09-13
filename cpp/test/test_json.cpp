@@ -107,9 +107,7 @@ TEST(json, deserialize)
     MessageBuilder mb(true);
 
     uint8_t * buffer_pointer;
-    uint32_t buffer_size;
-    mb.parse_json_message(std::string(json_msg), buffer_pointer, buffer_size);
-    EXPECT_GT(buffer_size, 0);
+    mb.parse_json_message(std::string(json_msg), buffer_pointer);
     auto parsed = flatbuffers::GetRoot<fb::Message>(buffer_pointer);
     EXPECT_EQ(parsed->now(), 2.0);
     EXPECT_NE(parsed->events(), nullptr);
@@ -140,8 +138,7 @@ TEST(json, INVALID_deserialize_json_disabled)
     EXPECT_THROW({
         try {
             uint8_t * buffer_pointer;
-            uint32_t buffer_size;
-            mb.parse_json_message(json_msg, buffer_pointer, buffer_size);
+            mb.parse_json_message(json_msg, buffer_pointer);
         }
         catch (const batprotocol::Error & e) {
             EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Cannot call buffer_as_json\(\) while json is disabled.*)"));
@@ -164,8 +161,7 @@ TEST(json, INVALID_deserialize_not_json)
     EXPECT_THROW({
         try {
             uint8_t * buffer_pointer;
-            uint32_t buffer_size;
-            mb.parse_json_message(json_msg, buffer_pointer, buffer_size);
+            mb.parse_json_message(json_msg, buffer_pointer);
         }
         catch (const batprotocol::Error & e) {
             EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Could not parse the provided json message with batprotocol's flatbuffers schema: .* declaration expected$)"));
@@ -202,8 +198,7 @@ TEST(json, INVALID_deserialize_missing_field)
     EXPECT_THROW({
         try {
             uint8_t * buffer_pointer;
-            uint32_t buffer_size;
-            mb.parse_json_message(json_msg, buffer_pointer, buffer_size);
+            mb.parse_json_message(json_msg, buffer_pointer);
         }
         catch (const batprotocol::Error & e) {
             EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Could not parse the provided json message with batprotocol's flatbuffers schema: .* required field is missing: job_id in JobCompletedEvent$)"));
@@ -226,8 +221,7 @@ TEST(json, INVALID_deserialize_unknown_field)
     EXPECT_THROW({
         try {
             uint8_t * buffer_pointer;
-            uint32_t buffer_size;
-            mb.parse_json_message(json_msg, buffer_pointer, buffer_size);
+            mb.parse_json_message(json_msg, buffer_pointer);
         }
         catch (const batprotocol::Error & e) {
             EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Could not parse the provided json message with batprotocol's flatbuffers schema: .* unknown field: unexpected-field$)"));

@@ -92,23 +92,20 @@ const std::string * const MessageBuilder::buffer_as_json()
 
 void MessageBuilder::parse_json_message(
     const std::string & json_msg,
-    uint8_t *& buffer_pointer,
-    uint32_t & buffer_size)
+    uint8_t *& buffer_pointer)
 {
-    parse_json_message(json_msg.c_str(), buffer_pointer, buffer_size);
+    parse_json_message(json_msg.c_str(), buffer_pointer);
 }
 
 void MessageBuilder::parse_json_message(
     const char * json_msg,
-    uint8_t *& buffer_pointer,
-    uint32_t & buffer_size)
+    uint8_t *& buffer_pointer)
 {
     BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
 
     bool ret = _parser->Parse(json_msg);
     BAT_ENFORCE(ret, "Could not parse the provided json message with batprotocol's flatbuffers schema: %s", _parser->error_.c_str());
     buffer_pointer = _parser->builder_.GetBufferPointer();
-    buffer_size = _parser->builder_.GetSize();
 }
 
 void MessageBuilder::add_job_submitted(
