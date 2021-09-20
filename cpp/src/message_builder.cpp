@@ -42,6 +42,7 @@ void MessageBuilder::clear(double now)
     _current_time = now;
     _events.clear();
     _builder->Clear();
+    _json_buffer.clear();
     _is_buffer_finished = false;
 }
 
