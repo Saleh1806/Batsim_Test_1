@@ -30,6 +30,48 @@ TEST(json, serialize_events)
     // printf("%s\n", json->c_str());
 }
 
+// Make sure the generated string is null-terminated
+TEST(json, serialize_null_terminated)
+{
+    using namespace batprotocol;
+    MessageBuilder mb(true);
+    mb.finish_message(0.0);
+    auto json = mb.buffer_as_json();
+    EXPECT_NE(json, nullptr);
+    EXPECT_GT(json->size(), 0);
+    EXPECT_EQ(json->c_str()[json->size()], '\0');
+}
+
+// Make sure you can generate valid JSON objects with the same MessageBuilder
+TEST(json, several_messages)
+{
+    using namespace batprotocol;
+    MessageBuilder mb(true);
+    mb.finish_message(0.0);
+    auto json0 = mb.buffer_as_json();
+    EXPECT_NE(json0, nullptr);
+    auto size0 = json0->size();
+    EXPECT_GT(size0, 0);
+
+    // should be the exact same message
+    mb.clear(0.0);
+    mb.finish_message(0.0);
+    auto json1 = mb.buffer_as_json();
+    EXPECT_NE(json1, nullptr);
+    auto size1 = json1->size();
+    EXPECT_GT(size1, 0);
+    EXPECT_EQ(size1, size0);
+
+    // should be longer, as 123456.0 is longer to serialize than 0.0 in json.
+    mb.clear(123456.0);
+    mb.finish_message(123456.0);
+    auto json2 = mb.buffer_as_json();
+    EXPECT_NE(json2, nullptr);
+    auto size2 = json2->size();
+    EXPECT_GT(size2, 0);
+    EXPECT_GT(size2, size1);
+}
+
 // Try to serialize an unfinished JSON message
 TEST(json, INVALID_serialize_unfinished)
 {
