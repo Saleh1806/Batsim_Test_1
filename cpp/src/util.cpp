@@ -51,7 +51,7 @@ void serialize_message(
         // generate a JSON flatbuffers Message byte buffer then return its pointer/size.
         auto * buffer_str = mb.buffer_as_json();
         *output_buffer = (uint8_t*) buffer_str->c_str();
-        *output_buffer_size = buffer_str->size();
+        *output_buffer_size = buffer_str->size() + 1; // null-terminated C string
     }
 }
 
