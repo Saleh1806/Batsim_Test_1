@@ -61,7 +61,7 @@ void MessageBuilder::set_current_time(double now)
     _current_time = now;
 }
 
-const uint8_t * const MessageBuilder::buffer_pointer() const
+const uint8_t * MessageBuilder::buffer_pointer() const
 {
     BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_pointer() while buffer is not finished. Please call finish_message() first.");
     return _builder->GetBufferPointer();
@@ -83,7 +83,7 @@ bool MessageBuilder::has_events() const
     return !_events.empty();
 }
 
-const std::string * const MessageBuilder::buffer_as_json()
+const std::string * MessageBuilder::buffer_as_json()
 {
     BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
     BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_as_json() while buffer is not finished. Please call finish_message() first.");
