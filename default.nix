@@ -53,6 +53,8 @@ let
       mesonFlags = [ "--warnlevel=3" ]
         ++ pkgs.lib.optional werror [ "--werror" ]
         ++ pkgs.lib.optional doCoverage [ "-Db_coverage=true" ];
+      ninjaFlags = [ "-v" ];
+      hardeningDisable = if debug then [ "fortify" ] else [];
       postInstall = pkgs.lib.optionalString doCoverage ''
         mkdir -p $out/gcno
         cp libbatprotocol-cpp.so.p/*.gcno $out/gcno/
@@ -74,10 +76,12 @@ let
       mesonBuildType = if debug then "debug" else "release";
       dontStrip = debug;
       CXXFLAGS = if debug then "-O0" else "";
+      ninjaFlags = [ "-v" ];
       src = pkgs.lib.sourceByRegex ./cpp/test [
         "^meson\.build"
         "^.*?pp"
       ];
+      hardeningDisable = if debug then [ "fortify" ] else [];
     };
 
     cpp-test = pkgs.stdenv.mkDerivation rec {
