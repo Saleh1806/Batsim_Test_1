@@ -183,7 +183,7 @@ TEST(json, INVALID_deserialize_json_disabled)
             mb.parse_json_message(json_msg, buffer_pointer);
         }
         catch (const batprotocol::Error & e) {
-            EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Cannot call buffer_as_json\(\) while json is disabled.*)"));
+            EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^Cannot call parse_json_message\(\) while json is disabled.*)"));
             throw;
         }
         catch(...) {
