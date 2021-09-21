@@ -86,7 +86,7 @@ let
 
     cpp-test = pkgs.stdenv.mkDerivation rec {
       name = "cpp-test";
-      buildInputs = [ cpp-test-binary ];
+      buildInputs = [ cpp-test-binary pkgs.findutils pkgs.gnused pkgs.jq ];
       unpackPhase = "true"; # no src for this package
       buildPhase = pkgs.lib.optionalString doCoverage ''
         mkdir -p gcda
@@ -98,8 +98,12 @@ let
         BATPROTOCOL_TEST_OUTPUT_PATH=output-files batprotocol-cpp-test
       '';
       installPhase = ''
-        mkdir -p $out
-        cp -r output-files $out/
+        mkdir -p $out/output-files
+
+        # copy output-files, but indent json ones via jq
+        cp output-files/*.bin $out/output-files/
+        echo "indenting all JSON output files..."
+        find output-files -name '*.json' | sed -E "sW(output-files/(.*))Wcat \1 | jq > $out/output-files/\2W" | bash
       '' + pkgs.lib.optionalString doCoverage ''
         mv gcda $out/
       '';
