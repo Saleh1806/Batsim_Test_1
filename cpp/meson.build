@@ -39,6 +39,7 @@ src = [
   'src/profile.cpp',
   'src/simulation_begins.cpp',
   'src/temporal_trigger.cpp',
+  'src/util.cpp',
   'src/version.cpp',
 ]
 
@@ -53,6 +54,7 @@ inc = [
   'src/profile.hpp',
   'src/simulation_begins.hpp',
   'src/temporal_trigger.hpp',
+  'src/util.hpp',
   'src/version.hpp',
   meson.project_build_root() + '/batprotocol_generated.h',
   meson.project_build_root() + '/schema.hpp',
