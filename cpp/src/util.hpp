@@ -22,4 +22,11 @@ namespace batprotocol
         const uint8_t *& output_buffer,
         uint32_t & output_buffer_size
     );
+
+    void serialize_message(
+        MessageBuilder & mb,
+        bool format_json,
+        const uint8_t ** output_buffer,
+        uint32_t * output_buffer_size
+    );
 }

@@ -29,20 +29,29 @@ void serialize_message(
     const uint8_t *& output_buffer,
     uint32_t & output_buffer_size)
 {
+    serialize_message(mb, format_json, &output_buffer, &output_buffer_size);
+}
+
+void serialize_message(
+    MessageBuilder & mb,
+    bool format_json,
+    const uint8_t ** output_buffer,
+    uint32_t * output_buffer_size)
+{
     if (!format_json)
     {
         // If the message must be formatted in binary,
         // just return MessageBuilder pointer/size.
-        output_buffer = mb.buffer_pointer();
-        output_buffer_size = mb.buffer_size();
+        *output_buffer = mb.buffer_pointer();
+        *output_buffer_size = mb.buffer_size();
     }
     else
     {
         // If the message must be formatted in JSON,
         // generate a JSON flatbuffers Message byte buffer then return its pointer/size.
         auto * buffer_str = mb.buffer_as_json();
-        output_buffer = (uint8_t*) buffer_str->c_str();
-        output_buffer_size = buffer_str->size();
+        *output_buffer = (uint8_t*) buffer_str->c_str();
+        *output_buffer_size = buffer_str->size();
     }
 }
 
