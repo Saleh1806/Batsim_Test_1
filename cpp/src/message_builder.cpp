@@ -20,6 +20,7 @@ MessageBuilder::MessageBuilder(bool enable_json)
         flatbuffers::IDLOptions parser_options;
         parser_options.strict_json = true;
         parser_options.output_default_scalars_in_json = true;
+        parser_options.indent_step = -1; // < 0 means no spaces nor line breaks
         _parser = new flatbuffers::Parser(parser_options);
 
         bool ret = _parser->Parse(batprotocol::fb::schema.c_str());
