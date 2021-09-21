@@ -102,7 +102,7 @@ void MessageBuilder::parse_json_message(
     const char * json_msg,
     uint8_t *& buffer_pointer)
 {
-    BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
+    BAT_ENFORCE(_is_json_enabled, "Cannot call parse_json_message() while json is disabled. Please enable json when constructing your MessageBuilder.");
 
     bool ret = _parser->Parse(json_msg);
     BAT_ENFORCE(ret, "Could not parse the provided json message with batprotocol's flatbuffers schema: %s", _parser->error_.c_str());
