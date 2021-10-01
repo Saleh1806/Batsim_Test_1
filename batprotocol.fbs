@@ -600,6 +600,43 @@ table BatsimHelloEvent {
   batsim_commit: string;
 }
 
+table EDCRequestedSimulationFeatures {
+  /// If true the dynamic registration of jobs and profiles will be enabled for this EDC. This means the EDC must send a FinishRegistrationEvent so the simulation can end.
+  dynamic_registration: bool = false;
+
+  /// If true any existing profile can be used to register dynamic jobs. Otherwise the EDC must make sure that the desired profile has not been garbage collected from Batsim memory when registering a job (which happens when the last job that references a profile completes).
+  profile_reuse: bool = false;
+
+  /// If true Batsim will emit a JobSubmittedEvent to this EDC when the EDC registers a job.
+  acknowledge_dynamic_jobs: bool = false;
+
+  /// If true Batsim will include profile information in JobSubmittedEvent.
+  forward_profiles_on_job_submission: bool = false;
+
+  /// If true Batsim will include profile information in JobsKilledEvent.
+  forward_profiles_on_jobs_killed: bool = false;
+
+  /// If true Batsim will include profile information in SimulationBeginsEvent.
+  forward_profiles_on_simulation_begins: bool = false;
+}
+
+enum JobAllocationValidationStrategy : byte {
+  None
+, MatchJobRequestExactly
+, MatchJobRequestBigEnough
+}
+
+table EDCSchedulingConstraints {
+  /// If false, allocating the same computation host for several jobs at the same time is forbidden for this EDC.
+  compute_sharing: bool = false;
+
+  /// If false, allocating the same storage host for several jobs at the same time is forbidden for this EDC.
+  storage_sharing: bool = true;
+
+  /// Defines how Batsim should check the validity of the job allocations coming from this EDC. Note that the executability of the underlying profile will always be checked.
+  job_allocation_validation_strategy: JobAllocationValidationStrategy = MatchJobRequestExactly;
+}
+
 table ExternalDecisionComponentHelloEvent {
   /// The version of the batprotocol. Expecting a semantic versioning format. For example "1.0.0", "0.1.0+9a04b9d60a211c380d62abbe70e2a3b2ffb869b3"...
   batprotocol_version: string (required);
@@ -612,6 +649,12 @@ table ExternalDecisionComponentHelloEvent {
 
   /// The commit (from a version control system, typically Git) that precisely identifies the decision component version. Can be null. Example: "880dd60c537d7d7a8246daaf5b2d1f7bfea3cbf4". Cannot contain comma (ASCII/UTF-8 0x2C) nor double quote (ASCII/UTF-8 0x22).
   decision_component_commit: string;
+
+  /// The simulation features requested by the decision component.
+  requested_simulation_features: EDCRequestedSimulationFeatures;
+
+  /// The scheduling constraints that the decision component must respect.
+  scheduling_constraints: EDCSchedulingConstraints;
 }
 
 table HostProperty {

@@ -618,17 +618,35 @@ void MessageBuilder::add_batsim_hello(
 void MessageBuilder::add_external_decision_component_hello(
     const std::string & decision_component_name,
     const std::string & decision_component_version,
-    const std::string & decision_component_commit)
+    const std::string & decision_component_commit,
+    const EDCHelloOptions & options)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_external_decision_component_hello() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!decision_component_name.empty(), "Invalid (empty) decision_component_name received");
     BAT_ENFORCE(!decision_component_version.empty(), "Invalid (empty) decision_component_version received");
 
+    auto requested_simulation_features = fb::CreateEDCRequestedSimulationFeatures(*_builder,
+        options._dynamic_registration,
+        options._profile_reuse,
+        options._acknowledge_dynamic_jobs,
+        options._forward_profiles_on_job_submission,
+        options._forward_profiles_on_jobs_killed,
+        options._forward_profiles_on_simulation_begins
+    );
+
+    auto scheduling_constraints = fb::CreateEDCSchedulingConstraints(*_builder,
+        options._compute_sharing,
+        options._storage_sharing,
+        options._job_allocation_validation_strategy
+    );
+
     auto dc_hello = fb::CreateExternalDecisionComponentHelloEventDirect(*_builder,
         version().c_str(),
         decision_component_name.c_str(),
         decision_component_version.c_str(),
-        decision_component_commit.c_str()
+        decision_component_commit.c_str(),
+        requested_simulation_features,
+        scheduling_constraints
     );
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ExternalDecisionComponentHelloEvent, dc_hello.Union());
     _events.push_back(event);

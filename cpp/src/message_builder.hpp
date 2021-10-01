@@ -8,6 +8,7 @@
 #include <flatbuffers/idl.h>
 
 #include "create_probe.hpp"
+#include "edc_hello.hpp"
 #include "execute_job.hpp"
 #include "job.hpp"
 #include "kill.hpp"
@@ -137,7 +138,8 @@ namespace batprotocol
         void add_external_decision_component_hello(
             const std::string & decision_component_name,
             const std::string & decision_component_version,
-            const std::string & decision_component_commit = ""
+            const std::string & decision_component_commit = "",
+            const EDCHelloOptions & options = EDCHelloOptions()
         );
 
         void add_simulation_begins(
