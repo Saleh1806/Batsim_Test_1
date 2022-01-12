@@ -631,7 +631,8 @@ void MessageBuilder::add_external_decision_component_hello(
         options._acknowledge_dynamic_jobs,
         options._forward_profiles_on_job_submission,
         options._forward_profiles_on_jobs_killed,
-        options._forward_profiles_on_simulation_begins
+        options._forward_profiles_on_simulation_begins,
+        options._forward_unknown_external_events
     );
 
     auto scheduling_constraints = fb::CreateEDCSchedulingConstraints(*_builder,

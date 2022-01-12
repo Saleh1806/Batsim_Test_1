@@ -41,6 +41,12 @@ EDCHelloOptions & EDCHelloOptions::request_forward_profiles_on_simulation_begins
     return *this;
 }
 
+EDCHelloOptions & EDCHelloOptions::request_forward_unknown_external_events()
+{
+    _forward_unknown_external_events = true;
+    return *this;
+}
+
 EDCHelloOptions & EDCHelloOptions::set_compute_sharing(bool value)
 {
     _compute_sharing = value;

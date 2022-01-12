@@ -18,6 +18,7 @@ namespace batprotocol
         EDCHelloOptions & request_forward_profiles_on_job_submission();
         EDCHelloOptions & request_forward_profiles_on_jobs_killed();
         EDCHelloOptions & request_forward_profiles_on_simulation_begins();
+        EDCHelloOptions & request_forward_unknown_external_events();
 
         EDCHelloOptions & set_compute_sharing(bool value);
         EDCHelloOptions & set_storage_sharing(bool value);
@@ -31,6 +32,7 @@ namespace batprotocol
         bool _forward_profiles_on_job_submission = false;
         bool _forward_profiles_on_jobs_killed = false;
         bool _forward_profiles_on_simulation_begins = false;
+        bool _forward_unknown_external_events = false;
 
         bool _compute_sharing = false;
         bool _storage_sharing = true;

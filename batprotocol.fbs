@@ -618,6 +618,9 @@ table EDCRequestedSimulationFeatures {
 
   /// If true Batsim will include profile information in SimulationBeginsEvent.
   forward_profiles_on_simulation_begins: bool = false;
+
+  // If true external events unkown to Batsim will be sent to this EDC.
+  forward_unknown_external_events: bool = false;
 }
 
 enum JobAllocationValidationStrategy : byte {

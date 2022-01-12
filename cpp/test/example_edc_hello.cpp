@@ -56,6 +56,13 @@ void example_external_decision_component_hello_feature6(batprotocol::MessageBuil
     );
 }
 
+void example_external_decision_component_hello_feature7(batprotocol::MessageBuilder & builder)
+{
+    builder.add_external_decision_component_hello("cpp-unit-test", "0.1.0", "unknown",
+        EDCHelloOptions().request_forward_unknown_external_events()
+    );
+}
+
 void example_external_decision_component_hello_compute_sharing(batprotocol::MessageBuilder & builder)
 {
     builder.add_external_decision_component_hello("cpp-unit-test", "0.1.0", "unknown",
