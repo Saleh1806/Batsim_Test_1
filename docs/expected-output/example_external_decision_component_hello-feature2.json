@@ -10,8 +10,8 @@
         "decision_component_version": "0.1.0",
         "decision_component_commit": "unknown",
         "requested_simulation_features": {
-          "dynamic_registration": false,
-          "profile_reuse": false,
+          "dynamic_registration": true,
+          "profile_reuse": true,
           "acknowledge_dynamic_jobs": false,
           "forward_profiles_on_job_submission": false,
           "forward_profiles_on_jobs_killed": false,

@@ -400,6 +400,37 @@ External decision component hello
       .. literalinclude:: expected-output/example_external_decision_component_hello-simple.json
          :language: json
 
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature1.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature2.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature3.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature4.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature5.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature6.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-feature7.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-compute_sharing.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-no_storage_sharing.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_external_decision_component_hello-job_alloc_validation_strategy.json
+         :language: json
+
+
 Finish registration
 ~~~~~~~~~~~~~~~~~~~
 

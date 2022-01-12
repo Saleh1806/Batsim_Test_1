@@ -19,8 +19,8 @@
           "forward_unknown_external_events": false
         },
         "scheduling_constraints": {
-          "compute_sharing": false,
-          "storage_sharing": true,
+          "compute_sharing": true,
+          "storage_sharing": false,
           "job_allocation_validation_strategy": "MatchJobRequestExactly"
         }
       }

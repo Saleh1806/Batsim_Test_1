@@ -15,7 +15,7 @@
           "acknowledge_dynamic_jobs": false,
           "forward_profiles_on_job_submission": false,
           "forward_profiles_on_jobs_killed": false,
-          "forward_profiles_on_simulation_begins": false,
+          "forward_profiles_on_simulation_begins": true,
           "forward_unknown_external_events": false
         },
         "scheduling_constraints": {

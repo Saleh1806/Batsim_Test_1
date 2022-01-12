@@ -21,7 +21,7 @@
         "scheduling_constraints": {
           "compute_sharing": false,
           "storage_sharing": true,
-          "job_allocation_validation_strategy": "MatchJobRequestExactly"
+          "job_allocation_validation_strategy": "MatchJobRequestBigEnough"
         }
       }
     }
