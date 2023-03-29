@@ -72,6 +72,7 @@ void SequencerDVFS::on_requested_call(double date)
     {
         int new_pstate = _currently_fast ? _pstate_compute_slow : _pstate_compute_fast;
         _decision->add_set_resource_state(_allocated_machines, new_pstate, date);
+        _currently_fast = !_currently_fast;
     }
 }
 
