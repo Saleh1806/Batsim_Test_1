@@ -66,6 +66,8 @@ src = [
     'src/algo/rejecter.hpp',
     'src/algo/sequencer.cpp',
     'src/algo/sequencer.hpp',
+    'src/algo/sequencer_dvfs.cpp',
+    'src/algo/sequencer_dvfs.hpp',
     'src/algo/sleeper.cpp',
     'src/algo/sleeper.hpp',
     'src/algo/submitter.cpp',
