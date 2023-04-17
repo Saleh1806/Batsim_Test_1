@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   ninjaFlags = [ "-v" ];
 
   passthru = rec {
-    GCOV_PREFIX_STRIP = "5";
+    GCOV_PREFIX_STRIP = "6";
     DEBUG_SRC_DIRS = [ "${src}/cpp/src" ];
     GDB_DIR_ARGS = map (x: "--directory=" + x) DEBUG_SRC_DIRS;
   };
