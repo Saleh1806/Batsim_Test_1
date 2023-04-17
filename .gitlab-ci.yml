@@ -15,13 +15,16 @@ build_and_test:
     #-------------#
     # C++ library #
     #-------------#
-    - nix-shell --pure -A batprotocol-cpp --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
-    - nix-build -A batprotocol-cpp
+    # - nix-shell --pure -A batprotocol-cpp --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
+    # - nix-build -A batprotocol-cpp
+    - nix flake show
+    - nix build .#batprotocol-cpp
+    - nix build .#ci-batprotocol-cpp-werror-gcc
     # tests
-    - nix-shell --pure -A cpp-test-binary --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
-    - nix-shell --pure -A cpp-test --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
-    - nix-build -A cpp-test
+    # - nix-shell --pure -A cpp-test-binary --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
+    # - nix-shell --pure -A cpp-test --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
+    # - nix-build -A cpp-test
     #----------------#
     # Python library #
     #----------------#
-    - nix-build -A batprotocol-py
+    # - nix-build -A batprotocol-py

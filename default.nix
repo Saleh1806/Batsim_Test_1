@@ -1,308 +1,203 @@
-{ kapack ? import
-    (fetchTarball "https://github.com/oar-team/nur-kapack/archive/master.tar.gz") {}
-, debug ? true
-, werror ? false
-, doCoverage ? true
-, coverageCobertura ? false
-, coverageCoveralls ? false
-, coverageGcovTxt ? true
-, coverageHtml ? true
-, coverageSonarqube ? false
+# Compatibility function to allow flakes to be used by
+# non-flake-enabled Nix versions. Given a source tree containing a
+# 'flake.nix' and 'flake.lock' file, it fetches the flake inputs and
+# calls the flake's 'outputs' function. It then returns an attrset
+# containing 'defaultNix' (to be used in 'default.nix'), 'shellNix'
+# (to be used in 'shell.nix').
+
+{ src ? ./.
+, system ? builtins.currentSystem or "unknown-system"
 }:
 
 let
-  pkgs = kapack.pkgs;
-  batprotocol_version = "0.1.0";
-  jobs = rec {
-    inherit pkgs;
 
-    shell = pkgs.mkShell rec {
-      buildInputs = [
-        flatbuffers_for_cpp_json
-        pkgs.ninja
-        pkgs.pkgconfig
-      ];
-      FLATBUFFERS_LIB_PATH="${flatbuffers_for_cpp_json}/lib";
-    };
+  lockFilePath = src + "/flake.lock";
 
-    batprotocol-cpp = pkgs.stdenv.mkDerivation rec {
-      name = "batprotocol-cpp";
-      version = "${batprotocol_version}";
-      nativeBuildInputs = [
-        flatbuffers_for_cpp_json
-        pkgs.meson
-        pkgs.ninja
-        pkgs.pkgconfig
-      ];
-      propagatedBuildInputs = [
-        flatbuffers_for_cpp_json
-      ];
-      src = pkgs.lib.sourceByRegex ./. [
-        "^batprotocol\.fbs"
-        "^cpp"
-        "^cpp/meson\.build"
-        "^cpp/src"
-        "^cpp/src/.*\.hpp"
-        "^cpp/src/.*\.hpp\.in"
-        "^cpp/src/.*\.cpp"
-      ];
-      preConfigure = "cd cpp";
-      mesonBuildType = if debug then "debug" else "release";
-      dontStrip = debug;
-      CXXFLAGS = if debug then "-O0" else "";
-      mesonFlags = [ "--warnlevel=3" ]
-        ++ pkgs.lib.optional werror [ "--werror" ]
-        ++ pkgs.lib.optional doCoverage [ "-Db_coverage=true" ];
-      ninjaFlags = [ "-v" ];
-      hardeningDisable = if debug then [ "fortify" ] else [];
-      postInstall = pkgs.lib.optionalString doCoverage ''
-        mkdir -p $out/gcno
-        cp libbatprotocol-cpp.so.p/*.gcno $out/gcno/
-      '';
-    };
+  lockFile = builtins.fromJSON (builtins.readFile lockFilePath);
 
-    cpp-test-binary = pkgs.stdenv.mkDerivation rec {
-      name = "cpp-test-binary";
-      version = "0.1.0";
-      nativeBuildInputs = [
-        pkgs.meson
-        pkgs.ninja
-        pkgs.pkgconfig
-        pkgs.gtest.dev
-      ];
-      buildInputs = [
-        batprotocol-cpp
-      ];
-      mesonBuildType = if debug then "debug" else "release";
-      dontStrip = debug;
-      CXXFLAGS = if debug then "-O0" else "";
-      ninjaFlags = [ "-v" ];
-      src = pkgs.lib.sourceByRegex ./cpp/test [
-        "^meson\.build"
-        "^.*?pp"
-      ];
-      hardeningDisable = if debug then [ "fortify" ] else [];
-    };
+  fetchTree =
+    info:
+    if info.type == "github" then
+      { outPath =
+          fetchTarball
+            ({ url = "https://api.${info.host or "github.com"}/repos/${info.owner}/${info.repo}/tarball/${info.rev}"; }
+             // (if info ? narHash then { sha256 = info.narHash; } else {})
+            );
+        rev = info.rev;
+        shortRev = builtins.substring 0 7 info.rev;
+        lastModified = info.lastModified;
+        lastModifiedDate = formatSecondsSinceEpoch info.lastModified;
+        narHash = info.narHash;
+      }
+    else if info.type == "git" then
+      { outPath =
+          builtins.fetchGit
+            ({ url = info.url; }
+             // (if info ? rev then { inherit (info) rev; } else {})
+             // (if info ? ref then { inherit (info) ref; } else {})
+             // (if info ? submodules then { inherit (info) submodules; } else {})
+            );
+        lastModified = info.lastModified;
+        lastModifiedDate = formatSecondsSinceEpoch info.lastModified;
+        narHash = info.narHash;
+      } // (if info ? rev then {
+        rev = info.rev;
+        shortRev = builtins.substring 0 7 info.rev;
+      } else {
+      })
+    else if info.type == "path" then
+      { outPath = builtins.path { path = info.path; };
+        narHash = info.narHash;
+      }
+    else if info.type == "tarball" then
+      { outPath =
+          fetchTarball
+            ({ inherit (info) url; }
+             // (if info ? narHash then { sha256 = info.narHash; } else {})
+            );
+      }
+    else if info.type == "gitlab" then
+      { inherit (info) rev narHash lastModified;
+        outPath =
+          fetchTarball
+            ({ url = "https://${info.host or "gitlab.com"}/api/v4/projects/${info.owner}%2F${info.repo}/repository/archive.tar.gz?sha=${info.rev}"; }
+             // (if info ? narHash then { sha256 = info.narHash; } else {})
+            );
+        shortRev = builtins.substring 0 7 info.rev;
+      }
+    else
+      # FIXME: add Mercurial, tarball inputs.
+      throw "flake input has unsupported input type '${info.type}'";
 
-    cpp-test = pkgs.stdenv.mkDerivation rec {
-      name = "cpp-test";
-      buildInputs = [ cpp-test-binary pkgs.findutils pkgs.gnused pkgs.jq ];
-      unpackPhase = "true"; # no src for this package
-      buildPhase = pkgs.lib.optionalString doCoverage ''
-        mkdir -p gcda
-        export GCOV_PREFIX=$(realpath gcda)
-        export GCOV_PREFIX_STRIP=5
-      '' + ''
-        getting-started
-        mkdir output-files
-        BATPROTOCOL_TEST_OUTPUT_PATH=output-files batprotocol-cpp-test
-      '';
-      installPhase = ''
-        mkdir -p $out/output-files
+  callFlake4 = flakeSrc: locks:
+    let
+      flake = import (flakeSrc + "/flake.nix");
 
-        # copy output-files, but indent json ones via jq
-        cp output-files/*.bin $out/output-files/
-        echo "indenting all JSON output files..."
-        find output-files -name '*.json' | sed -E "sW(output-files/(.*))Wcat \1 | jq > $out/output-files/\2W" | bash
-      '' + pkgs.lib.optionalString doCoverage ''
-        mv gcda $out/
-      '';
-    };
+      inputs = builtins.mapAttrs (n: v:
+        if v.flake or true
+        then callFlake4 (fetchTree (v.locked // v.info)) v.inputs
+        else fetchTree (v.locked // v.info)) locks;
 
-    cpp-coverage-report = pkgs.stdenv.mkDerivation rec {
-      name = "cpp-coverage-report";
-      buildInputs = batprotocol-cpp.buildInputs ++ [ kapack.gcovr ]
-        ++ [ batprotocol-cpp cpp-test ];
-      src = batprotocol-cpp.src;
+      outputs = flakeSrc // (flake.outputs (inputs // {self = outputs;}));
+    in
+      assert flake.edition == 201909;
+      outputs;
 
-      buildPhase = ''
-        cd cpp
-        mkdir cov-merged
-        cd cov-merged
-        cp ${batprotocol-cpp}/gcno/* ${cpp-test}/gcda/* ./
-        gcov -p *.gcno
-        mkdir report
-      '' + pkgs.lib.optionalString coverageHtml ''
-        mkdir -p report/html
-      '' + pkgs.lib.optionalString coverageGcovTxt ''
-        mkdir -p report/gcov-txt
-        cp \^\#src\#*.gcov report/gcov-txt/
-      '' + ''
-        gcovr -g -k -r .. --filter '\.\./src/' \
-          --txt report/file-summary.txt \
-          --csv report/file-summary.csv \
-          --json-summary report/file-summary.json \
-        '' + pkgs.lib.optionalString coverageCobertura ''
-          --xml report/cobertura.xml \
-        '' + pkgs.lib.optionalString coverageCoveralls ''
-          --coveralls report/coveralls.json \
-        '' + pkgs.lib.optionalString coverageHtml ''
-          --html-details report/html/index.html \
-        '' + pkgs.lib.optionalString coverageSonarqube ''
-          --sonarqube report/sonarqube.xml \
-        '' + ''
-          --print-summary
-      '';
-      installPhase = ''
-        mkdir -p $out
-        cp -r report/* $out/
-      '';
-    };
+  callLocklessFlake = flakeSrc:
+    let
+      flake = import (flakeSrc + "/flake.nix");
+      outputs = flakeSrc // (flake.outputs ({ self = outputs; }));
+    in outputs;
 
-    batprotocol-py = pkgs.python3Packages.buildPythonPackage rec {
-      version = "${batprotocol_version}";
-      name = "batprotocol-py-${version}";
-      nativeBuildInputs = [
-        flatbuffers_for_cpp_json
-      ];
-      propagatedBuildInputs = [
-        pkgs.python3Packages.setuptools_scm
-        flatbuffers_python
-      ];
-      src = pkgs.lib.sourceByRegex ./. [
-        "^batprotocol\.fbs"
-        "^py"
-        "^py/setup\.py"
-      ];
-      preConfigure = "cd py";
-    };
+  rootSrc = let
+    # Try to clean the source tree by using fetchGit, if this source
+    # tree is a valid git repository.
+    tryFetchGit = src:
+      if isGit && !isShallow
+      then
+        let res = builtins.fetchGit src;
+        in if res.rev == "0000000000000000000000000000000000000000" then removeAttrs res ["rev" "shortRev"]  else res
+      else { outPath = src; };
+    # NB git worktrees have a file for .git, so we don't check the type of .git
+    isGit = builtins.pathExists (src + "/.git");
+    isShallow = builtins.pathExists (src + "/.git/shallow");
 
-    py-test-shell = pkgs.mkShell rec {
-      buildInputs = [
-        pkgs.python3Packages.ipython
-        batprotocol-py
-      ];
-    };
+  in
+    { lastModified = 0; lastModifiedDate = formatSecondsSinceEpoch 0; }
+      // (if src ? outPath then src else tryFetchGit src);
 
-    batprotocol-rust-src = pkgs.stdenv.mkDerivation rec {
-      name = "batprotocol-rust-src";
-      version = "${batprotocol_version}";
-      src = pkgs.lib.sourceByRegex ./. [
-        "^batprotocol\.fbs"
-        "^rust"
-        "^rust/Cargo\..*"
-        "^rust/src"
-        "^rust/src/lib\.rs"
-        "^rust/tests"
-        "^rust/tests/.*\.rs"
-      ];
-      nativeBuildInputs = [flatbuffers_for_rust];
-      buildPhase = ''
-        cd rust
-        flatc --rust -o src ../batprotocol.fbs
-      '';
-      installPhase = ''
-        mkdir -p $out
-        cp -r * $out/
-      '';
-    };
+  # Format number of seconds in the Unix epoch as %Y%m%d%H%M%S.
+  formatSecondsSinceEpoch = t:
+    let
+      rem = x: y: x - x / y * y;
+      days = t / 86400;
+      secondsInDay = rem t 86400;
+      hours = secondsInDay / 3600;
+      minutes = (rem secondsInDay 3600) / 60;
+      seconds = rem t 60;
 
-    batprotocol-rust = pkgs.rustPlatform.buildRustPackage rec {
-      name = "batprotocol-rust";
-      version = batprotocol-rust-src.version;
-      src = batprotocol-rust-src;
-      cargoSha256 = "sha256:06ldr2ci896406jbs873a27qhhqrsxw4avi9w5gyykc6jlpx99as";
-    };
+      # Courtesy of https://stackoverflow.com/a/32158604.
+      z = days + 719468;
+      era = (if z >= 0 then z else z - 146096) / 146097;
+      doe = z - era * 146097;
+      yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+      y = yoe + era * 400;
+      doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+      mp = (5 * doy + 2) / 153;
+      d = doy - (153 * mp + 2) / 5 + 1;
+      m = mp + (if mp < 10 then 3 else -9);
+      y' = y + (if m <= 2 then 1 else 0);
 
-    go-shell = pkgs.mkShell rec {
-      buildInputs = [
-        pkgs.go
-      ];
-      shellHook = ''
-        export GOPATH=$(realpath ./tests/go)
-      '';
-    };
+      pad = s: if builtins.stringLength s < 2 then "0" + s else s;
+    in "${toString y'}${pad (toString m)}${pad (toString d)}${pad (toString hours)}${pad (toString minutes)}${pad (toString seconds)}";
 
-    rust-shell = pkgs.mkShell rec {
-      buildInputs = [
-        pkgs.cargo
-        flatbuffers_for_rust
-      ];
-    };
+  allNodes =
+    builtins.mapAttrs
+      (key: node:
+        let
+          sourceInfo =
+            if key == lockFile.root
+            then rootSrc
+            else fetchTree (node.info or {} // removeAttrs node.locked ["dir"]);
 
-    flatbuffers_for_cpp_json = pkgs.flatbuffers.overrideAttrs(attrs: rec {
-      version = "2.0.0";
-      src = pkgs.fetchFromGitHub {
-        owner = "google";
-        repo = "flatbuffers";
-        rev = "v${version}";
-        sha256 = "sha256:1zbf6bdpps8369r1ql00irxrp58jnalycc8jcapb8iqg654vlfz8";
-      };
-      patches = [];
+          subdir = if key == lockFile.root then "" else node.locked.dir or "";
 
-      nativeBuildInputs = [pkgs.cmake pkgs.pkgconfig];
-      cmakeBuildType = "Debug";
-      cmakeFlags = [
-        "-DFLATBUFFERS_BUILD_FLATLIB=OFF"
-        "-DFLATBUFFERS_BUILD_SHAREDLIB=ON"
-      ];
-      dontStrip = true;
-    });
+          flake = import (sourceInfo + (if subdir != "" then "/" else "") + subdir + "/flake.nix");
 
-    flatbuffers_for_rust = pkgs.flatbuffers.overrideAttrs(attrs: {
-      src = pkgs.fetchgit {
-        rev = "8008dde117ef165ef115564d58cb95a7d11ac918";
-        url = "https://github.com/google/flatbuffers.git";
-        sha256 = "sha256:1dbmidqhsrydfs3xjpv36h379dwi0wwp312mykfcffpp01qrxj8j";
-      };
-    });
+          inputs = builtins.mapAttrs
+            (inputName: inputSpec: allNodes.${resolveInput inputSpec})
+            (node.inputs or {});
 
-    flatbuffers_python = pkgs.python3Packages.buildPythonPackage {
-      name = "flatbuffers-1.12";
-      doCheck = false;
-      propagatedBuildInputs = [
-        pkgs.python3Packages.pytest
-        pkgs.python3Packages.setuptools_scm
-      ];
-      src = builtins.fetchurl {
-        url = "https://files.pythonhosted.org/packages/4d/c4/7b995ab9bf0c7eaf10c386d29a03408dfcf72648df4102b1f18896c3aeea/flatbuffers-1.12.tar.gz";
-        sha256 = "0426nirqv8wzj56ppk6m0316lvwan8sn28iyj40kfdsy5mr9mfv3";
-      };
-    };
+          # Resolve a input spec into a node name. An input spec is
+          # either a node name, or a 'follows' path from the root
+          # node.
+          resolveInput = inputSpec:
+              if builtins.isList inputSpec
+              then getInputByPath lockFile.root inputSpec
+              else inputSpec;
 
-    sphinx-tabs = pkgs.python3Packages.buildPythonPackage rec {
-      pname = "sphinx-tabs";
-      version = "3.1.0";
-      name = "${pname}-${version}";
+          # Follow an input path (e.g. ["dwarffs" "nixpkgs"]) from the
+          # root node, returning the final node.
+          getInputByPath = nodeName: path:
+            if path == []
+            then nodeName
+            else
+              getInputByPath
+                # Since this could be a 'follows' input, call resolveInput.
+                (resolveInput lockFile.nodes.${nodeName}.inputs.${builtins.head path})
+                (builtins.tail path);
 
-      src = pkgs.python3Packages.fetchPypi {
-        inherit pname version;
-        sha256 = "0kv935qhml40mly33rk5am128g2ygqkfvizh33vf29hjkf32mvjy";
-      };
+          outputs = flake.outputs (inputs // { self = result; });
 
-      propagatedBuildInputs = with pkgs.python3Packages; [
-        docutils
-        pygments
-        sphinx
-      ];
-    };
+          result = outputs // sourceInfo // { inherit inputs; inherit outputs; inherit sourceInfo; _type = "flake"; };
 
-    sphinx_doc = pkgs.stdenv.mkDerivation rec {
-      name = "batprotocol-sphinx-documentation";
-      src = pkgs.lib.sourceByRegex ./. [
-        "^docs"
-        "^docs/conf.py"
-        "^docs/Makefile"
-        "^docs/.*\.rst"
-        "^docs/expected-output"
-        "^docs/expected-output/.*\.json"
-        "^batprotocol.fbs"
-        "^cpp"
-        "^cpp/test"
-        "^cpp/test/getting-started\.cpp"
-        "^cpp/test/example_.*\.cpp"
-      ];
-      buildInputs = with pkgs.python3Packages; [
-        sphinx
-        sphinx_rtd_theme
-        sphinx-tabs
-      ];
-      buildPhase = "cd docs && make html";
-      installPhase = ''
-        mkdir -p $out
-        cp -r _build/html $out/
-      '';
-    };
-  };
+        in
+          if node.flake or true then
+            assert builtins.isFunction flake.outputs;
+            result
+          else
+            sourceInfo
+      )
+      lockFile.nodes;
+
+  result =
+    if !(builtins.pathExists lockFilePath)
+    then callLocklessFlake rootSrc
+    else if lockFile.version == 4
+    then callFlake4 rootSrc (lockFile.inputs)
+    else if lockFile.version >= 5 && lockFile.version <= 7
+    then allNodes.${lockFile.root}
+    else throw "lock file '${lockFilePath}' has unsupported version ${toString lockFile.version}";
+
 in
-  jobs
+  rec {
+    defaultNix =
+      (builtins.removeAttrs result ["__functor"])
+      // (if result ? defaultPackage.${system} then { default = result.defaultPackage.${system}; } else {})
+      // (if result ? packages.${system}.default then { default = result.packages.${system}.default; } else {});
+
+    shellNix =
+      defaultNix
+      // (if result ? devShell.${system} then { default = result.devShell.${system}; } else {})
+      // (if result ? devShells.${system}.default then { default = result.devShells.${system}.default; } else {});
+  }
