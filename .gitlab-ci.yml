@@ -20,10 +20,11 @@ build_and_test:
     - nix flake show
     - nix build .#batprotocol-cpp
     - nix build .#ci-batprotocol-cpp-werror-gcc
+    #- nix build .#ci-batprotocol-cpp-werror-clang
     # tests
-    # - nix-shell --pure -A cpp-test-binary --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
-    # - nix-shell --pure -A cpp-test --command '.ci/list-store-paths-for-cachix.bash' | grep -v 'batprotocol-cpp' | cachix push batsim
-    # - nix-build -A cpp-test
+    - nix build .#ci-cpp-test
+    - nix build -o result-cov-report .#ci-cpp-coverage-report
+    - cat ./result-cov-report/file-summary.txt
     #----------------#
     # Python library #
     #----------------#

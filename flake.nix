@@ -40,6 +40,8 @@
         packages = packages-release // {
           ci-batprotocol-cpp-werror-gcc = callPackage pkgs functions.batprotocol-cpp { stdenv = pkgs.gccStdenv; werror = true; } release-options;
           ci-batprotocol-cpp-werror-clang = callPackage pkgs functions.batprotocol-cpp { stdenv = pkgs.clangStdenv; werror = true; } release-options;
+          ci-cpp-test = packages-debug.cpp-test;
+          ci-cpp-coverage-report = packages-debug.cpp-coverage-report;
         };
 
         devShells = {
