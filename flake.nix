@@ -21,6 +21,7 @@
           debug = true;
           doCoverage = true;
         };
+        base-defs = { cppMesonDevBase = nur-kapack.lib.${system}.cppMesonDevBase; };
         callPackage = mergedPkgs: deriv-func: attrset: options: pkgs.lib.callPackageWith(mergedPkgs // options) deriv-func attrset;
       in rec {
         functions = rec {
@@ -35,11 +36,11 @@
             cpp-coverage-report = callPackage mergedPkgs cpp-coverage-report {} options;
           };
         };
-        packages-debug = functions.generate-packages (pkgs // packages-debug) debug-options;
-        packages-release = functions.generate-packages (pkgs // packages-release) release-options;
+        packages-debug = functions.generate-packages (pkgs // base-defs // packages-debug) debug-options;
+        packages-release = functions.generate-packages (pkgs // base-defs // packages-release) release-options;
         packages = packages-release // {
-          ci-batprotocol-cpp-werror-gcc = callPackage pkgs functions.batprotocol-cpp { stdenv = pkgs.gccStdenv; werror = true; } release-options;
-          ci-batprotocol-cpp-werror-clang = callPackage pkgs functions.batprotocol-cpp { stdenv = pkgs.clangStdenv; werror = true; } release-options;
+          ci-batprotocol-cpp-werror-gcc = callPackage pkgs functions.batprotocol-cpp ({ stdenv = pkgs.gccStdenv; werror = true; } // base-defs) release-options;
+          ci-batprotocol-cpp-werror-clang = callPackage pkgs functions.batprotocol-cpp ({ stdenv = pkgs.clangStdenv; werror = true; } // base-defs) release-options;
           ci-cpp-test = packages-debug.cpp-test;
           ci-cpp-coverage-report = packages-debug.cpp-coverage-report;
         };
