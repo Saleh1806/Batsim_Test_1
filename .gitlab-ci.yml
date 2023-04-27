@@ -25,7 +25,14 @@ build_and_test:
     - nix build -L .#ci-cpp-test
     - nix build -L -o result-cov-report .#ci-cpp-coverage-report
     - cat ./result-cov-report/file-summary.txt
+    - cp -rL result-cov-report cpp-cov-report
     #----------------#
     # Python library #
     #----------------#
     # - nix-build -A batprotocol-py
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cpp-cov-report/cobertura.xml
