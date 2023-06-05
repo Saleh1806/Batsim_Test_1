@@ -15,12 +15,10 @@ build_and_test:
     #-------------#
     # C++ library #
     #-------------#
-    # - nix-shell --pure -A batprotocol-cpp --command '.ci/list-store-paths-for-cachix.bash' | cachix push batsim
-    # - nix-build -A batprotocol-cpp
     - nix flake show
     - nix build -L .#batprotocol-cpp
     - nix build -L .#ci-batprotocol-cpp-werror-gcc
-    #- nix build .#ci-batprotocol-cpp-werror-clang
+    - nix build -L .#ci-batprotocol-cpp-werror-clang
     # tests
     - nix build -L .#ci-cpp-test
     - nix build -L -o result-cov-report .#ci-cpp-coverage-report

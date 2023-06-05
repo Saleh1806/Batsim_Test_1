@@ -26,6 +26,7 @@
     flatbuffers
   ];
 
+  CXXFLAGS = "${attrs.CXXFLAGS} -Wno-gnu-zero-variadic-macro-arguments";
   preConfigure = "cd cpp";
 
   passthru = rec {
