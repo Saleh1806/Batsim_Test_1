@@ -37,7 +37,6 @@
             batprotocol-cpp = callPackage mergedPkgs batprotocol-cpp {} options;
             cpp-test-binary = callPackage mergedPkgs cpp-test-binary {} options;
             cpp-test = callPackage mergedPkgs cpp-test {} options;
-            cpp-coverage-report = callPackage mergedPkgs cpp-coverage-report {} options;
           };
         };
         packages-debug = functions.generate-packages (pkgs // base-defs // packages-debug) debug-options;
@@ -47,7 +46,7 @@
           ci-batprotocol-cpp-werror-gcc = callPackage pkgs functions.batprotocol-cpp ({ stdenv = pkgs.gccStdenv; werror = true; } // base-defs) release-options;
           ci-batprotocol-cpp-werror-clang = callPackage pkgs functions.batprotocol-cpp ({ stdenv = pkgs.clangStdenv; werror = true; } // base-defs) release-options;
           ci-cpp-test = packages-debug-cov.cpp-test;
-          ci-cpp-coverage-report = packages-debug-cov.cpp-coverage-report;
+          ci-cpp-coverage-report = callPackage (pkgs // base-defs // packages-debug-cov) functions.cpp-coverage-report {} debug-cov-options;
         };
 
         devShells = {
