@@ -175,8 +175,19 @@ void EasyBackfillingFast::make_decisions(double date,
     {
         Job * new_job = (*_workload)[new_job_id];
 
+
+        // Is the job valid on this platform?
+        if (new_job->nb_requested_resources > _nb_machines)
+        {
+            _decision->add_reject_job(new_job_id, date);
+        }
+        else if (!new_job->has_walltime)
+        {
+            _decision->add_reject_job(new_job_id, date);
+        }
+
         // Can the job be executed right now?
-        if (new_job->nb_requested_resources <= _nb_available_machines)
+        else if (new_job->nb_requested_resources <= _nb_available_machines)
         {
             //LOG_F(INFO, "There are enough available resources (%d) to execute job %s", _nb_available_machines, new_job->id.c_str());
             // Can it be executed now (without hindering priority job?)
@@ -213,26 +224,16 @@ void EasyBackfillingFast::make_decisions(double date,
         {
             // The job is too big to fit now.
 
-            // Is the job valid on this platform?
-            if (new_job->nb_requested_resources > _nb_machines)
+            if (_priority_job == nullptr)
             {
-                /*LOG_F(INFO, "Rejecing job %s (required %d machines, while platform size is %d)",
-                      new_job->id.c_str(), new_job->nb_requested_resources, _nb_machines);*/
-                _decision->add_reject_job(new_job_id, date);
+                // The job becomes priority.
+                _priority_job = new_job;
+                _priority_job->completion_time = compute_priority_job_expected_earliest_starting_time();
             }
             else
             {
-                if (_priority_job == nullptr)
-                {
-                    // The job becomes priority.
-                    _priority_job = new_job;
-                    _priority_job->completion_time = compute_priority_job_expected_earliest_starting_time();
-                }
-                else
-                {
-                    // The job is queued up.
-                    _pending_jobs.push_back(new_job);
-                }
+                // The job is queued up.
+                _pending_jobs.push_back(new_job);
             }
         }
     }
