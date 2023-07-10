@@ -3,6 +3,7 @@
 //#include <loguru.hpp>
 
 #include "../pempek_assert.hpp"
+#include <cstddef>
 
 EasyBackfillingFast::EasyBackfillingFast(Workload *workload,
     SchedulingDecision *decision, Queue *queue, ResourceSelector *selector,
@@ -133,6 +134,11 @@ void EasyBackfillingFast::make_decisions(double date,
             // Backfill jobs that does not hinder priority job.
             if (_nb_available_machines > 0)
             {
+                // Update priority job expected starting time (might have changed if a recently ended job 
+                // completed before its walltime)
+                if (_priority_job != nullptr)
+                    _priority_job->completion_time = compute_priority_job_expected_earliest_starting_time();
+
                 for (auto job_it = _pending_jobs.begin();
                      job_it != _pending_jobs.end(); )
                 {
