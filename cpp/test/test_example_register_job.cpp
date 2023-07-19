@@ -23,13 +23,10 @@ TEST(example_register_job, simple)
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->job_id()->str(), "dyn!0");
     EXPECT_EQ(event0->job()->walltime(), 600.0);
+    EXPECT_EQ(event0->job()->resource_request(), 8);
     EXPECT_EQ(event0->job()->profile_id()->str(), "w0!prof");
     EXPECT_EQ(event0->job()->rigid(), false);
     EXPECT_EQ(event0->job()->extra_data()->str(), "");
-    EXPECT_EQ(event0->job()->computation_resource_request_type(), fb::ComputationResourceRequest_HostNumber);
-    auto res_request = event0->job()->computation_resource_request_as_HostNumber();
-    EXPECT_NE(res_request, nullptr);
-    EXPECT_EQ(res_request->host_number(), 8);
 
     write_test_mb(mb);
 }

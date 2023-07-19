@@ -8,7 +8,7 @@ using namespace batprotocol;
 void example_register_job_simple(batprotocol::MessageBuilder & builder)
 {
     auto job = Job::make();
-    job->set_host_number(8);
+    job->set_resource_number(8);
     job->set_walltime(600.0);
     job->set_profile("w0!prof");
     job->set_non_rigid();

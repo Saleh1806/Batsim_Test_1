@@ -7,14 +7,14 @@
 
 using namespace batprotocol;
 
-void example_job_submitted_host(MessageBuilder &);
-void example_job_submitted_core(MessageBuilder &);
+void example_job_submitted_simple(MessageBuilder &);
+void example_job_submitted_extra_data(MessageBuilder &);
 void example_job_submitted_ghost(MessageBuilder &);
 
-TEST(example_job_submitted, host)
+TEST(example_job_submitted, simple)
 {
     MessageBuilder mb(true);
-    example_job_submitted_host(mb);
+    example_job_submitted_simple(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -25,22 +25,19 @@ TEST(example_job_submitted, host)
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->job_id()->str(), "w0!0");
     EXPECT_EQ(event0->submission_time(), 0.0);
+    EXPECT_EQ(event0->job()->resource_request(), 4);
     EXPECT_EQ(event0->job()->walltime(), 3600.0);
     EXPECT_EQ(event0->job()->profile_id()->str(), "w0!prof");
     EXPECT_EQ(event0->job()->rigid(), true);
     EXPECT_EQ(event0->job()->extra_data()->str(), "");
-    EXPECT_EQ(event0->job()->computation_resource_request_type(), fb::ComputationResourceRequest_HostNumber);
-    auto res_request = event0->job()->computation_resource_request_as_HostNumber();
-    EXPECT_NE(res_request, nullptr);
-    EXPECT_EQ(res_request->host_number(), 4);
 
     write_test_mb(mb);
 }
 
-TEST(example_job_submitted, core)
+TEST(example_job_submitted, extra_data)
 {
     MessageBuilder mb(true);
-    example_job_submitted_core(mb);
+    example_job_submitted_extra_data(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -51,14 +48,11 @@ TEST(example_job_submitted, core)
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->job_id()->str(), "w0!1");
     EXPECT_EQ(event0->submission_time(), 1.0);
+    EXPECT_EQ(event0->job()->resource_request(), 16);
     EXPECT_EQ(event0->job()->walltime(), -1);
     EXPECT_EQ(event0->job()->profile_id()->str(), "w0!prof");
     EXPECT_EQ(event0->job()->rigid(), false);
     EXPECT_EQ(event0->job()->extra_data()->str(), R"("application": "npb-lu")");
-    EXPECT_EQ(event0->job()->computation_resource_request_type(), fb::ComputationResourceRequest_CoreNumber);
-    auto res_request = event0->job()->computation_resource_request_as_CoreNumber();
-    EXPECT_NE(res_request, nullptr);
-    EXPECT_EQ(res_request->core_number(), 16);
 
     write_test_mb(mb);
 }
@@ -81,9 +75,6 @@ TEST(example_job_submitted, ghost)
     EXPECT_EQ(event0->job()->profile_id()->str(), "");
     EXPECT_EQ(event0->job()->rigid(), true);
     EXPECT_EQ(event0->job()->extra_data()->str(), "... (some data to do dynamic registrations)");
-    EXPECT_EQ(event0->job()->computation_resource_request_type(), fb::ComputationResourceRequest_NONE);
-    EXPECT_EQ(event0->job()->computation_resource_request_as_HostNumber(), nullptr);
-    EXPECT_EQ(event0->job()->computation_resource_request_as_CoreNumber(), nullptr);
 
     write_test_mb(mb);
 }

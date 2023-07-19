@@ -22,6 +22,7 @@ TEST(example_requested_call, simple)
     auto event0 = (*parsed->events())[0]->event_as_RequestedCallEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->call_me_later_id()->str(), "example_one_shot");
+    EXPECT_EQ(event0->last_periodic_call(), false);
 
     write_test_mb(mb);
 }
