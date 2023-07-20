@@ -139,10 +139,11 @@ void EasyBackfillingFast::make_decisions(double date,
                      job_it != _pending_jobs.end(); )
                 {
                     const Job * pending_job = *job_it;
-                    // Can the job be executed now ?
-                    if (pending_job->nb_requested_resources <= _nb_available_machines &&
-                        date + pending_job->walltime <= _priority_job_expected_start_time)
-                    {
+                    // Can the job be executed now (without hindering priority job)?
+                    if (pending_job->nb_requested_resources <= _nb_available_machines && 
+                    (date + pending_job->walltime <= _priority_job_expected_start_time ||
+                    pending_job->nb_requested_resources <= _remaining_resources_at_priority_job_start))
+                        {
                         // Yes, it can be backfilled!
                         alloc.machines = _available_machines.left(
                             pending_job->nb_requested_resources);
@@ -158,11 +159,13 @@ void EasyBackfillingFast::make_decisions(double date,
                         _nb_available_machines -= pending_job->nb_requested_resources;
                         _current_allocations[pending_job->id] = alloc;
                         job_it = _pending_jobs.erase(job_it);
+                        if(date + pending_job->walltime > _priority_job_expected_start_time)
+                        _remaining_resources_at_priority_job_start -= pending_job->nb_requested_resources;
 
                         // Directly get out of the backfilling loop if all machines are busy.
                         if (_nb_available_machines <= 0)
                             break;
-                    }
+                    } 
                     else
                     {
                         ++job_it;
@@ -192,9 +195,10 @@ void EasyBackfillingFast::make_decisions(double date,
         else if (new_job->nb_requested_resources <= _nb_available_machines)
         {
             //LOG_F(INFO, "There are enough available resources (%d) to execute job %s", _nb_available_machines, new_job->id.c_str());
-            // Can it be executed now (without hindering priority job?)
+            // Can it be executed now (without hindering priority job)?
             if (_priority_job == nullptr ||
-                date + new_job->walltime <= _priority_job_expected_start_time)
+                date + new_job->walltime <= _priority_job_expected_start_time || 
+                new_job->nb_requested_resources <= _remaining_resources_at_priority_job_start)
             {
                 //LOG_F(INFO, "Job %s can be started right away!", new_job->id.c_str());
                 // Yes, the job can be executed right away!
@@ -213,6 +217,8 @@ void EasyBackfillingFast::make_decisions(double date,
                 _available_machines -= alloc.machines;
                 _nb_available_machines -= new_job->nb_requested_resources;
                 _current_allocations[new_job_id] = alloc;
+                if(_priority_job != nullptr && date + new_job->walltime > _priority_job_expected_start_time)
+                    _remaining_resources_at_priority_job_start -= new_job->nb_requested_resources;
             }
             else
             {
