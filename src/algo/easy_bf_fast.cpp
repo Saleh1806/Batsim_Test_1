@@ -49,6 +49,12 @@ void EasyBackfillingFast::make_decisions(double date,
     // - only handles one priority job (the first of the queue)
     // - only handles time as floating-point (-> precision errors).
 
+    // Warning: you might obtain different outputs than with easy_bf. This is 
+    // due to the fact that this version only keeps track of the priority job 
+    // expected start time and the number of machines available then, while 
+    // easy_bf keeps track of a full 2D schedule of the future. easy_bf_fast 
+    // will sometimes be a little more greedy in backfilling.
+
     bool job_ended = false;
 
     // Handle newly finished jobs
