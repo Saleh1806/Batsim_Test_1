@@ -29,7 +29,7 @@ TEST(example_external_decision_component_hello, simple)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -65,7 +65,7 @@ TEST(example_external_decision_component_hello, feature1)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -101,7 +101,7 @@ TEST(example_external_decision_component_hello, feature2)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -137,7 +137,7 @@ TEST(example_external_decision_component_hello, feature3)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -173,7 +173,7 @@ TEST(example_external_decision_component_hello, feature4)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -209,7 +209,7 @@ TEST(example_external_decision_component_hello, feature5)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -245,7 +245,7 @@ TEST(example_external_decision_component_hello, feature6)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -281,7 +281,7 @@ TEST(example_external_decision_component_hello, feature7)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -317,7 +317,7 @@ TEST(example_external_decision_component_hello, compute_sharing)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -353,7 +353,7 @@ TEST(example_external_decision_component_hello, no_storage_sharing)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");
@@ -389,7 +389,7 @@ TEST(example_external_decision_component_hello, job_alloc_validation_strategy)
     EXPECT_EQ(parsed->now(), 0.0);
     EXPECT_EQ(parsed->events()->size(), 1u);
 
-    auto event0 = (*parsed->events())[0]->event_as_ExternalDecisionComponentHelloEvent();
+    auto event0 = (*parsed->events())[0]->event_as_EDCHelloEvent();
     EXPECT_NE(event0, nullptr);
     EXPECT_EQ(event0->batprotocol_version()->str(), batprotocol::version());
     EXPECT_EQ(event0->decision_component_name()->str(), "cpp-unit-test");

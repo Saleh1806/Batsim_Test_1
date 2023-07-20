@@ -15,8 +15,7 @@ namespace batprotocol
     public:
         static std::shared_ptr<Job> make();
 
-        Job & set_host_number(uint32_t host_number);
-        Job & set_core_number(uint32_t core_number);
+        Job & set_resource_number(uint32_t res_number);
 
         Job & set_walltime(double walltime);
         Job & set_extra_data(const std::string extra_data);
@@ -26,7 +25,6 @@ namespace batprotocol
     private:
         friend class MessageBuilder;
         Job() = default;
-        fb::ComputationResourceRequest _request_type = fb::ComputationResourceRequest_NONE;
         uint32_t _resource_number = 0;
         double _walltime = -1;
         bool _rigid = true;

@@ -579,14 +579,14 @@ void MessageBuilder::add_call_me_later(
     _events.push_back(event);
 }
 
-void MessageBuilder::add_requested_call(const std::string & call_me_later_id)
+void MessageBuilder::add_requested_call(const std::string & call_me_later_id, bool last_periodic_call)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_requested_call() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!call_me_later_id.empty(), "Invalid (empty) call_me_later_id received");
 
     auto call_me_later_id_s = _builder->CreateString(call_me_later_id);
 
-    auto requested_call = fb::CreateRequestedCallEvent(*_builder, call_me_later_id_s);
+    auto requested_call = fb::CreateRequestedCallEvent(*_builder, call_me_later_id_s, last_periodic_call);
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_RequestedCallEvent, requested_call.Union());
     _events.push_back(event);
 }
@@ -641,7 +641,7 @@ void MessageBuilder::add_external_decision_component_hello(
         options._job_allocation_validation_strategy
     );
 
-    auto dc_hello = fb::CreateExternalDecisionComponentHelloEventDirect(*_builder,
+    auto dc_hello = fb::CreateEDCHelloEventDirect(*_builder,
         version().c_str(),
         decision_component_name.c_str(),
         decision_component_version.c_str(),
@@ -649,7 +649,7 @@ void MessageBuilder::add_external_decision_component_hello(
         requested_simulation_features,
         scheduling_constraints
     );
-    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ExternalDecisionComponentHelloEvent, dc_hello.Union());
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_EDCHelloEvent, dc_hello.Union());
     _events.push_back(event);
 }
 
@@ -717,6 +717,15 @@ void MessageBuilder::add_finish_registration()
 
     auto finish_registration = fb::CreateFinishRegistrationEvent(*_builder);
     auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_FinishRegistrationEvent, finish_registration.Union());
+    _events.push_back(event);
+}
+
+void MessageBuilder::add_force_simulation_stop()
+{
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_force_simulation_stop() while buffer is finished. Please call clear() first.");
+
+    auto force_stop = fb::CreateForceSimulationStopEvent(*_builder);
+    auto event = fb::CreateEventAndTimestamp(*_builder, _current_time, fb::Event_ForceSimulationStopEvent, force_stop.Union());
     _events.push_back(event);
 }
 
@@ -838,21 +847,7 @@ std::vector<flatbuffers::Offset<batprotocol::fb::KillProgressWrapper>> MessageBu
 
 flatbuffers::Offset<fb::Job> MessageBuilder::serialize_job(const std::shared_ptr<Job> & job)
 {
-    flatbuffers::Offset<void> res_request_s = 0;
-    switch(job->_request_type) {
-    case fb::ComputationResourceRequest_NONE: {
-        // No computation resource request for this job.
-        // This is NOT invalid, as it is convenient to create "ghost"/"virtual" jobs.
-    } break;
-    case fb::ComputationResourceRequest_HostNumber: {
-        res_request_s = fb::CreateHostNumber(*_builder, job->_resource_number).Union();
-    } break;
-    case fb::ComputationResourceRequest_CoreNumber: {
-        res_request_s = fb::CreateCoreNumber(*_builder, job->_resource_number).Union();
-    } break;
-    }
-
-    auto job_s = fb::CreateJobDirect(*_builder, job->_request_type, res_request_s, job->_walltime, job->_extra_data.c_str(), job->_rigid, job->_profile_id.c_str());
+    auto job_s = fb::CreateJobDirect(*_builder, job->_resource_number, job->_walltime, job->_extra_data.c_str(), job->_rigid, job->_profile_id.c_str());
     return job_s;
 }
 

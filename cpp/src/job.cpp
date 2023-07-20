@@ -11,19 +11,9 @@ std::shared_ptr<Job> Job::make()
     return job;
 }
 
-Job & Job::set_host_number(uint32_t host_number)
+Job & Job::set_resource_number(uint32_t res_number)
 {
-    BAT_ENFORCE(_request_type == fb::ComputationResourceRequest_NONE, "another computation resource request has already been set");
-    _request_type = fb::ComputationResourceRequest_HostNumber;
-    _resource_number = host_number;
-    return *this;
-}
-
-Job & Job::set_core_number(uint32_t core_number)
-{
-    BAT_ENFORCE(_request_type == fb::ComputationResourceRequest_NONE, "another computation resource request has already been set");
-    _request_type = fb::ComputationResourceRequest_CoreNumber;
-    _resource_number = core_number;
+    _resource_number = res_number;
     return *this;
 }
 

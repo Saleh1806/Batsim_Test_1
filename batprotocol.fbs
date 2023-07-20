@@ -98,17 +98,10 @@ table TraceReplayProfile {
   filename: string (required);
 }
 
-///
-/// Job management events
-///
-union ComputationResourceRequest {
-  HostNumber
-, CoreNumber
-}
 
 table Job {
-  /// Defines how many computation resources the job requests. This also defines the number of SimGrid executors in most cases for rigid jobs.
-  computation_resource_request: ComputationResourceRequest;
+  /// Defines how many resources the job requests. This also defines the number of SimGrid executors in most cases for rigid jobs.
+  resource_request: uint32;
 
   /// If set, this is the amount of seconds after which the job will be automatically killed by Batsim.
   walltime: float64;
@@ -123,16 +116,6 @@ table Job {
   profile_id: string;
 }
 
-// Submission
-/// The number of SimGrid hosts to use.
-table HostNumber {
-  host_number: uint32;
-}
-
-/// The number of cores on SimGrid hosts to use.
-table CoreNumber {
-  core_number: uint32;
-}
 
 table JobSubmittedEvent {
   job_id: string (required);
@@ -583,6 +566,9 @@ table CallMeLaterEvent {
 
 table RequestedCallEvent {
   call_me_later_id: string (required);
+
+  // True if and only if this RequestedCallEvent is the last one from a non-infinite periodic call
+  last_periodic_call: bool = false;
 }
 
 table StopCallMeLaterEvent {
@@ -640,7 +626,7 @@ table EDCSchedulingConstraints {
   job_allocation_validation_strategy: JobAllocationValidationStrategy = MatchJobRequestExactly;
 }
 
-table ExternalDecisionComponentHelloEvent {
+table EDCHelloEvent {
   /// The version of the batprotocol. Expecting a semantic versioning format. For example "1.0.0", "0.1.0+9a04b9d60a211c380d62abbe70e2a3b2ffb869b3"...
   batprotocol_version: string (required);
 
@@ -752,6 +738,9 @@ table AllStaticExternalEventsHaveBeenInjectedEvent {
 table FinishRegistrationEvent {
 }
 
+table ForceSimulationStopEvent {
+}
+
 ///
 /// Main message type
 ///
@@ -777,12 +766,13 @@ union Event {
 , StopCallMeLaterEvent
 
 , BatsimHelloEvent
-, ExternalDecisionComponentHelloEvent
+, EDCHelloEvent
 , SimulationBeginsEvent
 , SimulationEndsEvent
 , AllStaticJobsHaveBeenSubmittedEvent
 , AllStaticExternalEventsHaveBeenInjectedEvent
 , FinishRegistrationEvent
+, ForceSimulationStopEvent
 }
 
 table EventAndTimestamp {

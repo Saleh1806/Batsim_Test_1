@@ -123,7 +123,8 @@ namespace batprotocol
         );
 
         void add_requested_call(
-            const std::string & call_me_later_id
+            const std::string & call_me_later_id,
+            bool last_periodic_call = false
         );
 
         void add_stop_call_me_later(
@@ -150,6 +151,7 @@ namespace batprotocol
         void add_all_static_jobs_have_been_submitted();
         void add_all_static_external_events_have_been_injected();
         void add_finish_registration();
+        void add_force_simulation_stop();
 
     private:
         std::vector<flatbuffers::Offset<flatbuffers::String> > serialize_string_vector(const std::vector<std::string> & strings);
