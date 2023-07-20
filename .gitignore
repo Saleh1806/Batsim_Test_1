@@ -5,3 +5,4 @@ test-instances
 cover
 result
 .vscode
+.cache

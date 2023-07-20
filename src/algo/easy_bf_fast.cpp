@@ -143,7 +143,7 @@ void EasyBackfillingFast::make_decisions(double date,
                     if (pending_job->nb_requested_resources <= _nb_available_machines && 
                     (date + pending_job->walltime <= _priority_job_expected_start_time ||
                     pending_job->nb_requested_resources <= _remaining_resources_at_priority_job_start))
-                        {
+                    {
                         // Yes, it can be backfilled!
                         alloc.machines = _available_machines.left(
                             pending_job->nb_requested_resources);
@@ -160,7 +160,7 @@ void EasyBackfillingFast::make_decisions(double date,
                         _current_allocations[pending_job->id] = alloc;
                         job_it = _pending_jobs.erase(job_it);
                         if(date + pending_job->walltime > _priority_job_expected_start_time)
-                        _remaining_resources_at_priority_job_start -= pending_job->nb_requested_resources;
+                            _remaining_resources_at_priority_job_start -= pending_job->nb_requested_resources;
 
                         // Directly get out of the backfilling loop if all machines are busy.
                         if (_nb_available_machines <= 0)
