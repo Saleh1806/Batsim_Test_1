@@ -15,7 +15,7 @@ int main()
 
     // Let us create a first message.
     // It only contains a single event.
-    builder.add_external_decision_component_hello("example-msg-builder", "0.1.0");
+    builder.add_edc_hello("example-msg-builder", "0.1.0");
     builder.finish_message(0);
     printf("Message serialized. Buffer at %p with size=%u\n",
         builder.buffer_pointer(), builder.buffer_size());

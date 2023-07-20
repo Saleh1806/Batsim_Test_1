@@ -136,7 +136,7 @@ namespace batprotocol
             const std::string & batsim_commit = ""
         );
 
-        void add_external_decision_component_hello(
+        void add_edc_hello(
             const std::string & decision_component_name,
             const std::string & decision_component_version,
             const std::string & decision_component_commit = "",

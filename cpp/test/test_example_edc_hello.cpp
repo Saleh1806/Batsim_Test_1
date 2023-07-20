@@ -7,22 +7,22 @@
 
 using namespace batprotocol;
 
-void example_external_decision_component_hello_simple(MessageBuilder &);
-void example_external_decision_component_hello_feature1(MessageBuilder &);
-void example_external_decision_component_hello_feature2(MessageBuilder &);
-void example_external_decision_component_hello_feature3(MessageBuilder &);
-void example_external_decision_component_hello_feature4(MessageBuilder &);
-void example_external_decision_component_hello_feature5(MessageBuilder &);
-void example_external_decision_component_hello_feature6(MessageBuilder &);
-void example_external_decision_component_hello_feature7(MessageBuilder &);
-void example_external_decision_component_hello_compute_sharing(MessageBuilder &);
-void example_external_decision_component_hello_no_storage_sharing(MessageBuilder &);
-void example_external_decision_component_hello_job_alloc_validation_strategy(MessageBuilder &);
+void example_edc_hello_simple(MessageBuilder &);
+void example_edc_hello_feature1(MessageBuilder &);
+void example_edc_hello_feature2(MessageBuilder &);
+void example_edc_hello_feature3(MessageBuilder &);
+void example_edc_hello_feature4(MessageBuilder &);
+void example_edc_hello_feature5(MessageBuilder &);
+void example_edc_hello_feature6(MessageBuilder &);
+void example_edc_hello_feature7(MessageBuilder &);
+void example_edc_hello_compute_sharing(MessageBuilder &);
+void example_edc_hello_no_storage_sharing(MessageBuilder &);
+void example_edc_hello_job_alloc_validation_strategy(MessageBuilder &);
 
-TEST(example_external_decision_component_hello, simple)
+TEST(example_edc_hello, simple)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_simple(mb);
+    example_edc_hello_simple(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -55,10 +55,10 @@ TEST(example_external_decision_component_hello, simple)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature1)
+TEST(example_edc_hello, feature1)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature1(mb);
+    example_edc_hello_feature1(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -91,10 +91,10 @@ TEST(example_external_decision_component_hello, feature1)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature2)
+TEST(example_edc_hello, feature2)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature2(mb);
+    example_edc_hello_feature2(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -127,10 +127,10 @@ TEST(example_external_decision_component_hello, feature2)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature3)
+TEST(example_edc_hello, feature3)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature3(mb);
+    example_edc_hello_feature3(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -163,10 +163,10 @@ TEST(example_external_decision_component_hello, feature3)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature4)
+TEST(example_edc_hello, feature4)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature4(mb);
+    example_edc_hello_feature4(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -199,10 +199,10 @@ TEST(example_external_decision_component_hello, feature4)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature5)
+TEST(example_edc_hello, feature5)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature5(mb);
+    example_edc_hello_feature5(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -235,10 +235,10 @@ TEST(example_external_decision_component_hello, feature5)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature6)
+TEST(example_edc_hello, feature6)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature6(mb);
+    example_edc_hello_feature6(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -271,10 +271,10 @@ TEST(example_external_decision_component_hello, feature6)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, feature7)
+TEST(example_edc_hello, feature7)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_feature7(mb);
+    example_edc_hello_feature7(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -307,10 +307,10 @@ TEST(example_external_decision_component_hello, feature7)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, compute_sharing)
+TEST(example_edc_hello, compute_sharing)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_compute_sharing(mb);
+    example_edc_hello_compute_sharing(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -343,10 +343,10 @@ TEST(example_external_decision_component_hello, compute_sharing)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, no_storage_sharing)
+TEST(example_edc_hello, no_storage_sharing)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_no_storage_sharing(mb);
+    example_edc_hello_no_storage_sharing(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());
@@ -379,10 +379,10 @@ TEST(example_external_decision_component_hello, no_storage_sharing)
     write_test_mb(mb);
 }
 
-TEST(example_external_decision_component_hello, job_alloc_validation_strategy)
+TEST(example_edc_hello, job_alloc_validation_strategy)
 {
     MessageBuilder mb(true);
-    example_external_decision_component_hello_job_alloc_validation_strategy(mb);
+    example_edc_hello_job_alloc_validation_strategy(mb);
     mb.finish_message(0.0);
 
     auto parsed = flatbuffers::GetRoot<fb::Message>(mb.buffer_pointer());

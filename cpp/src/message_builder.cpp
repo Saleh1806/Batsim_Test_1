@@ -615,13 +615,13 @@ void MessageBuilder::add_batsim_hello(
     _events.push_back(event);
 }
 
-void MessageBuilder::add_external_decision_component_hello(
+void MessageBuilder::add_edc_hello(
     const std::string & decision_component_name,
     const std::string & decision_component_version,
     const std::string & decision_component_commit,
     const EDCHelloOptions & options)
 {
-    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_external_decision_component_hello() while buffer is finished. Please call clear() first.");
+    BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_edc_hello() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!decision_component_name.empty(), "Invalid (empty) decision_component_name received");
     BAT_ENFORCE(!decision_component_version.empty(), "Invalid (empty) decision_component_version received");
 
