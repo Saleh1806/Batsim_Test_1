@@ -567,7 +567,7 @@ table CallMeLaterEvent {
 table RequestedCallEvent {
   call_me_later_id: string (required);
 
-  // Only used for Periodic temportal triggers with a finite number of periods
+  // True if and only if this RequestedCallEvent is the last one from a non-infinite periodic call
   last_periodic_call: bool = false;
 }
 
@@ -747,10 +747,10 @@ table ForceSimulationStopEvent {
 union Event {
   JobSubmittedEvent
 , JobCompletedEvent
-, JobsKilledEvent
 , RejectJobEvent
 , ExecuteJobEvent
 , KillJobsEvent
+, JobsKilledEvent
 
 , RegisterProfileEvent
 , RegisterJobEvent
@@ -761,8 +761,8 @@ union Event {
 , ResetProbeEvent
 , ProbeDataEmittedEvent
 
-, RequestedCallEvent
 , CallMeLaterEvent
+, RequestedCallEvent
 , StopCallMeLaterEvent
 
 , BatsimHelloEvent

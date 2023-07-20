@@ -75,6 +75,7 @@ TEST(example_job_submitted, ghost)
     EXPECT_EQ(event0->job()->profile_id()->str(), "");
     EXPECT_EQ(event0->job()->rigid(), true);
     EXPECT_EQ(event0->job()->extra_data()->str(), "... (some data to do dynamic registrations)");
+    EXPECT_EQ(event0->job()->resource_request(), 0);
 
     write_test_mb(mb);
 }

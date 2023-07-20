@@ -124,7 +124,7 @@ namespace batprotocol
 
         void add_requested_call(
             const std::string & call_me_later_id,
-            const bool last_periodic_call = false
+            bool last_periodic_call = false
         );
 
         void add_stop_call_me_later(

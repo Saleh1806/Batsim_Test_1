@@ -579,7 +579,7 @@ void MessageBuilder::add_call_me_later(
     _events.push_back(event);
 }
 
-void MessageBuilder::add_requested_call(const std::string & call_me_later_id, const bool last_periodic_call)
+void MessageBuilder::add_requested_call(const std::string & call_me_later_id, bool last_periodic_call)
 {
     BAT_ENFORCE(!_is_buffer_finished, "Cannot call add_requested_call() while buffer is finished. Please call clear() first.");
     BAT_ENFORCE(!call_me_later_id.empty(), "Invalid (empty) call_me_later_id received");
