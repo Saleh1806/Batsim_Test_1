@@ -39,7 +39,7 @@ private:
     };
 
 private:
-    double compute_priority_job_expected_earliest_starting_time();
+    void update_priority_job_expected_earliest_start_time();
     std::list<FinishedHorizonPoint>::iterator insert_horizon_point(const FinishedHorizonPoint & point);
 
 private:
@@ -59,4 +59,6 @@ private:
 
     // At any time, null if there is no priority job (no waiting job)
     Job * _priority_job = nullptr;
+    double _priority_job_expected_start_time = -1;
+    int _remaining_resources_at_priority_job_start = -1;
 };

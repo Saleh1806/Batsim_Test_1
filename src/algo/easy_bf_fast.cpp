@@ -49,8 +49,11 @@ void EasyBackfillingFast::make_decisions(double date,
     // - only handles one priority job (the first of the queue)
     // - only handles time as floating-point (-> precision errors).
 
-    // Hacks:
-    // - uses priority job's completion time to store its expected starting time
+    // Warning: you might obtain different outputs than with easy_bf. This is
+    // due to the fact that this version only keeps track of the priority job
+    // expected start time and the number of machines available then, while
+    // easy_bf keeps track of a full 2D schedule of the future. easy_bf_fast
+    // will sometimes be a little more greedy in backfilling.
 
     bool job_ended = false;
 
@@ -121,7 +124,7 @@ void EasyBackfillingFast::make_decisions(double date,
                     {
                         // The job becomes priority!
                         _priority_job = pending_job;
-                        _priority_job->completion_time = compute_priority_job_expected_earliest_starting_time();
+                        update_priority_job_expected_earliest_start_time();
                         _pending_jobs.erase(job_it);
 
                         // Stop first queue traversal.
@@ -133,13 +136,19 @@ void EasyBackfillingFast::make_decisions(double date,
             // Backfill jobs that does not hinder priority job.
             if (_nb_available_machines > 0)
             {
+                // Update priority job expected starting time (might have changed if a recently ended job
+                // completed before its walltime)
+                if (_priority_job != nullptr)
+                    update_priority_job_expected_earliest_start_time();
+
                 for (auto job_it = _pending_jobs.begin();
                      job_it != _pending_jobs.end(); )
                 {
                     const Job * pending_job = *job_it;
-                    // Can the job be executed now ?
+                    // Can the job be executed now (without hindering priority job)?
                     if (pending_job->nb_requested_resources <= _nb_available_machines &&
-                        date + pending_job->walltime <= _priority_job->completion_time)
+                    (date + pending_job->walltime <= _priority_job_expected_start_time ||
+                    pending_job->nb_requested_resources <= _remaining_resources_at_priority_job_start))
                     {
                         // Yes, it can be backfilled!
                         alloc.machines = _available_machines.left(
@@ -156,6 +165,8 @@ void EasyBackfillingFast::make_decisions(double date,
                         _nb_available_machines -= pending_job->nb_requested_resources;
                         _current_allocations[pending_job->id] = alloc;
                         job_it = _pending_jobs.erase(job_it);
+                        if(date + pending_job->walltime > _priority_job_expected_start_time)
+                            _remaining_resources_at_priority_job_start -= pending_job->nb_requested_resources;
 
                         // Directly get out of the backfilling loop if all machines are busy.
                         if (_nb_available_machines <= 0)
@@ -175,13 +186,25 @@ void EasyBackfillingFast::make_decisions(double date,
     {
         Job * new_job = (*_workload)[new_job_id];
 
+
+        // Is the job valid on this platform?
+        if (new_job->nb_requested_resources > _nb_machines)
+        {
+            _decision->add_reject_job(new_job_id, date);
+        }
+        else if (!new_job->has_walltime)
+        {
+            _decision->add_reject_job(new_job_id, date);
+        }
+
         // Can the job be executed right now?
-        if (new_job->nb_requested_resources <= _nb_available_machines)
+        else if (new_job->nb_requested_resources <= _nb_available_machines)
         {
             //LOG_F(INFO, "There are enough available resources (%d) to execute job %s", _nb_available_machines, new_job->id.c_str());
-            // Can it be executed now (without hindering priority job?)
+            // Can it be executed now (without hindering priority job)?
             if (_priority_job == nullptr ||
-                date + new_job->walltime <= _priority_job->completion_time)
+                date + new_job->walltime <= _priority_job_expected_start_time ||
+                new_job->nb_requested_resources <= _remaining_resources_at_priority_job_start)
             {
                 //LOG_F(INFO, "Job %s can be started right away!", new_job->id.c_str());
                 // Yes, the job can be executed right away!
@@ -200,12 +223,14 @@ void EasyBackfillingFast::make_decisions(double date,
                 _available_machines -= alloc.machines;
                 _nb_available_machines -= new_job->nb_requested_resources;
                 _current_allocations[new_job_id] = alloc;
+                if(_priority_job != nullptr && date + new_job->walltime > _priority_job_expected_start_time)
+                    _remaining_resources_at_priority_job_start -= new_job->nb_requested_resources;
             }
             else
             {
                 // No, the job cannot be executed (hinders priority job.)
                 /*LOG_F(INFO, "Not enough time to execute job %s (walltime=%g, priority job expected starting time=%g)",
-                      new_job->id.c_str(), (double)new_job->walltime, _priority_job->completion_time);*/
+                      new_job->id.c_str(), (double)new_job->walltime, _priority_job_expected_start_time);*/
                 _pending_jobs.push_back(new_job);
             }
         }
@@ -213,32 +238,22 @@ void EasyBackfillingFast::make_decisions(double date,
         {
             // The job is too big to fit now.
 
-            // Is the job valid on this platform?
-            if (new_job->nb_requested_resources > _nb_machines)
+            if (_priority_job == nullptr)
             {
-                /*LOG_F(INFO, "Rejecing job %s (required %d machines, while platform size is %d)",
-                      new_job->id.c_str(), new_job->nb_requested_resources, _nb_machines);*/
-                _decision->add_reject_job(new_job_id, date);
+                // The job becomes priority.
+                _priority_job = new_job;
+                update_priority_job_expected_earliest_start_time();
             }
             else
             {
-                if (_priority_job == nullptr)
-                {
-                    // The job becomes priority.
-                    _priority_job = new_job;
-                    _priority_job->completion_time = compute_priority_job_expected_earliest_starting_time();
-                }
-                else
-                {
-                    // The job is queued up.
-                    _pending_jobs.push_back(new_job);
-                }
+                // The job is queued up.
+                _pending_jobs.push_back(new_job);
             }
         }
     }
 }
 
-double EasyBackfillingFast::compute_priority_job_expected_earliest_starting_time()
+void EasyBackfillingFast::update_priority_job_expected_earliest_start_time()
 {
     int nb_available = _nb_available_machines;
     int required = _priority_job->nb_requested_resources;
@@ -249,12 +264,14 @@ double EasyBackfillingFast::compute_priority_job_expected_earliest_starting_time
 
         if (nb_available >= required)
         {
-            return it->date;
+            _priority_job_expected_start_time = it->date;
+            _remaining_resources_at_priority_job_start = nb_available - required;
+            return;
         }
     }
 
     PPK_ASSERT_ERROR(false, "The job will never be executable.");
-    return 0;
+    return;
 }
 
 std::list<EasyBackfillingFast::FinishedHorizonPoint>::iterator EasyBackfillingFast::insert_horizon_point(const EasyBackfillingFast::FinishedHorizonPoint &point)
