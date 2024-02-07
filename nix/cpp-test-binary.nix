@@ -1,13 +1,13 @@
 { stdenv, lib
 , cppMesonDevBase
 , gtest, batprotocol-cpp
-, meson, ninja, pkgconfig
+, meson, ninja, pkg-config
 , debug ? false
 , werror ? false
 }:
 
 (cppMesonDevBase {
-  inherit stdenv lib meson ninja pkgconfig debug werror;
+  inherit stdenv lib meson ninja pkg-config debug werror;
   doCoverage = false;
 }).overrideAttrs(attrs: rec {
   name = "cpp-test-binary";
