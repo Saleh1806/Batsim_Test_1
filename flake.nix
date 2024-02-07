@@ -1,11 +1,12 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=22.11";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=23.11";
+    flake-utils.url = "github:numtide/flake-utils";
     nur-kapack = {
       url = "github:oar-team/nur-kapack/master";
-      inputs.nixpkgs.follows = "nixpkgs"; # tell kapack to use the nixpkgs that is defined above
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { self, nixpkgs, nur-kapack, flake-utils }:
