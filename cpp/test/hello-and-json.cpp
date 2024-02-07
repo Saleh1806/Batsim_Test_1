@@ -96,7 +96,7 @@ root_type Message;
     printf("\nSchema:\n###\n%s###\n\n", schema);
 
     std::string generated_json;
-    GenerateText(parser, fbb.GetBufferPointer(), &generated_json);
+    GenText(parser, fbb.GetBufferPointer(), &generated_json);
     printf("Manually crafted buffer as JSON:\n%s\n", generated_json.c_str());
 
 const char * json_msg = R"raw(

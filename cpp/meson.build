@@ -8,7 +8,7 @@ fs = import('fs')
 
 flatc = find_program('flatc', required: true)
 fbs_file = '../batprotocol.fbs'
-flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.project_build_root(), fbs_file)
+flatc_gen_cpp_cmd = run_command(flatc, '--cpp', '-o', meson.project_build_root(), fbs_file, check: true)
 if flatc_gen_cpp_cmd.returncode() != 0
   error('flatbuffers compiler (flatc) failed with the following output.\n' + flatc_gen_cpp_cmd.stdout().strip())
 endif

@@ -1,14 +1,14 @@
 { stdenv, lib
 , cppMesonDevBase
 , flatbuffers
-, meson, ninja, pkgconfig
+, meson, ninja, pkg-config
 , debug ? false
 , doCoverage ? false
 , werror ? false
 }:
 
 (cppMesonDevBase {
-  inherit stdenv lib meson ninja pkgconfig debug werror doCoverage;
+  inherit stdenv lib meson ninja pkg-config debug werror doCoverage;
   coverageGcnoGlob = "libbatprotocol-cpp.so.p/*.gcno";
 }).overrideAttrs(attrs: rec {
   name = "batprotocol-cpp";
