@@ -28,9 +28,7 @@
             }
           }
         ],
-        "storage_placement": [
-
-        ]
+        "storage_placement": []
       }
     },
     {
@@ -73,9 +71,7 @@
             }
           }
         ],
-        "storage_placement": [
-
-        ]
+        "storage_placement": []
       }
     },
     {
@@ -100,9 +96,7 @@
             }
           }
         ],
-        "storage_placement": [
-
-        ]
+        "storage_placement": []
       }
     }
   ]

@@ -7,10 +7,7 @@
       "event": {
         "job_id": "w0!0",
         "job": {
-          "computation_resource_request_type": "HostNumber",
-          "computation_resource_request": {
-            "host_number": 4
-          },
+          "resource_request": 4,
           "walltime": 3600.0,
           "extra_data": "",
           "rigid": true,

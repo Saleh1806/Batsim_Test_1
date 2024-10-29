@@ -7,10 +7,7 @@
       "event": {
         "job_id": "w0!1",
         "job": {
-          "computation_resource_request_type": "CoreNumber",
-          "computation_resource_request": {
-            "core_number": 16
-          },
+          "resource_request": 16,
           "walltime": -1.0,
           "extra_data": "\"application\": \"npb-lu\"",
           "rigid": false,

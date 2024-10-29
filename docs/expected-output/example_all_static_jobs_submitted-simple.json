@@ -4,8 +4,7 @@
     {
       "timestamp": 0.0,
       "event_type": "AllStaticJobsHaveBeenSubmittedEvent",
-      "event": {
-      }
+      "event": {}
     }
   ]
 }

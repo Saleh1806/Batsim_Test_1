@@ -8,11 +8,11 @@
         "call_me_later_id": "example_infinite_period",
         "when_type": "Periodic",
         "when": {
-          "start_time": 42.0,
-          "period": 10.0,
+          "period": 500,
+          "offset": 27,
+          "time_unit": "Millisecond",
           "mode_type": "Infinite",
-          "mode": {
-          }
+          "mode": {}
         }
       }
     }

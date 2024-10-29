@@ -8,8 +8,7 @@
         "profile": {
           "id": "dyn!ptask3",
           "profile_type": "ParallelTaskProfile",
-          "profile": {
-          }
+          "profile": {}
         }
       }
     }

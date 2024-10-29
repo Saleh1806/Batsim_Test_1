@@ -1,9 +1,9 @@
 {
-  "now": 0,
+  "now": 0.0,
   "events": [
     {
-      "timestamp": 0,
-      "event_type": "ExternalDecisionComponentHelloEvent",
+      "timestamp": 0.0,
+      "event_type": "EDCHelloEvent",
       "event": {
         "batprotocol_version": "0.1.0+unknown-please-define-me-properly",
         "decision_component_name": "cpp-unit-test",
@@ -20,7 +20,7 @@
         },
         "scheduling_constraints": {
           "compute_sharing": false,
-          "storage_sharing": false,
+          "storage_sharing": true,
           "job_allocation_validation_strategy": "MatchJobRequestExactly"
         }
       }

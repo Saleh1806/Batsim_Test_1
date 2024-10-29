@@ -5,16 +5,14 @@
       "timestamp": 0.0,
       "event_type": "CallMeLaterEvent",
       "event": {
-        "call_me_later_id": "example_finite_period",
+        "call_me_later_id": "example_infinite_period",
         "when_type": "Periodic",
         "when": {
-          "period": 20,
+          "period": 10,
           "offset": 0,
           "time_unit": "Second",
-          "mode_type": "FinitePeriodNumber",
-          "mode": {
-            "nb_periods": 5
-          }
+          "mode_type": "Infinite",
+          "mode": {}
         }
       }
     }

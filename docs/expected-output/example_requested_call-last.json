@@ -5,8 +5,8 @@
       "timestamp": 0.0,
       "event_type": "RequestedCallEvent",
       "event": {
-        "call_me_later_id": "example_one_shot",
-        "last_periodic_call": false
+        "call_me_later_id": "example_finite_periodic_last",
+        "last_periodic_call": true
       }
     }
   ]

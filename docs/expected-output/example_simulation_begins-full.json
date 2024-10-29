@@ -72,17 +72,22 @@
             "pstate": 0,
             "pstate_count": 1,
             "state": "IDLE",
-            "properties": [
-
-            ],
-            "zone_properties": [
-
-            ],
+            "properties": [],
+            "zone_properties": [],
             "core_count": 1,
             "computation_speed": [
               1000000000.0
             ]
           }
+        ],
+        "batsim_arguments": [
+          "batsim",
+          "-p",
+          "cluster_energy_128.xml",
+          "-w",
+          "test_energy_minimal_load0.json",
+          "-ebatres",
+          "--energy"
         ],
         "batsim_execution_context_json": "another JSON string",
         "workloads": [

@@ -12,24 +12,21 @@
           "host_ids": "0-3"
         },
         "data_accumulation_strategy_type": "NoProbeDataAccumulation",
-        "data_accumulation_strategy": {
-        },
+        "data_accumulation_strategy": {},
         "measurement_triggering_policy_type": "TemporalTriggerWrapper",
         "measurement_triggering_policy": {
           "temporal_trigger_type": "OneShot",
           "temporal_trigger": {
-            "time": 30.0
+            "time": 30,
+            "time_unit": "Second"
           }
         },
         "resources_aggregation_function_type": "ArithmeticMean",
-        "resources_aggregation_function": {
-        },
+        "resources_aggregation_function": {},
         "temporal_aggregation_function_type": "NoTemporalAggregation",
-        "temporal_aggregation_function": {
-        },
+        "temporal_aggregation_function": {},
         "emission_filtering_policy_type": "NoFiltering",
-        "emission_filtering_policy": {
-        }
+        "emission_filtering_policy": {}
       }
     }
   ]

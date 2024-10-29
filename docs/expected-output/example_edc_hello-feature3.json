@@ -1,21 +1,21 @@
 {
-  "now": 0,
+  "now": 0.0,
   "events": [
     {
-      "timestamp": 0,
-      "event_type": "ExternalDecisionComponentHelloEvent",
+      "timestamp": 0.0,
+      "event_type": "EDCHelloEvent",
       "event": {
         "batprotocol_version": "0.1.0+unknown-please-define-me-properly",
         "decision_component_name": "cpp-unit-test",
         "decision_component_version": "0.1.0",
         "decision_component_commit": "unknown",
         "requested_simulation_features": {
-          "dynamic_registration": false,
-          "profile_reuse": false,
-          "acknowledge_dynamic_jobs": false,
+          "dynamic_registration": true,
+          "profile_reuse": true,
+          "acknowledge_dynamic_jobs": true,
           "forward_profiles_on_job_submission": false,
           "forward_profiles_on_jobs_killed": false,
-          "forward_profiles_on_simulation_begins": true,
+          "forward_profiles_on_simulation_begins": false,
           "forward_unknown_external_events": false
         },
         "scheduling_constraints": {

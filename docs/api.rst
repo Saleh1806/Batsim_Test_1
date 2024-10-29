@@ -171,10 +171,10 @@ Job submitted
 
    .. group-tab:: JSON
 
-      .. literalinclude:: expected-output/example_job_submitted-host.json
+      .. literalinclude:: expected-output/example_job_submitted-simple.json
          :language: json
 
-      .. literalinclude:: expected-output/example_job_submitted-core.json
+      .. literalinclude:: expected-output/example_job_submitted-extra_data.json
          :language: json
 
       .. literalinclude:: expected-output/example_job_submitted-ghost.json
@@ -348,6 +348,21 @@ Probe data emitted
 Simulation management events
 ----------------------------
 
+Force simulation stop
+~~~~~~~~~~~~~~~~~~~~~
+
+.. tabs::
+
+   .. group-tab:: C++
+
+      .. literalinclude:: ../cpp/test/example_force_simulation_stop.cpp
+         :language: cpp
+
+   .. group-tab:: JSON
+
+      .. literalinclude:: expected-output/example_force_simulation_stop-simple.json
+         :language: json
+
 Call me later
 ~~~~~~~~~~~~~
 
@@ -363,7 +378,10 @@ Call me later
       .. literalinclude:: expected-output/example_call_me_later-one_shot.json
          :language: json
 
-      .. literalinclude:: expected-output/example_call_me_later-periodic.json
+      .. literalinclude:: expected-output/example_call_me_later-periodic_10s.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_call_me_later-periodic_500ms.json
          :language: json
 
       .. literalinclude:: expected-output/example_call_me_later-periodic_finite.json
@@ -397,37 +415,37 @@ External decision component hello
 
    .. group-tab:: JSON
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-simple.json
+      .. literalinclude:: expected-output/example_edc_hello-simple.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature1.json
+      .. literalinclude:: expected-output/example_edc_hello-feature1.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature2.json
+      .. literalinclude:: expected-output/example_edc_hello-feature2.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature3.json
+      .. literalinclude:: expected-output/example_edc_hello-feature3.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature4.json
+      .. literalinclude:: expected-output/example_edc_hello-feature4.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature5.json
+      .. literalinclude:: expected-output/example_edc_hello-feature5.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature6.json
+      .. literalinclude:: expected-output/example_edc_hello-feature6.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-feature7.json
+      .. literalinclude:: expected-output/example_edc_hello-feature7.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-compute_sharing.json
+      .. literalinclude:: expected-output/example_edc_hello-compute_sharing.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-no_storage_sharing.json
+      .. literalinclude:: expected-output/example_edc_hello-no_storage_sharing.json
          :language: json
 
-      .. literalinclude:: expected-output/example_external_decision_component_hello-job_alloc_validation_strategy.json
+      .. literalinclude:: expected-output/example_edc_hello-job_alloc_validation_strategy.json
          :language: json
 
 
@@ -504,6 +522,9 @@ Requested call
    .. group-tab:: JSON
 
       .. literalinclude:: expected-output/example_requested_call-simple.json
+         :language: json
+
+      .. literalinclude:: expected-output/example_requested_call-last.json
          :language: json
 
 All static jobs have been submitted

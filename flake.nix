@@ -48,6 +48,7 @@
           ci-batprotocol-cpp-werror-clang = callPackage pkgs functions.batprotocol-cpp ({ stdenv = pkgs.clangStdenv; werror = true; } // base-defs) release-options;
           ci-cpp-test = packages-debug-cov.cpp-test;
           ci-cpp-coverage-report = callPackage (pkgs // base-defs // packages-debug-cov) functions.cpp-coverage-report {} debug-cov-options;
+          sphinx-doc = pkgs.callPackage ./nix/sphinx-doc.nix {};
         };
 
         devShells = {

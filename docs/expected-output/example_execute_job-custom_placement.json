@@ -18,12 +18,8 @@
             ]
           }
         },
-        "profile_allocation_override": [
-
-        ],
-        "storage_placement": [
-
-        ]
+        "profile_allocation_override": [],
+        "storage_placement": []
       }
     },
     {
@@ -43,12 +39,8 @@
             ]
           }
         },
-        "profile_allocation_override": [
-
-        ],
-        "storage_placement": [
-
-        ]
+        "profile_allocation_override": [],
+        "storage_placement": []
       }
     }
   ]

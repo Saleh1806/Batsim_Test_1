@@ -13,9 +13,7 @@
             "strategy": "SpreadOverHostsFirst"
           }
         },
-        "profile_allocation_override": [
-
-        ],
+        "profile_allocation_override": [],
         "storage_placement": [
           {
             "storage_name": "pfs",
@@ -36,9 +34,7 @@
             "strategy": "SpreadOverHostsFirst"
           }
         },
-        "profile_allocation_override": [
-
-        ],
+        "profile_allocation_override": [],
         "storage_placement": [
           {
             "storage_name": "burst_buffer",
