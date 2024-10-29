@@ -7,7 +7,7 @@ using namespace batprotocol;
 // Create a one shot probe.
 void example_create_probe_one_shot(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3");
 
@@ -17,7 +17,8 @@ void example_create_probe_one_shot(batprotocol::MessageBuilder & builder)
 // Create a periodic probe.
 void example_create_probe_periodic(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_periodic(30.0, 5.0);
+    auto trigger = TemporalTrigger::make_periodic(30);
+    trigger->set_offset(5);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     auto links = std::vector<std::string>({
         "pfs",
@@ -34,7 +35,7 @@ void example_create_probe_periodic(batprotocol::MessageBuilder & builder)
 // Aggregate values over resources as a sum.
 void example_create_probe_resource_aggregation_sum(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_sum();
@@ -45,7 +46,7 @@ void example_create_probe_resource_aggregation_sum(batprotocol::MessageBuilder &
 // Aggregate values over resources as an arithmetic mean.
 void example_create_probe_resource_aggregation_arithmetic_mean(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_arithmetic_mean();
@@ -56,7 +57,7 @@ void example_create_probe_resource_aggregation_arithmetic_mean(batprotocol::Mess
 // Aggregate values over resources as a median.
 void example_create_probe_resource_aggregation_median(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_median();
@@ -67,7 +68,7 @@ void example_create_probe_resource_aggregation_median(batprotocol::MessageBuilde
 // Aggregate values over resources as a minimum.
 void example_create_probe_resource_aggregation_min(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_min();
@@ -78,7 +79,7 @@ void example_create_probe_resource_aggregation_min(batprotocol::MessageBuilder &
 // Aggregate values over resources as a maximum.
 void example_create_probe_resource_aggregation_max(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_max();
@@ -89,7 +90,7 @@ void example_create_probe_resource_aggregation_max(batprotocol::MessageBuilder &
 // Aggregate values over resources as a quantile function.
 void example_create_probe_resource_aggregation_quantile_func(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_one_shot(30.0);
+    auto trigger = TemporalTrigger::make_one_shot(30);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_resource_aggregation_as_quantile_function(0.25);
@@ -100,7 +101,8 @@ void example_create_probe_resource_aggregation_quantile_func(batprotocol::Messag
 // Set an emission filtering threshold.
 void example_create_probe_emission_filtering_threshold(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_periodic(30.0, 5.0);
+    auto trigger = TemporalTrigger::make_periodic(30);
+    trigger->set_offset(5);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .set_emission_filtering_as_threshold(1e6, fb::BooleanComparisonOperator_GreaterThanOrEqual);
@@ -111,7 +113,8 @@ void example_create_probe_emission_filtering_threshold(batprotocol::MessageBuild
 // Accumulate values over time as a sum, resetting the value at every period.
 void example_create_probe_accumulate_sum_reset(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_periodic(30.0, 5.0);
+    auto trigger = TemporalTrigger::make_periodic(30);
+    trigger->set_offset(5);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .enable_accumulation_with_reset(0.0, false, fb::CumulativeFunction_Sum);
@@ -122,7 +125,8 @@ void example_create_probe_accumulate_sum_reset(batprotocol::MessageBuilder & bui
 // Accumulate values over time as a sum, without reset at every period.
 void example_create_probe_accumulate_sum_no_reset(batprotocol::MessageBuilder & builder)
 {
-    auto trigger = TemporalTrigger::make_periodic(30.0, 5.0);
+    auto trigger = TemporalTrigger::make_periodic(30);
+    trigger->set_offset(5);
     auto create_probe = CreateProbe::make_temporal_triggerred(trigger);
     create_probe->set_resources_as_hosts("0-3")
                  .enable_accumulation_no_reset(true, fb::CumulativeFunction_Sum);

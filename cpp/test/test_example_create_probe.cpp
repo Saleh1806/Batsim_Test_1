@@ -47,7 +47,8 @@ TEST(example_create_probe, one_shot)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -85,8 +86,9 @@ TEST(example_create_probe, periodic)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_Periodic);
     auto periodic = trigger->temporal_trigger_as_Periodic();
     EXPECT_NE(periodic, nullptr);
-    EXPECT_EQ(periodic->start_time(), 30.0);
-    EXPECT_EQ(periodic->period(), 5.0);
+    EXPECT_EQ(periodic->period(), 30);
+    EXPECT_EQ(periodic->offset(), 5);
+    EXPECT_EQ(periodic->time_unit(), fb::TimeUnit_Second);
     EXPECT_EQ(periodic->mode_type(), fb::PeriodicMode_Infinite);
 
     write_test_mb(mb);
@@ -120,7 +122,8 @@ TEST(example_create_probe, resource_aggregation_sum)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -153,7 +156,8 @@ TEST(example_create_probe, resource_aggregation_arithmetic_mean)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -189,7 +193,8 @@ TEST(example_create_probe, resource_aggregation_median)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -225,7 +230,8 @@ TEST(example_create_probe, resource_aggregation_min)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -261,7 +267,8 @@ TEST(example_create_probe, resource_aggregation_max)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -297,7 +304,8 @@ TEST(example_create_probe, resource_aggregation_quantile_func)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_OneShot);
     auto one_shot = trigger->temporal_trigger_as_OneShot();
     EXPECT_NE(one_shot, nullptr);
-    EXPECT_EQ(one_shot->time(), 30.0);
+    EXPECT_EQ(one_shot->time(), 30);
+    EXPECT_EQ(one_shot->time_unit(), fb::TimeUnit_Second);
 
     write_test_mb(mb);
 }
@@ -334,8 +342,9 @@ TEST(example_create_probe, emission_filtering_threshold)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_Periodic);
     auto periodic = trigger->temporal_trigger_as_Periodic();
     EXPECT_NE(periodic, nullptr);
-    EXPECT_EQ(periodic->start_time(), 30.0);
-    EXPECT_EQ(periodic->period(), 5.0);
+    EXPECT_EQ(periodic->period(), 30);
+    EXPECT_EQ(periodic->offset(), 5);
+    EXPECT_EQ(periodic->time_unit(), fb::TimeUnit_Second);
     EXPECT_EQ(periodic->mode_type(), fb::PeriodicMode_Infinite);
 
     write_test_mb(mb);
@@ -376,8 +385,9 @@ TEST(example_create_probe, accumulate_sum_reset)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_Periodic);
     auto periodic = trigger->temporal_trigger_as_Periodic();
     EXPECT_NE(periodic, nullptr);
-    EXPECT_EQ(periodic->start_time(), 30.0);
-    EXPECT_EQ(periodic->period(), 5.0);
+    EXPECT_EQ(periodic->period(), 30);
+    EXPECT_EQ(periodic->offset(), 5);
+    EXPECT_EQ(periodic->time_unit(), fb::TimeUnit_Second);
     EXPECT_EQ(periodic->mode_type(), fb::PeriodicMode_Infinite);
 
     write_test_mb(mb);
@@ -415,8 +425,9 @@ TEST(example_create_probe, accumulate_sum_no_reset)
     EXPECT_EQ(trigger->temporal_trigger_type(), fb::TemporalTrigger_Periodic);
     auto periodic = trigger->temporal_trigger_as_Periodic();
     EXPECT_NE(periodic, nullptr);
-    EXPECT_EQ(periodic->start_time(), 30.0);
-    EXPECT_EQ(periodic->period(), 5.0);
+    EXPECT_EQ(periodic->period(), 30);
+    EXPECT_EQ(periodic->offset(), 5);
+    EXPECT_EQ(periodic->time_unit(), fb::TimeUnit_Second);
     EXPECT_EQ(periodic->mode_type(), fb::PeriodicMode_Infinite);
 
     write_test_mb(mb);

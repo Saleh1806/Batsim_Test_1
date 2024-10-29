@@ -519,10 +519,18 @@ table ProbeDataEmittedEvent {
 /// Simulation management events
 ///
 
+enum TimeUnit : byte {
+  Second
+, Millisecond
+}
+
 /// A temporal trigger that happens only once, at a given time.
 table OneShot {
   /// The point in time at which the event should occur.
-  time: float64;
+  time: uint64;
+
+  /// The time unit
+  time_unit: TimeUnit = Second;
 }
 
 table Infinite {}
@@ -537,11 +545,14 @@ union PeriodicMode {
 }
 
 table Periodic {
-  /// The point in time at which the first event should occur.
-  start_time: float64;
+  /// The _distance in time_ between two consecutive events.
+  period: uint64;
 
-  /// The duration between two consecutive events.
-  period: float64;
+  /// How measures should be offset from time 0.
+  offset: uint64 = 0;
+
+  /// The time unit in which period and offset are expressed
+  time_unit: TimeUnit = Second;
 
   mode: PeriodicMode;
 }

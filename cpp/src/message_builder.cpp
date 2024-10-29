@@ -941,7 +941,7 @@ flatbuffers::Offset<void> MessageBuilder::serialize_temporal_trigger(const std::
         BAT_ASSERT(false, "Internal inconsistency: should not be able to create untyped time specifiers");
     } break;
     case fb::TemporalTrigger_OneShot: {
-        return fb::CreateOneShot(*_builder, temporal_trigger->_time_point).Union();
+        return fb::CreateOneShot(*_builder, temporal_trigger->_time, temporal_trigger->_time_unit).Union();
     } break;
     case fb::TemporalTrigger_Periodic: {
         flatbuffers::Offset<void> periodic_mode_s;
@@ -957,7 +957,7 @@ flatbuffers::Offset<void> MessageBuilder::serialize_temporal_trigger(const std::
             periodic_mode_s = fb::CreateInfinite(*_builder).Union();
         }
 
-        return fb::CreatePeriodic(*_builder, temporal_trigger->_time_point, temporal_trigger->_period, periodic_mode, periodic_mode_s).Union();
+        return fb::CreatePeriodic(*_builder, temporal_trigger->_period, temporal_trigger->_offset, temporal_trigger->_time_unit, periodic_mode, periodic_mode_s).Union();
     } break;
     }
 
