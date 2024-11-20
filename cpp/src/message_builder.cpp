@@ -49,7 +49,7 @@ void MessageBuilder::clear(double now)
 
 void MessageBuilder::finish_message(double now)
 {
-    BAT_ENFORCE(now >= _current_time, "New time (%g) is before current time (%g), which is forbidden. The time at which your message is sent cannot be before the last event you added. Also make sure that you called clear() with a correct `now` value.", now, _current_time);
+    BAT_ENFORCE(now >= _current_time, "Bad call to finish_message: new time (%g) is before current time (%g), which is forbidden. The time at which your message is sent cannot be before the last event you added. Also make sure that you called clear() with a correct `now` value.", now, _current_time);
 
     auto msg = CreateMessageDirect(*_builder, now, &_events);
     _builder->Finish(msg);
@@ -58,7 +58,7 @@ void MessageBuilder::finish_message(double now)
 
 void MessageBuilder::set_current_time(double now)
 {
-    BAT_ENFORCE(now >= _current_time, "New time (%g) is before current time (%g), which is forbidden. Please add your events in chronological order. Also make sure that you called clear() with a correct `now` value.", now, _current_time);
+    BAT_ENFORCE(now >= _current_time, "Bad call to set_current_time: new time (%g) is before current time (%g), which is forbidden. Please add your events in chronological order. Also make sure that you called clear() with a correct `now` value.", now, _current_time);
     _current_time = now;
 }
 
