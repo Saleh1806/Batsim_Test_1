@@ -149,7 +149,7 @@ TEST(timestamp, INVALID_decreasing_events)
                 mb.set_current_time(time-1.0);
             }
             catch (const batprotocol::Error & e) {
-                EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^New time \([0-9]+\) is before current time \([0-9]+\), which is forbidden\..*)"));
+                EXPECT_THAT(e.what(), testing::MatchesRegex(R"(Bad call to set_current_time: new time \([0-9]+\) is before current time \([0-9]+\), which is forbidden\. Please add your events in chronological order\. Also make sure that you called clear\(\) with a correct `now` value\.)"));
                 throw;
             }
             catch(...) {
@@ -174,7 +174,7 @@ TEST(timestamp, INVALID_now_before_events)
                 mb.finish_message(time-1.0);
             }
             catch (const batprotocol::Error & e) {
-                EXPECT_THAT(e.what(), testing::MatchesRegex(R"(^New time \([0-9]+\) is before current time \([0-9]+\), which is forbidden\..*)"));
+                EXPECT_THAT(e.what(), testing::MatchesRegex(R"(Bad call to finish_message: new time \([0-9]+\) is before current time \([0-9]+\), which is forbidden\. The time at which your message is sent cannot be before the last event you added\. Also make sure that you called clear\(\) with a correct `now` value\.)"));
                 throw;
             }
             catch(...) {
