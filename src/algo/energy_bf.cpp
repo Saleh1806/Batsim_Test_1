@@ -739,7 +739,7 @@ void EnergyBackfilling::update_first_slice_taking_sleep_jobs_into_account(Ration
 
         IntervalSet wakable_machines_now, non_wakable_machines_now;
 
-        for (const auto mit : slice_it->allocated_jobs)
+        for (const auto& mit : slice_it->allocated_jobs)
         {
             const Job * job = mit.first;
             const IntervalSet & alloc = mit.second;
