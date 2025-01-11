@@ -2,7 +2,7 @@
 #include <list>
 #include <batprotocol.hpp>
 #include <intervalset.hpp>
-#include <nlohmann/json.hpp>
+#include <rapidjson/document.h>  // Inclusion de RapidJSON
 #include "batsim_edc.h"
 
 // Ajout de dépendances pour garantir que Sleeper soit disponible dans l'environnement d'exécution
@@ -11,7 +11,7 @@
 #endif
 
 using namespace batprotocol;
-using json = nlohmann::json;
+using namespace rapidjson;  // Utilisation de l'espace de noms RapidJSON
 
 struct SchedJob {
     std::string job_id;
@@ -53,10 +53,21 @@ uint8_t batsim_edc_init(const uint8_t * data, uint32_t size, uint32_t flags) {
 
     std::string init_string((const char *)data, static_cast<size_t>(size));
     try {
-        auto init_json = json::parse(init_string);
-        behavior = init_json["behavior"];
-        inter_stop_probe_delay = init_json["inter_stop_probe_delay"];
-    } catch (const json::exception & e) {
+        Document init_json;
+        init_json.Parse(init_string.c_str());
+
+        if (init_json.HasParseError()) {
+            throw std::runtime_error("Failed to parse JSON initialization string");
+        }
+
+        // Accès aux valeurs dans RapidJSON
+        if (init_json.HasMember("behavior") && init_json["behavior"].IsString()) {
+            behavior = init_json["behavior"].GetString();
+        }
+        if (init_json.HasMember("inter_stop_probe_delay") && init_json["inter_stop_probe_delay"].IsDouble()) {
+            inter_stop_probe_delay = init_json["inter_stop_probe_delay"].GetDouble();
+        }
+    } catch (const std::exception & e) {
         throw std::runtime_error("scheduler called with bad init string: " + std::string(e.what()));
     }
 
@@ -224,4 +235,3 @@ uint8_t batsim_edc_take_decisions(
     serialize_message(*mb, !format_binary, const_cast<const uint8_t **>(decisions), decisions_size);
     return 0;
 }
-
