@@ -1,4 +1,4 @@
-#include "power_probe.hpp"
+#include "PowerProbe.hpp"
 #include <stdexcept>
 #include <cstdio>
 #include <asprintf.h>
