@@ -68,6 +68,7 @@ src = [
     'src/algo/sequencer.hpp',
     'src/algo/sequencer_dvfs.cpp',
     'src/algo/sequencer_dvfs.hpp',
+    'src/algo/batprotocol.hpp',
     'src/algo/PowerProbe.cpp',
     'src/algo/PowerProbe.hpp',
     'src/algo/sleeper.cpp',
