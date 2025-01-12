@@ -9,7 +9,7 @@
 #include "../locality.hpp"
 
 // Inclure les bibliothèques nécessaires
-#include <batprotocol.hpp>
+#include "batprotocol.hpp"
 #include <intervalset.hpp>
 #include <rapidjson/document.h>  // Inclusion de RapidJSON
 
