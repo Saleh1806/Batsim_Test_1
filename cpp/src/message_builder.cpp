@@ -88,7 +88,7 @@ const std::string * MessageBuilder::buffer_as_json()
 {
     BAT_ENFORCE(_is_json_enabled, "Cannot call buffer_as_json() while json is disabled. Please enable json when constructing your MessageBuilder.");
     BAT_ENFORCE(_is_buffer_finished, "Cannot call buffer_as_json() while buffer is not finished. Please call finish_message() first.");
-    GenText(*_parser, _builder->GetBufferPointer(), &_json_buffer);
+    gettext(*_parser, _builder->GetBufferPointer(), &_json_buffer);
     return &_json_buffer;
 }
 
