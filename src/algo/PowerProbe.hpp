@@ -8,10 +8,10 @@
 #include "../json_workload.hpp"
 #include "../locality.hpp"
 
-// Inclure les bibliothèques nécessaires
-#include "batprotocol.hpp"
-#include <intervalset.hpp>
-#include <rapidjson/document.h>  // Inclusion de RapidJSON
+// Inclure les bibliothèques nécessaires depuis l'environnement flake.nix
+#include <batprotocol/batprotocol.hpp>  // Inclus depuis le package batprotocol
+#include <intervalset/intervalset.hpp>  // Inclus depuis le package intervalset
+#include <rapidjson/document.h>         // Inclus depuis RapidJSON
 
 #ifdef USE_SLEEPER
 #include "sleeper.hpp"  // Si Sleeper est nécessaire à l'initialisation
@@ -69,4 +69,3 @@ private:
     Sleeper *sleeper;
     #endif
 };
-
