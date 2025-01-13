@@ -14,6 +14,7 @@ libzmq_dep = dependency('libzmq')
 loguru_dep = dependency('loguru')
 intervalset_dep = dependency('intervalset')
 gmpxx_dep = dependency('gmpxx')
+batprotocol_dep = dependency('batprotocol')
 
 batsched_deps = [
     boost_dep,
@@ -21,7 +22,8 @@ batsched_deps = [
     libzmq_dep,
     loguru_dep,
     intervalset_dep,
-    gmpxx_dep
+    gmpxx_dep,
+    batprotocol_dep
 ]
 
 # Source files
