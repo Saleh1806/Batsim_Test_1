@@ -12,9 +12,15 @@
       inputs.nur-kapack.follows = "nur-kapack";
       inputs.flake-utils.follows = "flake-utils";
     };
+    batprotocol = {
+      url = "git+https://framagit.org/batsim/batprotocol";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nur-kapack.follows = "nur-kapack";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
-  outputs = { self, nixpkgs, nur-kapack, flake-utils, intervalset }:
+  outputs = { self, nixpkgs, nur-kapack, flake-utils, intervalset, batprotocol }:
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -23,11 +29,13 @@
           debug = false;
           doCoverage = false;
           intervalset = intervalset.packages-release.${system}.intervalset;
+          batprotocol-cpp = batprotocol.packages-release.${system}.batprotocol-cpp;
         };
         debug-options = {
           debug = true;
           doCoverage = false;
           intervalset = intervalset.packages-debug.${system}.intervalset;
+          batprotocol-cpp = batprotocol.packages-debug.${system}.batprotocol-cpp;
         };
         debug-cov-options = debug-options // {
           doCoverage = true;
@@ -56,5 +64,3 @@
       }
     );
 }
-
-
